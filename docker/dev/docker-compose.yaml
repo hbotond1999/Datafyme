@@ -29,6 +29,7 @@ services:
           timeout: 30s
           retries: 10
 
+# nem végleges még, inkább localban indítsd el a python manage.py runserver
   backend:
     image: report_assistant/backend
     restart: always
