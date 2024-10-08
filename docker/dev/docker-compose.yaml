@@ -11,7 +11,7 @@ services:
         - ./mockdb:/var/lib/postgresql/data
 
   neo4j:
-      image: neo4j:5.11
+      image: neo4j:5.24
       ports:
         - "7687:7687"
         - "7474:7474"
