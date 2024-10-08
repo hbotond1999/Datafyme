@@ -9,3 +9,24 @@ services:
       volumes:
         - ./mock-db/init.sql:/docker-entrypoint-initdb.d/init.sql
         - db:/var/lib/postgresql/data
+        -
+  neo4j:
+      image: neo4j:5.11
+      ports:
+        - "7687:7687"
+        - "7474:7474"
+      volumes:
+        - ./neo4j/data:/data
+      environment:
+        - NEO4J_PLUGINS=["apoc"]
+        - NEO4J_db_tx__log_rotation_retention__policy=false
+        - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      env_file:
+        - ./neo4j/.env
+      healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1"]
+          interval: 15s
+          timeout: 30s
+          retries: 10
+      networks:
+        - net
