@@ -28,3 +28,15 @@ services:
           interval: 15s
           timeout: 30s
           retries: 10
+
+  backend:
+    image: report_assistant/backend
+    restart: always
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: poetry run gunicorn reportassistant.wsgi:application -w 4 --bind 0.0.0.0:8000
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
