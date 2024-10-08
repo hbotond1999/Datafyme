@@ -1,0 +1,43 @@
+services:
+  mock-db:
+      image: postgres:17
+      restart: always
+      ports:
+        - "5432:5432"
+      env_file:
+        - ./mockdb/.env
+      volumes:
+        - ./mockdb/init.sql:/docker-entrypoint-initdb.d/init.sql
+        - ./mockdb/data:/var/lib/postgresql/data
+
+  neo4j:
+      image: neo4j:5.24
+      ports:
+        - "7687:7687"
+        - "7474:7474"
+      volumes:
+        - ./neo4j/data:/data
+      environment:
+        - NEO4J_PLUGINS=["apoc"]
+        - NEO4J_db_tx__log_rotation_retention__policy=false
+        - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      env_file:
+        - ./neo4j/.env
+      healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider localhost:7474 || exit 1"]
+          interval: 15s
+          timeout: 30s
+          retries: 10
+
+# nem végleges még, inkább localban indítsd el a python manage.py runserver
+  backend:
+    image: report_assistant/backend
+    restart: always
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: poetry run gunicorn reportassistant.wsgi:application -w 4 --bind 0.0.0.0:8000
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
