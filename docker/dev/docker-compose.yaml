@@ -5,10 +5,10 @@ services:
       ports:
         - "5432:5432"
       env_file:
-        - .mock-db/.env
+        - ./mockdb/.env
       volumes:
-        - ./mock-db/init.sql:/docker-entrypoint-initdb.d/init.sql
-        - mock-db:/var/lib/postgresql/data
+        - ./mockdb/init.sql:/docker-entrypoint-initdb.d/init.sql
+        - ./mockdb:/var/lib/postgresql/data
 
   neo4j:
       image: neo4j:5.11
