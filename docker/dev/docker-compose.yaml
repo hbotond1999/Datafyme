@@ -8,7 +8,7 @@ services:
         - .mock-db/.env
       volumes:
         - ./mock-db/init.sql:/docker-entrypoint-initdb.d/init.sql
-        - db:/var/lib/postgresql/data
+        - mock-db:/var/lib/postgresql/data
 
   neo4j:
       image: neo4j:5.11
