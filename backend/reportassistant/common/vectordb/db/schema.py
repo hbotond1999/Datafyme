@@ -1,7 +1,6 @@
 import logging
 
-from pymilvus import FieldSchema, DataType, CollectionSchema
-
+from pymilvus import FieldSchema, DataType, CollectionSchema, MilvusClient
 
 from common.vectordb.db.client import get_client
 from common.vectordb.embeddings import BgeM3EmbeddingsModel
@@ -35,11 +34,14 @@ def create_collection(collection_name: str):
             # Create the collection using the client
             client.create_collection(collection_name, schema=schema)
 
-            client.add_index(field_name="sparse_vector", metric_type="IP", index_type="SPARSE_INVERTED_INDEX")
-            client.add_index(field_name="dense_vector",  metric_type="IP", index_type="FLAT")
+            index_sv_params = MilvusClient.prepare_index_params()
+            index_sv_params.add_index(field_name="sparse_vector", metric_type="IP", index_type="SPARSE_INVERTED_INDEX")
 
-            # Load the collection into memory
-            client.load_collection(collection_name)
+            client.create_index(collection_name=collection_name, index_params=index_sv_params)
+
+            index_dv_params = MilvusClient.prepare_index_params()
+            index_dv_params.add_index(field_name="dense_vector",  metric_type="IP", index_type="FLAT")
+            client.create_index(collection_name=collection_name, index_params=index_dv_params)
 
         except Exception as e:
             logger.error(f"Error during create {collection_name} collection: {str(e)}")
