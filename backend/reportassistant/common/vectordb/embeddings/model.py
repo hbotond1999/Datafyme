@@ -1,6 +1,6 @@
 from milvus_model.hybrid.bge_m3 import BGEM3EmbeddingFunction
 
-from reportassistant.common.vectordb.embeddings.schema import EmbeddingsResult
+from common.vectordb.embeddings.schema import EmbeddingsResult
 
 
 from typing import List
