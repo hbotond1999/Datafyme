@@ -10,6 +10,15 @@ from common.vectordb.embeddings import BgeM3EmbeddingsModel
 logger = logging.getLogger(__name__)
 
 def insert_docs_to_collection(table_docs: List[TableDocument], collection_name: str = COLLECTION_NAME):
+    """
+    Insert table use cases to vector database
+    Args:
+        table_docs (List[TableDocument]): A list of table use cases to be inserted.
+        collection_name (str, optional): The name of the collection into which the documents
+
+    Raises:
+        Exception: Re-raises any exception encountered during the insertion process.
+    """
     try:
         Collection(collection_name).insert(convert_to_milvus_data(table_docs))
     except Exception as e:
