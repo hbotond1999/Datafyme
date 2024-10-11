@@ -1,8 +1,9 @@
 import logging
+from typing import List
 
-from pymilvus import FieldSchema, DataType, CollectionSchema, MilvusClient
+from attr import dataclass
+from pymilvus import FieldSchema, DataType, CollectionSchema, MilvusClient, Collection
 
-from common.vectordb.db.client import get_client
 from common.vectordb.embeddings import BgeM3EmbeddingsModel
 
 logger = logging.getLogger(__name__)
@@ -25,24 +26,44 @@ def create_collection(collection_name: str):
         FieldSchema(name="schema_name", dtype=DataType.VARCHAR, max_length=2048),
         FieldSchema(name="table_name", dtype=DataType.VARCHAR, max_length=2048),
     ]
+    schema = CollectionSchema(fields, "")
+    col_name = collection_name
 
-    with get_client() as client:
-        try:
-            # Create the collection schema
-            schema = CollectionSchema(fields, description="Table use cases")
+    col = Collection(col_name, schema)
 
-            # Create the collection using the client
-            client.create_collection(collection_name, schema=schema)
+    sparse_index = {"index_type": "SPARSE_INVERTED_INDEX", "metric_type": "IP"}
+    col.create_index("sparse_vector", sparse_index)
+    dense_index = {"index_type": "FLAT", "metric_type": "IP"}
+    col.create_index("dense_vector", dense_index)
+    col.load()
 
-            index_sv_params = MilvusClient.prepare_index_params()
-            index_sv_params.add_index(field_name="sparse_vector", metric_type="IP", index_type="SPARSE_INVERTED_INDEX")
 
-            client.create_index(collection_name=collection_name, index_params=index_sv_params)
+@dataclass
+class TableDocument:
+    text: str
+    database_name: str
+    schema_name: str
+    table_name: str
+    distance: float = None
 
-            index_dv_params = MilvusClient.prepare_index_params()
-            index_dv_params.add_index(field_name="dense_vector",  metric_type="IP", index_type="FLAT")
-            client.create_index(collection_name=collection_name, index_params=index_dv_params)
+def convert_to_milvus_data(table_docs: List[TableDocument]):
+    texts = []
+    database_names = []
+    schema_names = []
+    table_names = []
+    for table_doc in table_docs:
+        texts.append(table_doc.text)
+        database_names.append(table_doc.database_name)
+        schema_names.append(table_doc.schema_name)
+        table_names.append(table_doc.table_name)
 
-        except Exception as e:
-            logger.error(f"Error during create {collection_name} collection: {str(e)}")
-            raise e
+    result = BgeM3EmbeddingsModel.create_sparse_dense_vectors(texts)
+    return [
+        texts,
+        result.sparse_vectors,
+        result.dense_vectors,
+        database_names,
+        schema_names,
+        table_names
+    ]
+

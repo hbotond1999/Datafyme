@@ -123,6 +123,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -130,10 +131,12 @@ LOGGING = {
         "verbose": {
             "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
             "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",  # Időpont formátum
         },
         "simple": {
-            "format": "{levelname} {message}",
+            "format": "{levelname} {asctime} {message}",
             "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
     "handlers": {
@@ -141,16 +144,24 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "simple",
-        }
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "django_app.log",
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "django": {
-            "handlers": ["console"],
+            "handlers": ["console", "file"],
+            "level": "INFO",
             "propagate": True,
         },
         "reportassistant.custom": {
-            "handlers": ["console"],
-            "level": "INFO"
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }
