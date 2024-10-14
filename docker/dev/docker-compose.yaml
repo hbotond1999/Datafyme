@@ -7,7 +7,7 @@ services:
       env_file:
         - ./mockdb/.env
       volumes:
-        - ./mockdb/init.sql:/docker-entrypoint-initdb.d/init.sql
+        - ./mockdb/dataset:/docker-entrypoint-initdb.d
         - ./mockdb/data:/var/lib/postgresql/data
 
   neo4j:
