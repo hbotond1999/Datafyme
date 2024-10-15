@@ -1,7 +1,6 @@
 import dataclasses
 
 from django.http import JsonResponse
-from django.template.backends.django import reraise
 
 from db_configurator.models import DatabaseSource
 from dbloader.services.utils.db_schema.schema_extractor import DatabaseSchemaExtractor
