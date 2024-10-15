@@ -4,7 +4,7 @@ from typing import List
 from common.db.postgres import PostgresDatabaseManager
 from db_configurator.models import DatabaseSource
 from dbloader.services.utils.db_schema.abc import SchemaExtractor
-from dbloader.services.utils.db_schema.types import TableSchema, Column  # Ensure Column is imported
+from dbloader.services.utils.db_schema.types import TableSchema, Column
 
 logger = logging.getLogger(__name__)
 
