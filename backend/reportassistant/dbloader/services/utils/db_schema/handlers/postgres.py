@@ -45,7 +45,7 @@ class PostgresSchemaExtractor(SchemaExtractor):
                     Column(
                         name=row['column_name'],
                         data_type=row['data_type'],
-                        nullable=(row['is_nullable'] == 'YES')
+                        nullable=row['is_nullable'] == 'YES'
                     ) for row in result
                 ]
 
@@ -56,7 +56,7 @@ class PostgresSchemaExtractor(SchemaExtractor):
 
         except Exception as e:
             logger.error(f"An error occurred while fetching DDL for table {table_name}: {e}")
-            raise
+            raise e
 
     def get_table_names_with_schema(self) -> List[str]:
         try:
@@ -75,7 +75,7 @@ class PostgresSchemaExtractor(SchemaExtractor):
 
         except Exception as e:
             logger.error(f"An error occurred while fetching table names: {e}")
-            raise
+            raise e
 
     def get_tables_schemas(self) -> List[TableSchema]:
         try:
@@ -91,4 +91,4 @@ class PostgresSchemaExtractor(SchemaExtractor):
 
         except Exception as e:
             logger.error(f"An error occurred while fetching DDL for all tables: {e}")
-            return []
+            raise e
