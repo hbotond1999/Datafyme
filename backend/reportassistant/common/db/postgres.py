@@ -2,7 +2,7 @@ import psycopg2
 import logging
 from typing import Optional, List, Any
 
-from psycopg2.extras import RealDictCursor, DictCursor
+from psycopg2.extras import RealDictCursor
 
 logger = logging.getLogger(__name__)
 
