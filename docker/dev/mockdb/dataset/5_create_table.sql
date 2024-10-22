@@ -5,5 +5,7 @@ CREATE TABLE fulfillment.movements (
 	product_id varchar(50) NULL,
 	quantity int4 NULL,
 	movement_date varchar(50) NULL,
-	dolgozo_id varchar(50) NULL
+	dolgozo_id varchar(50) NULL,
+	PRIMARY KEY(movement_id),
+    CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES fulfillment.products(product_id)
 );

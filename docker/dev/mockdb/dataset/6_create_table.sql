@@ -5,5 +5,7 @@ CREATE TABLE fulfillment.orders (
 	closing_date varchar(50) NULL,
 	company_id varchar(50) NULL,
 	quantity int4 NULL,
-	location_id varchar(50) NULL
+	location_id varchar(50) NULL,
+	PRIMARY KEY(order_id),
+    CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES fulfillment.products(product_id)
 );
