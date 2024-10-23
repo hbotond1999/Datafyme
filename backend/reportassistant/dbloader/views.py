@@ -26,4 +26,6 @@ def loader(request):
     extractor = DatabaseSchemaExtractor(datasource)
     table_names = extractor.get_table_names_with_schema()
     tables_schemas = extractor.get_tables_schemas()
-    return JsonResponse(data={"names": table_names, "ddls": [dataclasses.asdict(t) for t in tables_schemas]}, safe=False)
+    database_relations = extractor.get_relations()
+    return JsonResponse(data={"names": table_names, "ddls": [dataclasses.asdict(t) for t in tables_schemas],
+                              "relations": [dataclasses.asdict(t) for t in database_relations]}, safe=False)

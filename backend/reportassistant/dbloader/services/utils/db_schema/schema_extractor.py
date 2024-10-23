@@ -4,7 +4,7 @@ from typing import List
 from db_configurator.models import DatabaseSource, DBType
 from dbloader.services.utils.db_schema.abc import SchemaExtractor
 from dbloader.services.utils.db_schema.handlers import HANDLER
-from dbloader.services.utils.db_schema.types import TableSchema
+from dbloader.services.utils.db_schema.types import TableSchema, Relation
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +30,16 @@ class DatabaseSchemaExtractor(SchemaExtractor):
             logger.error(f"An error occurred while getting DDL for table {table_name}: {e}")
             raise e
 
-
     def get_tables_schemas(self) -> List[TableSchema]:
         try:
             return self.handler.get_tables_schemas()
+        except Exception as e:
+            logger.error(f"An error occurred while getting tables DDL: {e}")
+            raise e
+
+    def get_relations(self) -> List[Relation]:
+        try:
+            return self.handler.get_relations()
         except Exception as e:
             logger.error(f"An error occurred while getting tables DDL: {e}")
             raise e
