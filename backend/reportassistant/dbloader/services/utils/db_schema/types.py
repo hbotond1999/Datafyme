@@ -1,3 +1,4 @@
+import dataclasses
 from dataclasses import dataclass
 from typing import List
 
@@ -12,3 +13,6 @@ class TableSchema:
     name: str
     schema: str
     columns: List[Column]
+
+    def to_dict(self):
+        return dataclasses.asdict(self)

@@ -4,6 +4,7 @@ from django.http import JsonResponse
 
 from db_configurator.models import DatabaseSource
 from dbloader.services.utils.db_schema.schema_extractor import DatabaseSchemaExtractor
+from dbloader.services.vector_loader.loader import VectorLoader
 
 
 # Create your views here.
@@ -26,4 +27,5 @@ def loader(request):
     extractor = DatabaseSchemaExtractor(datasource)
     table_names = extractor.get_table_names_with_schema()
     tables_schemas = extractor.get_tables_schemas()
-    return JsonResponse(data={"names": table_names, "ddls": [dataclasses.asdict(t) for t in tables_schemas]}, safe=False)
+    docs = VectorLoader(tables_schemas, datasource.name).create_docs()
+    return JsonResponse(data={"names": table_names, "docs": [doc.model_dump() for doc in docs]}, safe=False)
