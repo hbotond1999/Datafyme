@@ -8,6 +8,8 @@ from dbloader.services.vector_loader.loader import VectorLoader
 
 from common.graph_db.graph_db import Neo4JInstance
 
+from common.graph_db.graph_db import Neo4JInstance
+
 
 # Create your views here.
 # request handlers: request -> response
