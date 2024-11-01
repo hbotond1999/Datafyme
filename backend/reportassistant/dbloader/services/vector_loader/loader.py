@@ -45,7 +45,7 @@ class VectorLoader:
         table_docs = await asyncio.gather(*tasks)
         return table_docs
 
-    async def load(self) -> None:
+    def load(self) -> None:
         """
         Loads table documentations data into vector database.
         Args:
@@ -55,7 +55,10 @@ class VectorLoader:
             None
         """
         data = []
-        table_docs = await self.create_docs()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        table_docs = loop.run_until_complete(self.create_docs())
+        loop.close()
         for table_doc in table_docs:
             data.append(TableDocument(
                 text=table_doc.table_description,
