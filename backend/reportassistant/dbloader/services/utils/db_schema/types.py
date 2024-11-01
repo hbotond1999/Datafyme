@@ -19,6 +19,7 @@ class TableSchema:
     def to_dict(self):
         return dataclasses.asdict(self)
 
+
 @dataclass
 class Relation:
     schema: str
@@ -27,3 +28,10 @@ class Relation:
     column_name: str
     foreign_table_name: str
     foreign_column_name: str
+
+
+@dataclass
+class TablePreview:
+    schema: str
+    table_name: str
+    markdown_preview: str

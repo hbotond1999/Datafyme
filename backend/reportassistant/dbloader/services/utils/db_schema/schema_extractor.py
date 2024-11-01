@@ -4,7 +4,7 @@ from typing import List
 from db_configurator.models import DatabaseSource, DBType
 from dbloader.services.utils.db_schema.abc import SchemaExtractor
 from dbloader.services.utils.db_schema.handlers import HANDLER
-from dbloader.services.utils.db_schema.types import TableSchema, Relation
+from dbloader.services.utils.db_schema.types import TableSchema, Relation, TablePreview
 
 logger = logging.getLogger(__name__)
 
@@ -41,5 +41,12 @@ class DatabaseSchemaExtractor(SchemaExtractor):
         try:
             return self.handler.get_relations()
         except Exception as e:
-            logger.error(f"An error occurred while getting tables DDL: {e}")
+            logger.error(f"An error occurred while getting table relations: {e}")
+            raise e
+
+    def get_table_previews(self) -> List[TablePreview]:
+        try:
+            return self.handler.get_table_previews()
+        except Exception as e:
+            logger.error(f"An error occurred while getting table previews: {e}")
             raise e

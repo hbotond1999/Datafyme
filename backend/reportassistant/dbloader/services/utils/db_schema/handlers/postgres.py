@@ -1,10 +1,11 @@
 import logging
 from typing import List
 
+import pandas as pd
 from common.db.postgres import PostgresDatabaseManager
 from db_configurator.models import DatabaseSource
 from dbloader.services.utils.db_schema.abc import SchemaExtractor
-from dbloader.services.utils.db_schema.types import TableSchema, Column, Relation
+from dbloader.services.utils.db_schema.types import TableSchema, Column, Relation, TablePreview
 
 logger = logging.getLogger(__name__)
 
@@ -130,4 +131,47 @@ class PostgresSchemaExtractor(SchemaExtractor):
                 return []
         except Exception as e:
             logger.error(f"An error occurred while fetching table names: {e}")
+            raise e
+
+    def get_table_previews(self):
+        try:
+            # Fetch all table names with schema
+            table_names = self.get_table_names_with_schema()
+            table_list = []
+
+            for table_name in table_names:
+                table = self.preview(table_name)
+                table_list.append(table)
+
+            return table_list
+
+        except Exception as e:
+            logger.error(f"An error occurred while fetching preview for all tables: {e}")
+            raise e
+
+    def preview(self, table_name: str):
+        try:
+            schema, table = table_name.split('.')
+
+            # Query to get column definitions for the specified table
+            query = f"""
+            SELECT 
+                *
+            FROM {schema}.{table}
+            LIMIT 10;
+            """
+
+            # Execute the query
+            result = self.db_manager.execute_query(query)
+
+            if result and isinstance(result, list):
+                result_df = pd.DataFrame(result)
+                markdown_table = result_df.to_markdown(index=False)
+                return TablePreview(schema=schema, table_name=table, markdown_preview=markdown_table)
+            else:
+                logger.warning(f"No columns found for table {table_name}")
+                raise Exception(f"No columns found for table {table_name}")
+
+        except Exception as e:
+            logger.error(f"An error occurred while fetching preview for table {table_name}: {e}")
             raise e
