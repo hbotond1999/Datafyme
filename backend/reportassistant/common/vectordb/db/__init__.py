@@ -12,7 +12,7 @@ load_dotenv()
 
 connections.connect("default", uri=os.getenv("VECTORDB_URI"), token=os.getenv("VECTORDB_AUTH"))
 
-COLLECTION_NAME = "TableUseCases"
+COLLECTION_NAME = "TablesDocs"
 
 
 if not utility.has_collection(COLLECTION_NAME):

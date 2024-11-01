@@ -2,6 +2,9 @@ from typing import List
 
 from langchain.chains.base import Chain
 
+from common.vectordb.db import create_collection, COLLECTION_NAME
+from common.vectordb.db.schema import TableDocument
+from common.vectordb.db.utils import insert_docs_to_collection, delete_docs_from_collection
 from dbloader.services.utils.db_schema.types import TableSchema
 from dbloader.services.vector_loader.ai.doc_agent import create_doc_agent
 from dbloader.services.vector_loader.ai.response import TableDocumentation
@@ -36,5 +39,37 @@ class VectorLoader:
         return table_docs
 
     def load(self) -> None:
+        """
+        Loads table documentations data into vector database.
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        data = []
         table_docs = self.create_docs()
-        print(table_docs)
+        for table_doc in table_docs:
+            data.append(TableDocument(
+                text=table_doc.table_description,
+                table_name=table_doc.table_name,
+                database_name= table_doc.database_name,
+                schema_name=table_doc.schema_name)
+            )
+
+            for question in table_doc.common_queries:
+                data.append(TableDocument(
+                    text=question,
+                    table_name=table_doc.table_name,
+                    database_name= table_doc.database_name,
+                    schema_name=table_doc.schema_name)
+                )
+            for use_case in table_doc.use_cases:
+                data.append(TableDocument(
+                    text=use_case,
+                    table_name=table_doc.table_name,
+                    database_name=table_doc.database_name,
+                    schema_name=table_doc.schema_name)
+                )
+        delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_name", value=self.db_name)
+        insert_docs_to_collection(data, COLLECTION_NAME)

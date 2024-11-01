@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Union
 
 from pymilvus import Collection, AnnSearchRequest, RRFRanker
 
@@ -61,3 +61,18 @@ def hybrid_search(query: str, collection_name: str, limit: int = 50):
             )
         )
     return sorted(result, key=lambda item: item.distance, reverse=False)
+
+
+def delete_docs_from_collection(column_name: str, value: Union[str, int], collection_name: str):
+    """
+    Args:
+        column_name: The name of the column to filter the documents by.
+        value: The value to match in the specified column which determines the documents to delete. Can be a string or an integer.
+        collection_name: The name of the collection from which documents will be deleted.
+
+    """
+    col = Collection(collection_name)
+    if isinstance(value,str):
+        col.delete(f"""{column_name} in ["{value}"]""")
+    elif isinstance(value, int):
+        col.delete(f"""{column_name} in [{value}]""")
