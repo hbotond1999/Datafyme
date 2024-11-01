@@ -27,5 +27,5 @@ def loader(request):
     extractor = DatabaseSchemaExtractor(datasource)
     table_names = extractor.get_table_names_with_schema()
     tables_schemas = extractor.get_tables_schemas()
-    docs = VectorLoader(tables_schemas, datasource.name).create_docs()
-    return JsonResponse(data={"names": table_names, "docs": [doc.model_dump() for doc in docs]}, safe=False)
+    VectorLoader(tables_schemas, datasource.name).load()
+    return JsonResponse(data={"names": table_names}, safe=False)
