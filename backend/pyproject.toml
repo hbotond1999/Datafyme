@@ -15,6 +15,8 @@ python-dotenv = "^1.0.1"
 pymilvus = {extras = ["model"], version = "^2.4.7"}
 psycopg2 = "^2.9.9"
 neo4j = "^5.25.0"
+pandas = "^2.2.3"
+tabulate = "^0.9.0"
 
 [tool.poetry.dev-dependencies]
 

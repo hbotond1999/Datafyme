@@ -5,8 +5,7 @@ from django.http import JsonResponse, HttpResponse
 from db_configurator.models import DatabaseSource
 from dbloader.services.utils.db_schema.schema_extractor import DatabaseSchemaExtractor
 from dbloader.services.vector_loader.loader import VectorLoader
-
-from common.graph_db.graph_db import Neo4JInstance
+from dbloader.services.graph_loader.relation_finder import RelationFinder
 
 from common.graph_db.graph_db import Neo4JInstance
 
@@ -58,7 +57,13 @@ def create_relation_graph(request):
     extractor = DatabaseSchemaExtractor(datasource)
     database_relations = extractor.get_relations()
 
-    relations = [dataclasses.asdict(t) for t in database_relations]
+    defined_relations = [dataclasses.asdict(t) for t in database_relations]
+
+    table_previews = extractor.get_table_previews()
+    found_relations = RelationFinder(table_previews).find_relation()
+    found_relations = [rel.model_dump() for rel in found_relations.relations]
+
+    relations = defined_relations + found_relations
     if relations:
         table_foreign_pairs = []
         for relation in relations:
@@ -67,7 +72,10 @@ def create_relation_graph(request):
                 foreign_table_name = relation.get("foreign_table_name")
 
                 if table_name and foreign_table_name:
-                    table_foreign_pairs.append({"table_name": table_name, "foreign_table_name": foreign_table_name})
+                    edge = {"table_name": table_name, "foreign_table_name": foreign_table_name}
+
+                    if edge not in table_foreign_pairs:
+                        table_foreign_pairs.append(edge)
 
     else:
         return HttpResponse("There's no relation in database")
