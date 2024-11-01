@@ -8,7 +8,7 @@ from dbloader.services.vector_loader.loader import VectorLoader
 
 
 # Create your views here.
-def loader(request):
+async def loader(request):
     datasource, created = DatabaseSource.objects.get_or_create(
         name="postgres",
         defaults={
@@ -27,5 +27,5 @@ def loader(request):
     extractor = DatabaseSchemaExtractor(datasource)
     table_names = extractor.get_table_names_with_schema()
     tables_schemas = extractor.get_tables_schemas()
-    VectorLoader(tables_schemas, datasource.name).load()
+    await VectorLoader(tables_schemas, datasource.name).load()
     return JsonResponse(data={"names": table_names}, safe=False)

@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 
 from langchain.chains.base import Chain
@@ -23,22 +24,28 @@ class VectorLoader:
         self.documentation_agent = create_doc_agent()
         self.db_name = db_name
 
-    def create_docs(self) -> List[TableDocumentation]:
+    async def create_doc(self, table_schema):
+        table_doc: TableDocumentation = await self.documentation_agent.ainvoke({"table_schema": table_schema.to_dict()})
+        table_doc.table_name = table_schema.name
+        table_doc.schema_name = table_schema.schema
+        table_doc.database_name = self.db_name
+
+        return table_doc
+
+
+    async def create_docs(self) -> List[TableDocumentation]:
         """
         Creates and returns documentation for each table schema in the list of table schemas.
 
         :return: List of generated documentation for each table schema.
         """
-        table_docs = []
-        for table_schema in self.table_schemas:
-            table_doc: TableDocumentation = self.documentation_agent.invoke({"table_schema": table_schema.to_dict()})
-            table_doc.table_name = table_schema.name
-            table_doc.schema_name = table_schema.schema
-            table_doc.database_name = self.db_name
-            table_docs.append(table_doc)
+
+        tasks = [self.create_doc(table_schema) for table_schema in self.table_schemas]
+        # Run all tasks concurrently
+        table_docs = await asyncio.gather(*tasks)
         return table_docs
 
-    def load(self) -> None:
+    async def load(self) -> None:
         """
         Loads table documentations data into vector database.
         Args:
@@ -48,7 +55,7 @@ class VectorLoader:
             None
         """
         data = []
-        table_docs = self.create_docs()
+        table_docs = await self.create_docs()
         for table_doc in table_docs:
             data.append(TableDocument(
                 text=table_doc.table_description,
