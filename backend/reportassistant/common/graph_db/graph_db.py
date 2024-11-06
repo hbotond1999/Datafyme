@@ -24,23 +24,25 @@ class Neo4JInstance:
     def close(self):
         self.driver.close()
 
-    def create_relation(self, table1, table2):
+    def create_relation(self, table_name, column_name, foreign_table_name, foreign_column_name):
         with self.driver.session() as session:
-            result = self._create_and_return_relation(table1, table2)
+            result = self._create_and_return_relation(table_name, column_name, foreign_table_name, foreign_column_name)
             print(f"Created relation between: {result['t1']}, {result['t2']}")
 
-    def _create_and_return_relation(self, table1, table2):
+    def _create_and_return_relation(self, table_name, column_name, foreign_table_name, foreign_column_name):
 
         query = (
-            "MERGE (t1:Table { name: $table1 }) "
-            "MERGE (t2:Table { name: $table2 }) "
-            "MERGE (t1)-[:RELATED_TO]->(t2) "
-            "MERGE (t2)-[:RELATED_TO]->(t1) "
+            "MERGE (t1:Table { name: $table_name }) "
+            "MERGE (t2:Table { name: $foreign_table_name }) "
+            "MERGE (t1)-[r1:RELATED_TO { column_name: $column_name, foreign_column_name: $foreign_column_name }]->(t2)"
+            "MERGE (t2)-[r2:RELATED_TO { column_name: $foreign_column_name, foreign_column_name: $column_name }]->(t1)"
             "RETURN t1.name, t2.name"
         )
 
         try:
-            record = self.driver.execute_query(query, table1=table1, table2=table2, database_=self.database,
+            record = self.driver.execute_query(query, table_name=table_name, foreign_table_name=foreign_table_name,
+                                               column_name=column_name, foreign_column_name=foreign_column_name,
+                                               database_=self.database,
                                                result_transformer_=lambda r: r.single(strict=True))
             return {"t1": record["t1.name"], "t2": record["t2.name"]}
 

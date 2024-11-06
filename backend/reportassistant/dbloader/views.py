@@ -69,10 +69,17 @@ def create_relation_graph(request):
         for relation in relations:
             if relation is not None:
                 table_name = relation.get("table_name")
+                column_name = relation.get("column_name")
                 foreign_table_name = relation.get("foreign_table_name")
+                foreign_column_name = relation.get("foreign_column_name")
 
                 if table_name and foreign_table_name:
-                    edge = {"table_name": table_name, "foreign_table_name": foreign_table_name}
+                    edge = {
+                        "table_name": table_name,
+                        "column_name": column_name,
+                        "foreign_table_name": foreign_table_name,
+                        "foreign_column_name": foreign_column_name
+                    }
 
                     if edge not in table_foreign_pairs:
                         table_foreign_pairs.append(edge)
@@ -84,9 +91,9 @@ def create_relation_graph(request):
 
     try:
         for table_pair in table_foreign_pairs:
-            neo4j_instance.create_relation(table_pair["table_name"], table_pair["foreign_table_name"])
+            neo4j_instance.create_relation(table_pair["table_name"], table_pair["column_name"],
+                                           table_pair["foreign_table_name"], table_pair["foreign_column_name"])
 
-        neo4j_instance.find_table_neighbours(table_foreign_pairs[0]["table_name"])
         return JsonResponse(status=201, data={'status': 'Success', 'message': "Graph created"})
 
     except:
