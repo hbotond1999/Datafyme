@@ -62,12 +62,29 @@ class Neo4JInstance:
 
     def find_table_neighbours(self, table):
         query = (
-            "MATCH (t:Table)-[]->(neighbour) "
+            "MATCH (t:Table)-[r:RELATED_TO]->(neighbour) "
             "WHERE t.name = $table "
-            "RETURN neighbour.name AS name"
+            "RETURN neighbour.name AS name, r.column_name AS column_name, r.foreign_column_name AS foreign_column_name"
         )
 
         neighbours = self.driver.execute_query(query, table=table, database_=self.database,
                                                routing_=RoutingControl.READ,
-                                               result_transformer_=lambda r: r.value("name"))
-        return neighbours
+                                               result_transformer_=lambda r: {"neighbour": r.value("name")})
+
+        query = (
+            "MATCH (t1:Table)-[r:RELATED_TO]->(t2:Table) "
+            "WHERE t1.name = $table AND t2.name = $neighbour "
+            "RETURN r.column_name AS column_name, r.foreign_column_name AS foreign_column_name"
+        )
+
+        results = []
+        for neighbour in neighbours['neighbour']:
+            records, summary, keys = self.driver.execute_query(query, table=table, neighbour=neighbour,
+                                                               database_=self.database)
+            relation = {
+                'column_name': records[0]["column_name"],
+                'foreign_column_name': records[0]["foreign_column_name"]
+            }
+            results.append({"neighbour": neighbour, "relationship": relation})
+
+        return results
