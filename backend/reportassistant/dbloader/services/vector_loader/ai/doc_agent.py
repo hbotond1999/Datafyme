@@ -18,10 +18,11 @@ def create_doc_agent():
     :return: A configured prompt and an LLM model with structured output for table documentation.
     """
     prompt_str = "You are a professional systems analyst with expertise in both business and technical information. "\
-             "Your task is to document the database tables from both a technical and business perspective. "\
+             "Your task is to document the database table from both a technical and business perspective. "\
              "Your response should be concise and informative; "\
-             "the business section should reflect the language used by real end-users.) \n"\
-             "Table Schema: {table_schema}"
+             "the business section should reflect the language used by real end-users. \n"\
+             "Write 10 common reporting questions in the common_queries field. "\
+             "Write a detailed documentation for the following table schema: {table_schema}"
 
     prompt = PromptTemplate(template=prompt_str, input_variables=["table_schema"])
 
