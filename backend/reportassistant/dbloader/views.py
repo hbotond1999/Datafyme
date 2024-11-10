@@ -1,4 +1,5 @@
 import asyncio
+import dataclasses
 
 from django.http import JsonResponse, HttpResponse
 
