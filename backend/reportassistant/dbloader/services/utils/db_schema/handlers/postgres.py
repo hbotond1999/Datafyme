@@ -1,10 +1,11 @@
 import logging
 from typing import List
 
+import pandas as pd
 from common.db.postgres import PostgresDatabaseManager
 from db_configurator.models import DatabaseSource
 from dbloader.services.utils.db_schema.abc import SchemaExtractor
-from dbloader.services.utils.db_schema.types import TableSchema, Column
+from dbloader.services.utils.db_schema.types import TableSchema, Column, Relation, TablePreview
 
 logger = logging.getLogger(__name__)
 
@@ -91,4 +92,86 @@ class PostgresSchemaExtractor(SchemaExtractor):
 
         except Exception as e:
             logger.error(f"An error occurred while fetching DDL for all tables: {e}")
+            raise e
+
+    def get_relations(self) -> List[Relation]:
+        try:
+            result = self.db_manager.execute_query("""
+            select distinct 
+                tc.constraint_name, 
+                tc.table_name, 
+                tc.table_schema,
+                kcu.column_name, 
+                ccu.table_name AS foreign_table_name,
+                ccu.column_name AS foreign_column_name 
+            FROM information_schema.table_constraints AS tc 
+            JOIN information_schema.key_column_usage AS kcu
+                ON tc.constraint_name = kcu.constraint_name
+                AND tc.table_schema = kcu.table_schema
+            JOIN information_schema.constraint_column_usage AS ccu
+                ON ccu.constraint_name = tc.constraint_name
+            WHERE tc.constraint_type in ('FOREIGN KEY');
+            """)
+
+            if result and isinstance(result, list):
+                relations = [
+                    Relation(
+                        schema=row['table_schema'],
+                        constraint_name=row['constraint_name'],
+                        table_name=row['table_name'],
+                        column_name=row['column_name'],
+                        foreign_table_name=row['foreign_table_name'],
+                        foreign_column_name=row['foreign_column_name']
+                    ) for row in result
+                ]
+
+                return relations
+            else:
+                logger.warning("No relations found in the database.")
+                return []
+        except Exception as e:
+            logger.error(f"An error occurred while fetching table names: {e}")
+            raise e
+
+    def get_table_previews(self):
+        try:
+            # Fetch all table names with schema
+            table_names = self.get_table_names_with_schema()
+            table_list = []
+
+            for table_name in table_names:
+                table = self.preview(table_name)
+                table_list.append(table)
+
+            return table_list
+
+        except Exception as e:
+            logger.error(f"An error occurred while fetching preview for all tables: {e}")
+            raise e
+
+    def preview(self, table_name: str):
+        try:
+            schema, table = table_name.split('.')
+
+            # Query to get column definitions for the specified table
+            query = f"""
+            SELECT 
+                *
+            FROM {schema}.{table}
+            LIMIT 10;
+            """
+
+            # Execute the query
+            result = self.db_manager.execute_query(query)
+
+            if result and isinstance(result, list):
+                result_df = pd.DataFrame(result)
+                markdown_table = result_df.to_markdown(index=False)
+                return TablePreview(schema=schema, table_name=table, markdown_preview=markdown_table)
+            else:
+                logger.warning(f"No columns found for table {table_name}")
+                raise Exception(f"No columns found for table {table_name}")
+
+        except Exception as e:
+            logger.error(f"An error occurred while fetching preview for table {table_name}: {e}")
             raise e
