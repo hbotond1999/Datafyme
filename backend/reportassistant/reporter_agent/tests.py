@@ -40,3 +40,15 @@ class VizuAgentTests(TestCase):
         result = self.graph.invoke({"preview_data": test_data, "question": question})
         self.assertEqual(result["representation_type"], RepType.CHART.value)
         self.assertEqual(result["chart_type"], ChartTypes.BUBBLE.value)
+
+    def test_agent_text_only(self):
+        question = "Mennyi volt az árbevétel 2024-ben"
+        test_data = {"income": [20232321]}
+        result = self.graph.invoke({"preview_data": test_data, "question": question})
+        self.assertEqual(result["representation_type"], RepType.TEXT.value)
+
+    def test_agent_table(self):
+        question = "Listázd ki a top 3 szállítót az árbevétel szerint!"
+        test_data = {"company": ["IBM", "MICROSOFT", "SAP"], "income": [300, 200, 100]}
+        result = self.graph.invoke({"preview_data": test_data, "question": question})
+        self.assertEqual(result["representation_type"], RepType.TABLE.value)
