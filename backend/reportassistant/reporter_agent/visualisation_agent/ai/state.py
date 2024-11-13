@@ -1,5 +1,8 @@
 from typing import TypedDict, Any, Dict, List
 
+from reporter_agent.visualisation_agent.chart import BarChart, PieChart, LineChart, BubbleChart, \
+    ScatterChart, HistogramChart
+
 
 class GraphState(TypedDict):
     """
@@ -15,6 +18,6 @@ class GraphState(TypedDict):
     """
     representation_type: str
     chart_type: str
-    chart_data: Any
+    chart_data: BarChart | PieChart | LineChart | BubbleChart | ScatterChart | HistogramChart
     preview_data: Dict[str, List[Any]]
     question: str

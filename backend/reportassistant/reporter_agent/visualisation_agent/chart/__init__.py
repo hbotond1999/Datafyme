@@ -1,4 +1,5 @@
 from enum import Enum
+from types import UnionType
 
 from reporter_agent.visualisation_agent.chart.bar import BarChart
 from reporter_agent.visualisation_agent.chart.bubble import BubbleChart
