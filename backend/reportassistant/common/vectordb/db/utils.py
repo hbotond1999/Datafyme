@@ -48,7 +48,8 @@ def hybrid_search(query: str, collection_name: str, limit: int = 50):
     dense_req = AnnSearchRequest(query_embeddings["dense"], "dense_vector", dense_search_params, limit=limit)
 
     res = col.hybrid_search([sparse_req, dense_req], rerank=RRFRanker(),
-                            limit=limit, output_fields=['text', "source", "title"])
+                            limit=limit, output_fields=['table_name', "database_name", "schema_name", "text"])
+    res = res[0]
     result = []
     for hit in res:
         result.append(
