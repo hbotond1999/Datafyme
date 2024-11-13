@@ -10,21 +10,33 @@ from reporter_agent.visualisation_agent.chart import ChartTypes
 class VizuAgentTests(TestCase):
     def setUp(self):
         load_dotenv()
+        self.graph = create_graph()
 
     def test_agent(self):
-        graph = create_graph()
         test_data = {"company": ["IBM", "Microsoft", "Google"], "income": [1000, 2000, 3000]}
         question = "Hogyan oszlott meg a cégek között az árbevétel?"
-        result = graph.invoke({"preview_data": test_data, "question": question})
+        result = self.graph.invoke({"preview_data": test_data, "question": question})
 
         self.assertEqual(result["representation_type"], RepType.CHART.value)
         self.assertIn(result["chart_type"], [ChartTypes.BAR.value, ChartTypes.PIE.value])
 
     def test_agent_pie(self):
-        graph = create_graph()
         test_data = {"company": ["IBM", "Microsoft", "Google"], "income": [1000, 2000, 3000]}
         question = "Hogyan oszlott meg a cégek között az árbevétel? Kör digaram legyen!"
-        result = graph.invoke({"preview_data": test_data, "question": question})
+        result = self.graph.invoke({"preview_data": test_data, "question": question})
 
         self.assertEqual(result["representation_type"], RepType.CHART.value)
         self.assertEqual(result["chart_type"], ChartTypes.PIE.value)
+
+    def test_agent_bubble(self):
+        question = "Hogyan viszonyulnak egymáshoz a különböző termékkategóriák az eladott mennyiség, az átlagos vásárlói elégedettség, és az egy termékből származó bevétel alapján?"
+        test_data = {
+                "company": ["IBM", "Microsoft", "Google", "Amazon", "Apple"],
+                "income": [1000, 2000, 3000, 4000, 5000],
+                "satisfaction": [7.5, 8.2, 9.1, 7.8, 8.5],
+                "sales": [150, 300, 450, 200, 400]
+        }
+
+        result = self.graph.invoke({"preview_data": test_data, "question": question})
+        self.assertEqual(result["representation_type"], RepType.CHART.value)
+        self.assertEqual(result["chart_type"], ChartTypes.BUBBLE.value)
