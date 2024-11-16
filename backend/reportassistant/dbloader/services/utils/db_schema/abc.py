@@ -20,3 +20,11 @@ class SchemaExtractor(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_tables_schemas(self) -> List[TableSchema]:
         pass
+
+    @abc.abstractmethod
+    def get_relations(self):
+        pass
+
+    @abc.abstractmethod
+    def get_table_previews(self):
+        pass

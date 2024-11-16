@@ -40,13 +40,6 @@ def loader(request):
         # Handle disconnect
         raise
 
-    extractor = DatabaseSchemaExtractor(datasource)
-    table_names = extractor.get_table_names_with_schema()
-    tables_schemas = extractor.get_tables_schemas()
-    docs = VectorLoader(tables_schemas, datasource.name).create_docs()
-    database_relations = extractor.get_relations()
-    return JsonResponse(data={"names": table_names, "docs": [doc.model_dump() for doc in docs],
-                              "relations": [dataclasses.asdict(t) for t in database_relations]}, safe=False)
 
 
 def create_relation_graph(request):
