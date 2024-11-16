@@ -1,9 +1,11 @@
 import json
 
+from reporter_agent.visualisation_agent.ai import FinalData, RepType
 from reporter_agent.visualisation_agent.ai.agents import create_representation_agent, create_chart_selector_agent, \
-    create_chart_def_agent
+    create_chart_def_agent, create_summarize_agent
 from reporter_agent.visualisation_agent.ai.state import GraphState
-from reporter_agent.visualisation_agent.chart import CHART_RESPONSE_MAPPING
+from reporter_agent.visualisation_agent.ai.utils import get_first_ten_records
+from reporter_agent.visualisation_agent.chart import CHART_RESPONSE_MAPPING, ChartTypes
 
 
 def decide_representation(state: GraphState):
@@ -16,7 +18,8 @@ def decide_representation(state: GraphState):
         dict: A dictionary containing the 'representation_type' derived from the result of invoking
               the representation agent.
     """
-    result = create_representation_agent().invoke({'preview_data': json.dumps(state["preview_data"]), 'question': state["question"]})
+    preview_data = get_first_ten_records(data=state["input_data"])
+    result = create_representation_agent().invoke({'preview_data': json.dumps(preview_data), 'question': state["question"]})
     return {"representation_type": result.content}
 
 
@@ -28,7 +31,8 @@ def decide_chart_type(state: GraphState):
     Returns:
         A dictionary with the key 'chart_type' and the value being the type of chart determined by the agent.
     """
-    result = create_chart_selector_agent().invoke({'preview_data': json.dumps(state["preview_data"]), 'question': state["question"]})
+    preview_data = get_first_ten_records(data=state["input_data"])
+    result = create_chart_selector_agent().invoke({'preview_data': json.dumps(preview_data), 'question': state["question"]})
     return {"chart_type": result.content}
 
 
@@ -38,6 +42,35 @@ def populate_chart_data(state: GraphState):
         state (GraphState): A dictionary containing the state information for generating chart data.
     """
     agent = create_chart_def_agent(CHART_RESPONSE_MAPPING[state["chart_type"]])
+    preview_data = get_first_ten_records(data=state["input_data"])
+    result = agent.invoke({"preview_data": json.dumps(preview_data), "chart_type": state["chart_type"],  'question': state["question"]})
+    return {"chart_column_data": result}
 
-    result = agent.invoke({"preview_data": json.dumps(state["preview_data"]), "chart_type": state["chart_type"],  'question': state["question"]})
-    return {"chart_data": result}
+
+def create_final_data(state: GraphState):
+    """
+    Creates the final data based on the state provided.
+
+    Args:
+        state: A GraphState object which contains the representation type of the
+               data, input data, and other relevant information.
+
+    Returns:
+        A dictionary with the key "final_data" mapping to a FinalData object which
+        contains type, chart type (if applicable), and the relevant data.
+    """
+    rep_type = RepType[state["representation_type"]]
+    if rep_type == RepType.TEXT:
+        response = create_summarize_agent().invoke({"data": state["input_data"], "question": state["question"]}).content
+        return {
+            "final_data": FinalData(type=rep_type, chart_type= None, data=response)
+        }
+    elif rep_type == RepType.CHART:
+        return {
+            "final_data": FinalData(
+                type=rep_type,
+                chart_type=ChartTypes(state["chart_type"]),
+                data={"metadata": state["chart_column_data"].create_meta_data(), "data": state["input_data"]})
+        }
+    else:
+        return {"final_data": FinalData(type=rep_type, chart_type=None, data=state["input_data"])}

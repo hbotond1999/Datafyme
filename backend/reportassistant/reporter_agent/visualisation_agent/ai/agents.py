@@ -75,3 +75,17 @@ def create_chart_def_agent(structured_output):
     prompt = PromptTemplate(template=prompt_str, input_variables=["preview_data", "chart_type", "question"])
 
     return prompt | get_llm_model().with_structured_output(structured_output)
+
+
+def create_summarize_agent():
+    prompt_str = """
+   You are a helpful assistant, and your task is to summarize the following data in a response.
+   
+   User's question:  {question}
+   
+   USER question: {data}
+   """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["data", "question"])
+
+    return prompt | get_llm_model()

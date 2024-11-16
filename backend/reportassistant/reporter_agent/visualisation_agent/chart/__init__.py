@@ -1,5 +1,6 @@
+import abc
 from enum import Enum
-from types import UnionType
+from typing import Dict
 
 from reporter_agent.visualisation_agent.chart.bar import BarChart
 from reporter_agent.visualisation_agent.chart.bubble import BubbleChart
@@ -9,6 +10,7 @@ from reporter_agent.visualisation_agent.chart.pie import PieChart
 from reporter_agent.visualisation_agent.chart.scatter import ScatterChart
 
 
+
 class ChartTypes(Enum):
     BAR = 'BAR_CHART'
     LINE = 'LINE_CHART'
@@ -16,7 +18,6 @@ class ChartTypes(Enum):
     HISTOGRAM = 'HISTOGRAM'
     SCATTER = 'SCATTER_CHART'
     PIE = 'PIE_CHART'
-
 
 CHART_RESPONSE_MAPPING = {
     ChartTypes.BAR.value: BarChart,
