@@ -10,4 +10,5 @@ class GraphState(TypedDict):
 
     """
     matching_tables: List[Dict[str, str]]
+    matching_table_ddls: List[Dict[str, str]]
     message: str

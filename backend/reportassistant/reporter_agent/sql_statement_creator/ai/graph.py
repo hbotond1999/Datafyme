@@ -1,13 +1,12 @@
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-from reporter_agent.sql_statement_creator.ai.nodes import hybrid_search_node
-from langchain_core.messages import HumanMessage
+from reporter_agent.sql_statement_creator.ai.nodes import hybrid_search_node, get_ddls
 
 from reporter_agent.sql_statement_creator.ai.state import GraphState
 
 
-def create_graph():
+def create_sql_agent_graph():
     """
     Creates and compiles a state graph representing the workflow of an SQL generation process.
 
@@ -16,15 +15,10 @@ def create_graph():
     """
     graph = StateGraph(GraphState)
     graph.add_node("hybrid_search_node", hybrid_search_node)
+    graph.add_node("get_ddls_node", get_ddls)
 
     graph.add_edge(START, "hybrid_search_node")
-    graph.add_edge("hybrid_search_node", END)
+    graph.add_edge("hybrid_search_node", "get_ddls_node")
+    graph.add_edge("get_ddls_node", END)
 
     return graph.compile()
-
-
-if __name__ == '__main__':
-    message = "Most frequently ordered product."
-    sql_graph = create_graph()
-    matching_tables = sql_graph.invoke({"message": message})
-    print(matching_tables)
