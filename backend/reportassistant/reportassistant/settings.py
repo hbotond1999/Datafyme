@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "dbloader",
     "db_configurator",
+    "reporter_agent",
     "dashboard"
 ]
 
