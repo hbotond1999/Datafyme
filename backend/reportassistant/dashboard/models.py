@@ -9,7 +9,7 @@ class Dashboard(models.Model):
     id = models.IntegerField(primary_key=True, auto_created=True)
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=2500)
-    user = models.IntegerField(get_user_model())
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
 
 class DashboardSlot(models.Model):
