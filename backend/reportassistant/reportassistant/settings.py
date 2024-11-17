@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "dbloader",
-    "db_configurator"
+    "db_configurator",
+    "dashboard"
 ]
 
 MIDDLEWARE = [
