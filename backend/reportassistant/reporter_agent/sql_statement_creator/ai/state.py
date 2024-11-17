@@ -1,4 +1,4 @@
-from typing import TypedDict, Dict, List
+from typing import TypedDict, Dict, List, Any
 
 
 class GraphState(TypedDict):
@@ -9,6 +9,10 @@ class GraphState(TypedDict):
             matching_tables: A list of dicts containing matching schema, table pairs.
 
     """
-    matching_tables: List[Dict[str, str]]
-    matching_table_ddls: List[Dict[str, str]]
     message: str
+    matching_tables: List[Dict[str, str]]
+    matching_table_ddls: List[Dict[str, Any]]
+    filtered_table_ddls: List[Dict[str, Any]]
+    tables_all: List[Dict[str, str]]
+    table_final_ddls: List[Dict[str, Any]]
+    result_query: str

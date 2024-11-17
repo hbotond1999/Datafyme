@@ -8,7 +8,6 @@ def sql_agent(request):
     message = request.GET.get('message')
 
     sql_graph = create_sql_agent_graph()
-    matching_tables = sql_graph.invoke({"message": message})
-    print(matching_tables)
+    result = sql_graph.invoke({"message": message})
 
-    return JsonResponse(data={"result": matching_tables}, safe=False)
+    return JsonResponse(data={"result": result}, safe=False)
