@@ -51,5 +51,9 @@ class DatabaseManager(DatabaseManagerAbc):
             logger.error(f"An error occurred while getting table previews: {e}")
             raise e
 
-    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list') -> Dict[str, List[Any]]:
-        return self.handler.execute_sql(sql, response_format)
+    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
+        try:
+            self.handler.execute_sql(sql, response_format)
+        except Exception as e:
+            logger.error(f"An error occurred while executing the query: {e}")
+            raise e
