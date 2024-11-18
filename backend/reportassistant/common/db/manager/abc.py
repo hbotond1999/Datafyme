@@ -1,10 +1,10 @@
 import abc
-from typing import List
+from typing import List, Literal, Any, Dict
 from db_configurator.models import DatabaseSource
-from dbloader.services.utils.db_schema.types import TableSchema
+from common.db.manager.types import TableSchema
 
 
-class SchemaExtractor(metaclass=abc.ABCMeta):
+class DatabaseManagerAbc(metaclass=abc.ABCMeta):
 
     def __init__(self, db_source: DatabaseSource):
         self.db_source = db_source
@@ -27,4 +27,8 @@ class SchemaExtractor(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_table_previews(self):
+        pass
+
+    @abc.abstractmethod
+    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list') -> Dict[str, List[Any]]:
         pass

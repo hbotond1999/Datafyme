@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 logger = logging.getLogger(__name__)
 
 
-class PostgresDatabaseManager:
+class PostgresHelper:
     def __init__(self, dbname: str, user: str, password: str, host: str, port: int):
         """
         Initialize the PostgresDatabaseManager with database connection details.
