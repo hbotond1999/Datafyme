@@ -3,7 +3,7 @@ import dataclasses
 
 from django.http import JsonResponse, HttpResponse
 
-from common.db.manager.schema_extractor import DatabaseManager
+from common.db.manager.database_manager import DatabaseManager
 from db_configurator.models import DatabaseSource
 from dbloader.services.vector_loader.loader import VectorLoader
 from dbloader.services.graph_loader.relation_finder import RelationFinder
