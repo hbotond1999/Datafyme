@@ -52,4 +52,8 @@ class DatabaseManager(DatabaseManagerAbc):
             raise e
 
     def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
-        return self.handler.execute_sql(sql, response_format)
+        try:
+            self.handler.execute_sql(sql, response_format)
+        except Exception as e:
+            logger.error(f"An error occurred while executing the query: {e}")
+            raise e
