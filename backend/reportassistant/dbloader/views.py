@@ -3,8 +3,8 @@ import dataclasses
 
 from django.http import JsonResponse, HttpResponse
 
+from common.db.manager.schema_extractor import DatabaseManager
 from db_configurator.models import DatabaseSource
-from dbloader.services.utils.db_schema.schema_extractor import DatabaseSchemaExtractor
 from dbloader.services.vector_loader.loader import VectorLoader
 from dbloader.services.graph_loader.relation_finder import RelationFinder
 
@@ -31,7 +31,7 @@ def loader(request):
         else:
             print(f"Retrieved existing DatabaseSource: {datasource}")
 
-        extractor = DatabaseSchemaExtractor(datasource)
+        extractor = DatabaseManager(datasource)
         table_names = extractor.get_table_names_with_schema()
         tables_schemas = extractor.get_tables_schemas()
         VectorLoader(tables_schemas, datasource.name).load()
@@ -58,7 +58,7 @@ def create_relation_graph(request):
     else:
         print(f"Retrieved existing DatabaseSource: {datasource}")
 
-    extractor = DatabaseSchemaExtractor(datasource)
+    extractor = DatabaseManager(datasource)
     database_relations = extractor.get_relations()
 
     defined_relations = [dataclasses.asdict(t) for t in database_relations]

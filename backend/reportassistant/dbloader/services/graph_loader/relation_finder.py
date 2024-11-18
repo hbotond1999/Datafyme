@@ -2,7 +2,7 @@ from typing import List
 
 from langchain.chains.base import Chain
 
-from dbloader.services.utils.db_schema.types import TablePreview
+from common.db.manager.types import TablePreview
 from dbloader.services.graph_loader.ai.relation_agent import find_relation_agent
 from dbloader.services.graph_loader.ai.response import FoundRelations
 
