@@ -177,7 +177,7 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             raise e
 
 
-    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list') -> Dict[str, List[Any]]:
+    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
         try:
             result = self.db_manager.execute_query(sql)
             if result and isinstance(result, list):

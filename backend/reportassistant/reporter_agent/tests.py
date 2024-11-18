@@ -1,6 +1,8 @@
 from django.test import TestCase
 from dotenv import load_dotenv
 
+from common.db.manager.database_manager import DatabaseManager
+from db_configurator.models import DatabaseSource
 from reporter_agent.visualisation_agent.ai import RepType
 from reporter_agent.visualisation_agent.ai.graph import create_graph
 from reporter_agent.visualisation_agent.chart import ChartTypes
@@ -10,7 +12,20 @@ from reporter_agent.visualisation_agent.chart import ChartTypes
 class VizuAgentTests(TestCase):
     def setUp(self):
         load_dotenv()
+        datasource, created = DatabaseSource.objects.get_or_create(
+            name="postgres",
+            defaults={
+                "type": "postgresql",  # Set default values for other fields
+                "username": "postgres",
+                "password": "password",
+                "host": "localhost",
+                "port": 5432,
+            }
+        )
+        database_manager = DatabaseManager(datasource)
+        database_manager.execute_sql("select * from valami", response_format="list")
         self.graph = create_graph()
+
 
     def test_agent(self):
         test_data = {"company": ["IBM", "Microsoft", "Google"], "income": [1000, 2000, 3000]}
