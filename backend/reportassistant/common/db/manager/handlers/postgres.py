@@ -1,20 +1,20 @@
 import logging
-from typing import List
+from typing import List, Dict, AnyStr, Any, Literal
 
 import pandas as pd
-from common.db.postgres import PostgresDatabaseManager
+from common.db.manager.handlers.utils.postgres_helper import PostgresHelper
 from db_configurator.models import DatabaseSource
-from dbloader.services.utils.db_schema.abc import SchemaExtractor
-from dbloader.services.utils.db_schema.types import TableSchema, Column, Relation, TablePreview
+from common.db.manager.abc import DatabaseManagerAbc
+from common.db.manager.types import TableSchema, Column, Relation, TablePreview
 
 logger = logging.getLogger(__name__)
 
 
-class PostgresSchemaExtractor(SchemaExtractor):
+class PostgresDatabaseManager(DatabaseManagerAbc):
 
     def __init__(self, db_source: DatabaseSource):
         super().__init__(db_source)
-        self.db_manager = PostgresDatabaseManager(
+        self.db_manager = PostgresHelper(
             dbname=db_source.name,
             user=db_source.username,
             password=db_source.password,
@@ -176,4 +176,15 @@ class PostgresSchemaExtractor(SchemaExtractor):
 
         except Exception as e:
             logger.error(f"An error occurred while fetching preview for table {table_name}: {e}")
+            raise e
+
+
+    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
+        try:
+            result = self.db_manager.execute_query(sql)
+            if result and isinstance(result, list):
+                result_df = pd.DataFrame(result)
+                return result_df.to_dict(orient=response_format)
+        except Exception as e:
+            logger.error(f"An error occurred while execute query: {e}")
             raise e

@@ -3,10 +3,10 @@ from typing import List
 
 from langchain.chains.base import Chain
 
-from common.vectordb.db import create_collection, COLLECTION_NAME
+from common.db.manager.types import TableSchema
+from common.vectordb.db import COLLECTION_NAME
 from common.vectordb.db.schema import TableDocument
 from common.vectordb.db.utils import insert_docs_to_collection, delete_docs_from_collection
-from dbloader.services.utils.db_schema.types import TableSchema
 from dbloader.services.vector_loader.ai.doc_agent import create_doc_agent
 from dbloader.services.vector_loader.ai.response import TableDocumentation
 

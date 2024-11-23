@@ -1,16 +1,14 @@
 import logging
-from typing import List
+from typing import List, Dict, Any, Literal
 
-from db_configurator.models import DatabaseSource, DBType
-from dbloader.services.utils.db_schema.abc import SchemaExtractor
-from dbloader.services.utils.db_schema.handlers import HANDLER
-from dbloader.services.utils.db_schema.types import TableSchema, Relation, TablePreview
+from db_configurator.models import DatabaseSource
+from common.db.manager.abc import DatabaseManagerAbc
+from common.db.manager.handlers import HANDLER
+from common.db.manager.types import TableSchema, Relation, TablePreview
 
 logger = logging.getLogger(__name__)
 
-
-class DatabaseSchemaExtractor(SchemaExtractor):
-
+class DatabaseManager(DatabaseManagerAbc):
     def __init__(self, db_source: DatabaseSource):
         super().__init__(db_source)
         self.db_source = db_source
@@ -50,4 +48,11 @@ class DatabaseSchemaExtractor(SchemaExtractor):
             return self.handler.get_table_previews()
         except Exception as e:
             logger.error(f"An error occurred while getting table previews: {e}")
+            raise e
+
+    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
+        try:
+            self.handler.execute_sql(sql, response_format)
+        except Exception as e:
+            logger.error(f"An error occurred while executing the query: {e}")
             raise e
