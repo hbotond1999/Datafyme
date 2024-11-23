@@ -68,7 +68,7 @@ def create_relation_graph(request):
 
                 if table_name and foreign_table_name:
                     edge = {
-                        "database_name": database_name + '_1',
+                        "database_name": database_name,
                         "table_schema": table_schema,
                         "table_name": table_name,
                         "column_name": column_name,
@@ -119,16 +119,17 @@ def clear_relation_graph(request):
 
 
 def get_neighbours(request):
+    schema_name = request.GET.get('schema_name')
     table_name = request.GET.get('table_name')
     database_name = request.GET.get('database_name')
 
-    if not table_name or not database_name:
+    if not table_name or not database_name or not schema_name:
         return JsonResponse(status=400, data={'status': 'Failed', 'message': 'Table or database parameter is missing'})
 
     neo4j_instance = Neo4JInstance()
 
     try:
-        neighbours = neo4j_instance.find_table_neighbours(database_name, table_name)
+        neighbours = neo4j_instance.find_table_neighbours(database_name, schema_name, table_name)
         return JsonResponse(data={"neighbours": neighbours}, safe=False)
 
     except:
