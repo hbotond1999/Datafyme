@@ -8,6 +8,7 @@ from dbloader.services.utils.db_schema.types import TableSchema, Relation, Table
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseSchemaExtractor(SchemaExtractor):
 
     def __init__(self, db_source: DatabaseSource):
