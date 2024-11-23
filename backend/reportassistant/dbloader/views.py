@@ -41,7 +41,6 @@ def loader(request):
         raise
 
 
-
 def create_relation_graph(request):
     database_name = request.GET.get('database_name')
     datasource, _ = DatabaseSource.objects.get_or_create(name=database_name)

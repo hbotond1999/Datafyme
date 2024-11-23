@@ -1,9 +1,9 @@
 import asyncio
 import json
 
+from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
-from dbloader.services.utils.db_schema.schema_extractor import DatabaseSchemaExtractor
 from reporter_agent.sql_statement_creator.ai.agents import sql_agent
 from reporter_agent.sql_statement_creator.ai.reranker import grade_ddls
 
@@ -39,7 +39,7 @@ def get_ddls(state: GraphState):
     Returns:
         dict: A dictionary containing the matching_tables
     """
-    extractor = DatabaseSchemaExtractor(state["database_source"])
+    extractor = DatabaseManager(state["database_source"])
     tables_schemas = extractor.get_tables_schemas()
     matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["matching_tables"]]
     json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
@@ -83,7 +83,7 @@ def get_final_ddls(state: GraphState):
     Returns:
         dict: A dictionary containing the matching_tables
     """
-    extractor = DatabaseSchemaExtractor(state["database_source"])
+    extractor = DatabaseManager(state["database_source"])
     tables_schemas = extractor.get_tables_schemas()
     matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["tables_all"]]
     json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
