@@ -22,10 +22,11 @@ class TableSchema:
 
 @dataclass
 class Relation:
-    schema: str
     constraint_name: str
+    table_schema: str
     table_name: str
     column_name: str
+    foreign_table_schema: str
     foreign_table_name: str
     foreign_column_name: str
 

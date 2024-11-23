@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path("dbloader/", include("dbloader.urls")),
+    path("reporter_agent/", include("reporter_agent.urls")),
     path('admin/', admin.site.urls),
 ]

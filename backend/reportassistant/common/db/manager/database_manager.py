@@ -8,8 +8,8 @@ from common.db.manager.types import TableSchema, Relation, TablePreview
 
 logger = logging.getLogger(__name__)
 
-class DatabaseManager(DatabaseManagerAbc):
 
+class DatabaseManager(DatabaseManagerAbc):
     def __init__(self, db_source: DatabaseSource):
         super().__init__(db_source)
         self.db_source = db_source

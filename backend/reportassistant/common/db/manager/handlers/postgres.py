@@ -103,7 +103,8 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
                 tc.table_schema,
                 kcu.column_name, 
                 ccu.table_name AS foreign_table_name,
-                ccu.column_name AS foreign_column_name 
+                ccu.column_name AS foreign_column_name,
+                ccu.table_schema as foreign_table_schema
             FROM information_schema.table_constraints AS tc 
             JOIN information_schema.key_column_usage AS kcu
                 ON tc.constraint_name = kcu.constraint_name
@@ -116,10 +117,11 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             if result and isinstance(result, list):
                 relations = [
                     Relation(
-                        schema=row['table_schema'],
                         constraint_name=row['constraint_name'],
+                        table_schema=row['table_schema'],
                         table_name=row['table_name'],
                         column_name=row['column_name'],
+                        foreign_table_schema=row['foreign_table_schema'],
                         foreign_table_name=row['foreign_table_name'],
                         foreign_column_name=row['foreign_column_name']
                     ) for row in result
