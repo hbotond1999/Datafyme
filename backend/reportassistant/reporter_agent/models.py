@@ -8,7 +8,6 @@ TYPES["TABLE"] = "TABLE"
 
 # Create your models here.
 class Chart(models.Model):
-    id = models.IntegerField(primary_key=True, auto_created=True)
     data_source = models.ForeignKey(DatabaseSource, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.CharField(max_length=2500)
