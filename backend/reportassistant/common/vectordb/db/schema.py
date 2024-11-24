@@ -43,7 +43,7 @@ def create_collection(collection_name: str):
 class TableDocument:
     text: str
     database_name: str
-    database_id: str
+    database_id: int
     schema_name: str
     table_name: str
     distance: float = None

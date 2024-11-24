@@ -65,7 +65,7 @@ class VectorLoader:
                 table_name=table_doc.table_name,
                 database_name= table_doc.database_name,
                 schema_name=table_doc.schema_name,
-                database_id = table_doc.database_id)
+                database_id = self.data_source.id)
             )
 
             for question in table_doc.common_queries:
@@ -74,7 +74,7 @@ class VectorLoader:
                     table_name=table_doc.table_name,
                     database_name= table_doc.database_name,
                     schema_name=table_doc.schema_name,
-                    database_id = table_doc.database_id)
+                    database_id = self.data_source.id)
                 )
             for use_case in table_doc.use_cases:
                 data.append(TableDocument(
@@ -82,7 +82,7 @@ class VectorLoader:
                     table_name=table_doc.table_name,
                     database_name=table_doc.database_name,
                     schema_name=table_doc.schema_name,
-                    database_id = table_doc.database_id)
+                    database_id = self.data_source.id)
                 )
         delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_name", value=self.data_source.id)
         insert_docs_to_collection(data, COLLECTION_NAME)
