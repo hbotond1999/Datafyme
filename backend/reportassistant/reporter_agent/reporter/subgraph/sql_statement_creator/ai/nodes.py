@@ -19,7 +19,7 @@ def hybrid_search_node(state: GraphState):
         dict: A dictionary containing the matching_tables
     """
     collection_name = "TablesDocs"
-    similar_docs = hybrid_search(state["message"], collection_name, limit=15, database_id=state["database_source"].id)
+    similar_docs = hybrid_search(state["message"], collection_name, database_id=state["database_source"].id, limit=15)
     tables = []
     seen = set()
     for table_doc in similar_docs:

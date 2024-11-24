@@ -1,7 +1,6 @@
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-import reporter_agent
 from reporter_agent.reporter.nodes import summarize_history_node, create_sql_query_node, run_sql_query_node, \
     create_visualization_node
 from reporter_agent.reporter.state import GraphState

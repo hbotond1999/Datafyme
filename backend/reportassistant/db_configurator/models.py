@@ -9,7 +9,6 @@ class DBType(enum.Enum):
 class DatabaseSource(models.Model):
     DB_TYPES = [(t.value, t.value) for t in DBType]
 
-    id = models.IntegerField(primary_key=True, auto_created=True)
     type = models.CharField(max_length=50, choices=DB_TYPES)
     name = models.CharField(max_length=50)
     username = models.CharField(max_length=50)

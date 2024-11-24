@@ -49,7 +49,7 @@ def hybrid_search(query: str, collection_name: str, database_id: int, limit: int
     dense_req = AnnSearchRequest(query_embeddings["dense"], "dense_vector", dense_search_params, limit=limit, expr=f"database_id=={database_id}")
 
     res = col.hybrid_search([sparse_req, dense_req], rerank=RRFRanker(),
-                            limit=limit, output_fields=['table_name', "database_name", "schema_name", "text"])
+                            limit=limit, output_fields=['table_name', "database_name", "schema_name", "text", "database_id"])
     res = res[0]
     result = []
     for hit in res:
@@ -60,6 +60,7 @@ def hybrid_search(query: str, collection_name: str, database_id: int, limit: int
                 schema_name=hit.fields["schema_name"],
                 text=hit.fields["text"],
                 distance=hit.distance,
+                database_id=hit.fields["database_id"]
             )
         )
     return sorted(result, key=lambda item: item.distance, reverse=False)
