@@ -19,7 +19,7 @@ def create_reporter_graph():
     graph.add_conditional_edges(
         "run_sql_query",
         lambda x: not x["error_message"],
-        {True: "create_visualization", False: END}
+        {True: "create_visualization", False: END}  # TODO: ERROR HANDLING, SQL QUERY REFINE
     )
 
     graph.add_edge("create_visualization", END)
