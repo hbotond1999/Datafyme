@@ -1,7 +1,7 @@
 from django.db import models
 
 from db_configurator.models import DatabaseSource
-from reporter_agent.visualisation_agent.chart import ChartTypes
+from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartTypes
 
 TYPES = {c.name: c.value for c in ChartTypes}
 TYPES["TABLE"] = "TABLE"
