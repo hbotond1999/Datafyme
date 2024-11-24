@@ -15,9 +15,9 @@ class GraphState(TypedDict):
             input_data: A dictionary where the keys are strings and the values are lists of any type.
             question: A string containing a descriptive question or title related to the graph.
     """
-    representation_type: str
-    chart_type: str
+    representation_type: str # local
+    chart_type: str # local
     chart_column_data: Chart
-    input_data: Dict[str, List[Any]]
-    question: str
-    final_data: FinalData
+    input_data: Dict[str, List[Any]] # input
+    question: str # input
+    final_data: FinalData # output
