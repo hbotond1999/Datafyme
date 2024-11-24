@@ -1,11 +1,11 @@
 import json
 
-from reporter_agent.visualisation_agent.ai import FinalData, RepType
-from reporter_agent.visualisation_agent.ai.agents import create_representation_agent, create_chart_selector_agent, \
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData, RepType
+from reporter_agent.reporter.subgraph.visualisation_agent.ai.agents import create_representation_agent, create_chart_selector_agent, \
     create_chart_def_agent, create_summarize_agent
-from reporter_agent.visualisation_agent.ai.state import GraphState
-from reporter_agent.visualisation_agent.ai.utils import get_first_ten_records
-from reporter_agent.visualisation_agent.chart import CHART_RESPONSE_MAPPING, ChartTypes
+from reporter_agent.reporter.subgraph.visualisation_agent.ai.state import GraphState
+from reporter_agent.reporter.subgraph.visualisation_agent.ai.utils import get_first_ten_records
+from reporter_agent.reporter.subgraph.visualisation_agent.chart import CHART_RESPONSE_MAPPING, ChartTypes
 
 
 def decide_representation(state: GraphState):

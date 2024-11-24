@@ -1,7 +1,7 @@
 from typing import TypedDict, Any, Dict, List
 
-from reporter_agent.visualisation_agent.ai import FinalData
-from reporter_agent.visualisation_agent.chart.abc import Chart
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData
+from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
 
 
 class GraphState(TypedDict):
@@ -15,9 +15,9 @@ class GraphState(TypedDict):
             input_data: A dictionary where the keys are strings and the values are lists of any type.
             question: A string containing a descriptive question or title related to the graph.
     """
-    representation_type: str
-    chart_type: str
+    representation_type: str # local
+    chart_type: str # local
     chart_column_data: Chart
-    input_data: Dict[str, List[Any]]
-    question: str
-    final_data: FinalData
+    input_data: Dict[str, List[Any]] # input
+    question: str # input
+    final_data: FinalData # output

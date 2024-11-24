@@ -34,7 +34,7 @@ def loader(request):
         extractor = DatabaseManager(datasource)
         table_names = extractor.get_table_names_with_schema()
         tables_schemas = extractor.get_tables_schemas()
-        VectorLoader(tables_schemas, datasource.name).load()
+        VectorLoader(tables_schemas, datasource).load()
         return JsonResponse(data={"names": table_names}, safe=False)
     except asyncio.CancelledError:
         # Handle disconnect

@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 
 from db_configurator.models import DatabaseSource
-from reporter_agent.sql_statement_creator.ai.graph import create_sql_agent_graph
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
 
 
 # Create your views here.

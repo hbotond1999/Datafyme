@@ -4,7 +4,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 
 from common.ai.model import get_llm_model
-from reporter_agent.sql_statement_creator.ai.state import GraphState
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
 
 prompt = PromptTemplate(
     template="""You are a grader assessing relevance of a retrieved ddl (data definition language) to a user question.\n 

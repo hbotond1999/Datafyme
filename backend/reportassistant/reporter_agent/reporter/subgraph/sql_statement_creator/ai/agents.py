@@ -1,7 +1,7 @@
 from langchain_core.prompts import PromptTemplate
 
 from common.ai.model import get_llm_model
-from reporter_agent.sql_statement_creator.ai.response import SQLCommand
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import SQLCommand
 
 
 def sql_agent():

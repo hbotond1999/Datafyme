@@ -4,10 +4,10 @@ import json
 from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
-from reporter_agent.sql_statement_creator.ai.agents import sql_agent
-from reporter_agent.sql_statement_creator.ai.reranker import grade_ddls
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_ddls
 
-from reporter_agent.sql_statement_creator.ai.state import GraphState
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
 
 
 def hybrid_search_node(state: GraphState):
@@ -19,7 +19,7 @@ def hybrid_search_node(state: GraphState):
         dict: A dictionary containing the matching_tables
     """
     collection_name = "TablesDocs"
-    similar_docs = hybrid_search(state["message"], collection_name, limit=15)
+    similar_docs = hybrid_search(state["message"], collection_name, database_id=state["database_source"].id, limit=15)
     tables = []
     seen = set()
     for table_doc in similar_docs:

@@ -25,6 +25,7 @@ def create_collection(collection_name: str):
         FieldSchema(name="database_name", dtype=DataType.VARCHAR, max_length=2048),
         FieldSchema(name="schema_name", dtype=DataType.VARCHAR, max_length=2048),
         FieldSchema(name="table_name", dtype=DataType.VARCHAR, max_length=2048),
+        FieldSchema(name="database_id", dtype=DataType.INT64),
     ]
     schema = CollectionSchema(fields, "")
     col_name = collection_name
@@ -42,6 +43,7 @@ def create_collection(collection_name: str):
 class TableDocument:
     text: str
     database_name: str
+    database_id: int
     schema_name: str
     table_name: str
     distance: float = None
@@ -51,11 +53,13 @@ def convert_to_milvus_data(table_docs: List[TableDocument]):
     database_names = []
     schema_names = []
     table_names = []
+    database_ids = []
     for table_doc in table_docs:
         texts.append(table_doc.text)
         database_names.append(table_doc.database_name)
         schema_names.append(table_doc.schema_name)
         table_names.append(table_doc.table_name)
+        database_ids.append(table_doc.database_id)
 
     result = BgeM3EmbeddingsModel.create_sparse_dense_vectors(texts)
     return [
@@ -64,6 +68,7 @@ def convert_to_milvus_data(table_docs: List[TableDocument]):
         result.dense_vectors,
         database_names,
         schema_names,
-        table_names
+        table_names,
+        database_ids
     ]
 

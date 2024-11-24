@@ -26,10 +26,11 @@ def insert_docs_to_collection(table_docs: List[TableDocument], collection_name: 
         raise e
 
 
-def hybrid_search(query: str, collection_name: str, limit: int = 50):
+def hybrid_search(query: str, collection_name: str, database_id: int, limit: int = 50):
     """
     Hybrid search for documents. Semantic and keyword search is combined
     Args:
+        database_id: database id
         query: User query. Search text.
         limit: If the reranker is enabled, we retrieve this many documents from the vector database, and the reranker
         narrows it down to the top_k number of items.
@@ -43,12 +44,12 @@ def hybrid_search(query: str, collection_name: str, limit: int = 50):
     query_embeddings = BgeM3EmbeddingsModel.get_model()([query])
 
     sparse_search_params = {"metric_type": "IP"}
-    sparse_req = AnnSearchRequest(query_embeddings["sparse"],"sparse_vector", sparse_search_params, limit=limit)
+    sparse_req = AnnSearchRequest(query_embeddings["sparse"],"sparse_vector", sparse_search_params, limit=limit, expr=f"database_id=={database_id}")
     dense_search_params = {"metric_type": "IP"}
-    dense_req = AnnSearchRequest(query_embeddings["dense"], "dense_vector", dense_search_params, limit=limit)
+    dense_req = AnnSearchRequest(query_embeddings["dense"], "dense_vector", dense_search_params, limit=limit, expr=f"database_id=={database_id}")
 
     res = col.hybrid_search([sparse_req, dense_req], rerank=RRFRanker(),
-                            limit=limit, output_fields=['table_name', "database_name", "schema_name", "text"])
+                            limit=limit, output_fields=['table_name', "database_name", "schema_name", "text", "database_id"])
     res = res[0]
     result = []
     for hit in res:
@@ -59,6 +60,7 @@ def hybrid_search(query: str, collection_name: str, limit: int = 50):
                 schema_name=hit.fields["schema_name"],
                 text=hit.fields["text"],
                 distance=hit.distance,
+                database_id=hit.fields["database_id"]
             )
         )
     return sorted(result, key=lambda item: item.distance, reverse=False)
