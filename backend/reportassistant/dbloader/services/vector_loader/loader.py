@@ -84,5 +84,5 @@ class VectorLoader:
                     schema_name=table_doc.schema_name,
                     database_id = self.data_source.id)
                 )
-        delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_name", value=self.data_source.id)
+        delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=self.data_source.id)
         insert_docs_to_collection(data, COLLECTION_NAME)
