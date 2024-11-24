@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 
 from common.db.manager.database_manager import DatabaseManager
 from db_configurator.models import DatabaseSource
-from reporter_agent.visualisation_agent.ai import RepType
-from reporter_agent.visualisation_agent.ai.graph import create_graph
-from reporter_agent.visualisation_agent.chart import ChartTypes
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import RepType
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import create_graph
+from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartTypes
 
 
 # Create your tests here.
