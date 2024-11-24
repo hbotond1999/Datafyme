@@ -1,8 +1,8 @@
 from langchain_core.prompts import PromptTemplate
 
 from common.ai.model import get_llm_model
-from reporter_agent.visualisation_agent.ai import RepType
-from reporter_agent.visualisation_agent.chart import ChartTypes
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import RepType
+from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartTypes
 
 
 def create_representation_agent():

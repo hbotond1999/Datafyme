@@ -1,10 +1,10 @@
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-from reporter_agent.sql_statement_creator.ai.nodes import hybrid_search_node, get_ddls, sync_grade_ddls, relation_graph, \
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.nodes import hybrid_search_node, get_ddls, sync_grade_ddls, relation_graph, \
     get_final_ddls, create_query
 
-from reporter_agent.sql_statement_creator.ai.state import GraphState
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
 
 
 def create_sql_agent_graph():

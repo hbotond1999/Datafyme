@@ -3,7 +3,7 @@ from typing import Dict, List, Union, Any
 
 from pydantic import BaseModel
 
-from reporter_agent.visualisation_agent.chart import ChartTypes
+from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartTypes
 
 
 class RepType(Enum):

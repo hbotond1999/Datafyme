@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from reporter_agent.visualisation_agent.chart.abc import Chart
+from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
 
 
 class LineChart(BaseModel, Chart):

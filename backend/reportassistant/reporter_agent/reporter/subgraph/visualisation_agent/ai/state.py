@@ -1,7 +1,7 @@
 from typing import TypedDict, Any, Dict, List
 
-from reporter_agent.visualisation_agent.ai import FinalData
-from reporter_agent.visualisation_agent.chart.abc import Chart
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData
+from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
 
 
 class GraphState(TypedDict):

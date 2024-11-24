@@ -1,10 +1,10 @@
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
-from reporter_agent.visualisation_agent.ai import RepType
-from reporter_agent.visualisation_agent.ai.nodes import decide_representation, decide_chart_type, populate_chart_data, \
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import RepType
+from reporter_agent.reporter.subgraph.visualisation_agent.ai.nodes import decide_representation, decide_chart_type, populate_chart_data, \
     create_final_data
-from reporter_agent.visualisation_agent.ai.state import GraphState
+from reporter_agent.reporter.subgraph.visualisation_agent.ai.state import GraphState
 
 
 def create_graph():
