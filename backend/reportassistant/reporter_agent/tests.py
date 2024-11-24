@@ -3,8 +3,10 @@ from dotenv import load_dotenv
 
 from common.db.manager.database_manager import DatabaseManager
 from db_configurator.models import DatabaseSource
+from reporter_agent.reporter.graph import create_reporter_graph
+from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.visualisation_agent.ai import RepType
-from reporter_agent.reporter.subgraph.visualisation_agent.ai import create_graph
+from reporter_agent.reporter.subgraph.visualisation_agent.ai.graph import create_graph
 from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartTypes
 
 
@@ -12,18 +14,6 @@ from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartType
 class VizuAgentTests(TestCase):
     def setUp(self):
         load_dotenv()
-        datasource, created = DatabaseSource.objects.get_or_create(
-            name="postgres",
-            defaults={
-                "type": "postgresql",  # Set default values for other fields
-                "username": "postgres",
-                "password": "password",
-                "host": "localhost",
-                "port": 5432,
-            }
-        )
-        database_manager = DatabaseManager(datasource)
-        database_manager.execute_sql("select * from valami", response_format="list")
         self.graph = create_graph()
 
 
@@ -71,3 +61,22 @@ class VizuAgentTests(TestCase):
         result = self.graph.invoke({"input_data": test_data, "question": question})
         final_data = result["final_data"]
         self.assertEqual(final_data.type, RepType.TABLE)
+
+
+class ReporterAgentTests(TestCase):
+    def setUp(self):
+        self.agent = create_reporter_graph()
+        self.datasource, _ = DatabaseSource.objects.get_or_create(
+            name="postgres",
+            defaults={
+                "type": "postgresql",  # Set default values for other fields
+                "username": "postgres",
+                "password": "password",
+                "host": "localhost",
+                "port": 5432,
+            }
+        )
+
+    def test_reporter_agent(self):
+        result: GraphState = self.agent.invoke({"database_source": self.datasource, "chat_history": [], "question": "Milyen cégekkel dolgozunk együtt?"})
+        self.assertEqual(result["representation_data"].type, RepType.TABLE)
