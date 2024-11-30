@@ -1,4 +1,5 @@
 from common.db.manager.database_manager import DatabaseManager
+from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from reporter_agent.reporter.agents import create_history_summarizer
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
@@ -20,10 +21,10 @@ def create_sql_query_node(state: GraphState):
 def run_sql_query_node(state: GraphState):
     db_manager = DatabaseManager(state["database_source"])
     try:
-        data  = db_manager.execute_sql(state["sql_query"], response_format="list")
+        data = db_manager.execute_sql(state["sql_query"], response_format="list")
         return {"sql_query_result": data, "error_message": None}
-    except Exception as e:
-        return {"error_message": str(e)}
+    except ExecuteQueryError as e:
+        return {"error_message": {"message": e.message, "original_exception": e.original_exception}}
 
 
 def create_visualization_node(state: GraphState):
