@@ -6,7 +6,7 @@ from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import S
 
 def sql_agent():
     """
-    Creates a representation agent for sql creation tasks.
+    Creates an sql agent for sql creation tasks.
 
     Returns:
         A prompt that is combined with a language model for generating responses based on the prompt template.
@@ -20,3 +20,4 @@ def sql_agent():
     prompt = PromptTemplate(template=prompt_str, input_variables=["ddls", "message", "database"])
 
     return prompt | get_llm_model().with_structured_output(SQLCommand)
+

@@ -104,4 +104,6 @@ def create_query(state: GraphState):
     result = sql_agent().invoke({'ddls': json.dumps(state["table_final_ddls"]),
                                  'message': state["message"],
                                  'database': state["database_source"].type})
-    return {"sql_query": result.sql_query, "query_description": result.query_description}
+
+    return {"sql_query": result.sql_query, "query_description": result.query_description,
+            "table_final_ddls": state["table_final_ddls"]}

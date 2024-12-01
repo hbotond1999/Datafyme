@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 class SQLCommand(BaseModel):
     """
-    TableRelation:
+    SQLCommand:
         A class to store the created SQL commands.
 
     Attributes:
