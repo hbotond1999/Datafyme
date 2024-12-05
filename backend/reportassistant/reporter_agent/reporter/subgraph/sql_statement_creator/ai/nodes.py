@@ -54,13 +54,12 @@ def sync_grade_ddls(state: GraphState):
 
 def relation_graph(state: GraphState):
     filtered_tables = [(table["schema"], table["name"]) for table in state['filtered_table_ddls']]
-
     neo4j_instance = Neo4JInstance()
 
     tables_all = []
     seen = set()
     for schema_name, table_name in filtered_tables:
-        for neighbour in neo4j_instance.find_table_neighbours(state["database_source"].name, schema_name, table_name):
+        for neighbour in neo4j_instance.find_table_neighbours(state["database_source"].id, schema_name, table_name):
             key = (schema_name, table_name)
             key2 = (neighbour['neighbour_schema'], neighbour['neighbour_table_name'])
             if key not in seen:

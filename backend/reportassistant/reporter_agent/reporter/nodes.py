@@ -17,7 +17,7 @@ def create_sql_query_node(state: GraphState):
     result = create_sql_agent_graph().invoke({"message": state["question"],
                                               "database_source": state["database_source"]})
 
-    return {"sql_query": result["sql_query"] + 'asdasd', "sql_query_description": result["query_description"],
+    return {"sql_query": result["sql_query"], "sql_query_description": result["query_description"],
             "table_final_ddls": result["table_final_ddls"]}
 
 

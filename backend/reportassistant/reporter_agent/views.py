@@ -7,9 +7,9 @@ from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import crea
 # Create your views here.
 def sql_agent(request):
     message = request.GET.get('message')
-    database_name = request.GET.get('database_name')
+    database_id = request.GET.get('database_id')
 
-    datasource, _ = DatabaseSource.objects.get_or_create(name=database_name)
+    datasource = DatabaseSource.objects.get(id=database_id)
 
     sql_graph = create_sql_agent_graph()
     result = sql_graph.invoke({"message": message, "database_source": datasource})
