@@ -1,0 +1,109 @@
+/* Chat History Styles */
+body {
+    background-color: #f4f7fc;
+}
+
+.chat-history-container {
+    width: 100%;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+}
+
+.conversation-header h4 {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.conversation-body {
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.message {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+}
+
+.message p {
+    margin: 0;
+}
+
+.message strong {
+    color: #007bff;
+}
+
+.message small {
+    font-size: 0.9rem;
+    color: #888;
+    display: block;
+    margin-top: 5px;
+}
+
+.list-group-item {
+    border: none;
+    background-color: transparent;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.empty-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+/* Button in footer */
+.card-footer a.btn {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+}
+
+.card-footer a.btn:hover {
+    background-color: #0056b3;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.navbar .navbar-brand {
+    font-weight: bold;
+}
+
+.navbar .nav-link {
+    font-size: 1.1em;
+}
+
+/* In your CSS file (e.g., styles.css) */
+.navbar-nav .nav-item.active .nav-link {
+    color: white;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: whitesmoke;
+}

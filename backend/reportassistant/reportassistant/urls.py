@@ -22,5 +22,6 @@ urlpatterns = [
     path("reporter_agent/", include("reporter_agent.urls")),
     path('accounts/', include('accounts.urls')),
     path('db_configurator/', include('db_configurator.urls')),
+    path('chat/', include('chat.urls')),
     path('admin/', admin.site.urls),
 ]

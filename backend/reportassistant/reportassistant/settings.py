@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     "db_configurator",
     "reporter_agent",
     "dashboard",
-    "accounts"
+    "accounts",
+    "chat"
 ]
 
 MIDDLEWARE = [
