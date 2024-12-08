@@ -21,5 +21,6 @@ urlpatterns = [
     path("dbloader/", include("dbloader.urls")),
     path("reporter_agent/", include("reporter_agent.urls")),
     path('accounts/', include('accounts.urls')),
+    path('db_configurator/', include('db_configurator.urls')),
     path('admin/', admin.site.urls),
 ]
