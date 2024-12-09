@@ -4,10 +4,13 @@ import json
 from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent, refine_user_question_agent
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_ddls
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
+
+
+RECURSIVE_LIMIT = 5
 
 
 def hybrid_search_node(state: GraphState):
@@ -47,9 +50,20 @@ def get_ddls(state: GraphState):
     return {"matching_table_ddls": json_data}
 
 
-def sync_grade_ddls(state: GraphState):
+def reranker(state: GraphState):
     filtered_ddls = asyncio.run(grade_ddls(state))
     return {"filtered_table_ddls": filtered_ddls}
+
+
+def refine_user_question(state: GraphState):
+    global RECURSIVE_LIMIT
+    RECURSIVE_LIMIT -= 1
+
+    if RECURSIVE_LIMIT >= 0:
+        result = refine_user_question_agent().invoke({'message': state["message"]})
+        return {"message": result.message}
+    else:
+        raise SystemExit("Recursive limit exceeded")
 
 
 def relation_graph(state: GraphState):
@@ -75,13 +89,6 @@ def relation_graph(state: GraphState):
 
 
 def get_final_ddls(state: GraphState):
-    """
-    Args:
-        state (GraphState):
-
-    Returns:
-        dict: A dictionary containing the matching_tables
-    """
     extractor = DatabaseManager(state["database_source"])
     tables_schemas = extractor.get_tables_schemas()
     matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["tables_all"]]

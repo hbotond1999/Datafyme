@@ -1,7 +1,7 @@
 from langchain_core.prompts import PromptTemplate
 
 from common.ai.model import get_llm_model
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import SQLCommand
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import SQLCommand, NewQuestion
 
 
 def sql_agent():
@@ -21,3 +21,13 @@ def sql_agent():
 
     return prompt | get_llm_model().with_structured_output(SQLCommand)
 
+
+def refine_user_question_agent():
+    prompt_str = """Your task is to refine the user question. User question: {message}. 
+        The user's request does not match the tables in the database. Please rephrase the user's question in a way that 
+        makes it more suitable for vector database-based search and make sure that the content of the original question 
+        does not change."""
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["message"])
+
+    return prompt | get_llm_model().with_structured_output(NewQuestion)
