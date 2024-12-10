@@ -1,0 +1,50 @@
+<div class="container mt-4">
+        <button id="openAddDatabaseModal" class="btn btn-primary w-25 mb-2" data-bs-toggle="modal" data-bs-target="#addDatabaseModal">Add new database</button>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Host</th>
+                        <th>Port</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for database in databases %}
+                    <tr>
+                        <td>{{ database.name }}</td>
+                        <td>{{ database.type }}</td>
+                        <td>{{ database.host }}</td>
+                        <td>{{ database.port }}</td>
+                        <td>
+                            {% if database.is_paused %}
+                                <span class="badge bg-danger">Paused</span>
+                            {% else %}
+                                <span class="badge bg-success">Running</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
+                                    {% if database.is_paused %}
+                                        <i class="fas fa-play"></i> Resume
+                                    {% else %}
+                                        <i class="fas fa-pause"></i> Pause
+                                    {% endif %}
+                                </a>
+
+                                <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>

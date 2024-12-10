@@ -57,3 +57,6 @@ class DatabaseManager(DatabaseManagerAbc):
         except Exception as e:
             logger.error(f"An error occurred while executing the query: {e}")
             raise e
+
+    def check_connection(self) -> bool:
+        return self.handler.check_connection()

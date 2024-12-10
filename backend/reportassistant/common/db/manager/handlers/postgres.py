@@ -188,3 +188,6 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
         except Exception as e:
             logger.error(f"An error occurred while execute query: {e}")
             raise e
+
+    def check_connection(self) -> bool:
+        return self.db_manager.check_connection()

@@ -11,6 +11,9 @@
             <li class="nav-item {% if request.path == '/chat/history/' %}active{% endif %}">
                 <a class="nav-link" href="{% url 'chat_history' %}">Chat History</a>
             </li>
+            <li class="nav-item {% if request.path == '/db_configurator/' %}active{% endif %}">
+                <a class="nav-link" href="{% url 'db_configurator:manage_connections' %}">DB connections</a>
+            </li>
         </ul>
     </div>
 </nav>
