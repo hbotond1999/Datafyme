@@ -30,7 +30,6 @@ async def grade_ddls(state: GraphState):
     Returns:
         state (dict): Updates ddls key with only filtered relevant documents
     """
-    print("---CHECK DDL RELEVANCE TO QUESTION---")
     message = state["message"]
     ddls = state["matching_table_ddls"]
 
