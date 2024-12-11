@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .chart-container {
+            width: 45%;
+            margin: 20px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .full-width-container {
+            width: 45%;
+            margin: 20px;
+            display: inline-block;
+        }
+        canvas {
+            width: 100% !important;
+        }
+
+        #scatterChart, #pieChart {
+            height: 400px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="barChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="lineChart"></canvas>
+    </div>
+    <div class="full-width-container">
+        <canvas id="bubbleChart"></canvas>
+    </div>
+    <div class="full-width-container">
+        <canvas id="histogramChart"></canvas>
+    </div>
+    <div class="full-width-container">
+        <canvas id="scatterChart"></canvas>
+    </div>
+    <div class="full-width-container">
+        <canvas id="pieChart"></canvas>
+    </div>
+
+    <script>
+
+        const barInput = {
+            TYPE: "chart",
+            CHART_TYPE: "bar",
+            DATA: {
+                metadata: { x_axis: "col1", y_axis: "col2" },
+                data: { "col1": ["Apples", "Bananas", "Cherries"], "col2": [5, 7, 3] }
+            }
+        };
+
+        if (barInput.TYPE === "chart" && barInput.CHART_TYPE === "bar") {
+            const barLabels = barInput.DATA.data[barInput.DATA.metadata.x_axis];
+            const barData = barInput.DATA.data[barInput.DATA.metadata.y_axis];
+
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: barLabels,
+                    datasets: [{
+                        label: 'Fruits Count',
+                        data: barData,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(75, 192, 192, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Bar Chart Example'
+                        }
+                    },
+                    hover: {
+                        mode: null
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        const lineInput = {
+            TYPE: "chart",
+            CHART_TYPE: "line",
+            DATA: {
+                metadata: { x_axis: "Month", y_axis: "Sales" },
+                data: { "Month": ["January", "February", "March", "April", "May"], "Sales": [100, 120, 90, 150, 170] }
+            }
+        };
+
+        if (lineInput.TYPE === "chart" && lineInput.CHART_TYPE === "line") {
+            const lineLabels = lineInput.DATA.data[lineInput.DATA.metadata.x_axis];
+            const lineData = lineInput.DATA.data[lineInput.DATA.metadata.y_axis];
+
+            const lineCtx = document.getElementById('lineChart').getContext('2d');
+            new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: lineLabels,
+                    datasets: [{
+                        label: 'Monthly Sales',
+                        data: lineData,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Line Chart Example'
+                        }
+                    },
+                    hover: {
+                        mode: null
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        const bubbleInput = {
+            TYPE: "chart",
+            CHART_TYPE: "bubble",
+            DATA: {
+                metadata: { x_axis: "GDP", y_axis: "Life Expectancy", size: "Population", label: "Country" },
+                data: {
+                    "GDP": [40000, 35000, 30000, 25000, 20000],
+                    "Life Expectancy": [80, 78, 75, 72, 70],
+                    "Population": [50, 100, 200, 300, 400],
+                    "Country": ["USA", "Germany", "India", "Brazil", "China"]
+                }
+            }
+        };
+
+        if (bubbleInput.TYPE === "chart" && bubbleInput.CHART_TYPE === "bubble") {
+            const bubbleData = bubbleInput.DATA.data["GDP"].map((gdp, index) => ({
+                x: gdp,
+                y: bubbleInput.DATA.data["Life Expectancy"][index],
+                r: bubbleInput.DATA.data["Population"][index] / 10, 
+                label: bubbleInput.DATA.data["Country"][index] 
+            }));
+
+            const bubbleCtx = document.getElementById('bubbleChart').getContext('2d');
+            new Chart(bubbleCtx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Country Statistics',
+                        data: bubbleData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Bubble Chart Example'
+                        }
+                    },
+                    hover: {
+                        mode: null
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'GDP'
+                            },
+                            beginAtZero: true
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Life Expectancy'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        const histogramInput = {
+            TYPE: "chart",
+            CHART_TYPE: "histogram",
+            DATA: {
+                metadata: { x_axis: "Age", y_axis: "Frequency" },
+                data: {
+                    "Age": [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+                    "Frequency": [5, 10, 20, 30, 40, 35, 30, 25, 15, 10, 5, 3, 2, 1, 1]
+                }
+            }
+        };
+
+        if (histogramInput.TYPE === "chart" && histogramInput.CHART_TYPE === "histogram") {
+            const histogramLabels = histogramInput.DATA.data[histogramInput.DATA.metadata.x_axis];
+            const histogramData = histogramInput.DATA.data[histogramInput.DATA.metadata.y_axis];
+
+            const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+            new Chart(histogramCtx, {
+                type: 'bar',
+                data: {
+                    labels: histogramLabels,
+                    datasets: [{
+                        label: 'Age Frequency',
+                        data: histogramData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Histogram Chart Example'
+                        }
+                    },
+                    hover: {
+                        mode: null
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+
+        const scatterInput = {
+            TYPE: "chart",
+            CHART_TYPE: "scatter",
+            DATA: {
+                metadata: { x_axis: "Income", y_axis: "Spending" },
+                data: {
+                    "Income": [50000, 60000, 70000, 80000, 90000],
+                    "Spending": [40000, 45000, 50000, 55000, 60000]
+                }
+            }
+        };
+
+        if (scatterInput.TYPE === "chart" && scatterInput.CHART_TYPE === "scatter") {
+            const scatterLabels = scatterInput.DATA.data[scatterInput.DATA.metadata.x_axis];
+            const scatterData = scatterInput.DATA.data[scatterInput.DATA.metadata.y_axis];
+
+            const scatterCtx = document.getElementById('scatterChart').getContext('2d');
+            new Chart(scatterCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Income vs Spending',
+                        data: scatterLabels.map((x, index) => ({ x, y: scatterData[index] })),
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Scatter Chart Example'
+                        }
+                    },
+                    hover: {
+                        mode: null
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        const pieInput = {
+            TYPE: "chart",
+            CHART_TYPE: "pie",
+            DATA: {
+                metadata: { x_axis: "Fruit", y_axis: "Quantity" },
+                data: { "Fruit": ["Apples", "Bananas", "Cherries"], "Quantity": [5, 7, 3] }
+            }
+        };
+
+        if (pieInput.TYPE === "chart" && pieInput.CHART_TYPE === "pie") {
+            const pieLabels = pieInput.DATA.data[pieInput.DATA.metadata.x_axis];
+            const pieData = pieInput.DATA.data[pieInput.DATA.metadata.y_axis];
+
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(75, 192, 192, 0.6)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Fruit Pie Chart'
+                        }
+                    },
+                    hover: {
+                        mode: null
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

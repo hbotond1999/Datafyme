@@ -15,3 +15,4 @@ class DatabaseSource(models.Model):
     password = models.CharField(max_length=50)
     host = models.CharField(max_length=1000)
     port = models.IntegerField()
+    is_paused = models.BooleanField(default=False) 
