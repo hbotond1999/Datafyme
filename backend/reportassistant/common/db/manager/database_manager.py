@@ -1,6 +1,7 @@
 import logging
 from typing import List, Dict, Any, Literal
 
+from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from db_configurator.models import DatabaseSource
 from common.db.manager.abc import DatabaseManagerAbc
 from common.db.manager.handlers import HANDLER
@@ -55,8 +56,7 @@ class DatabaseManager(DatabaseManagerAbc):
         try:
             return self.handler.execute_sql(sql, response_format)
         except Exception as e:
-            logger.error(f"An error occurred while executing the query: {e}")
-            raise e
+            raise ExecuteQueryError(f"Failed to execute query: {sql}", original_exception=e)
 
     def check_connection(self) -> bool:
         return self.handler.check_connection()
