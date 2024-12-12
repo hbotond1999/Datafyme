@@ -1,7 +1,3 @@
-body {
-    background-color: #f4f7fc;
-}
-
 .chat-container {
     position: fixed;
     bottom: 20px;
@@ -120,27 +116,5 @@ body {
 .btn-send i,
 .btn-danger i {
     margin-right: 5px;
-}
-
-.navbar {
-    margin-bottom: 20px;
-}
-
-.navbar .navbar-brand {
-    font-weight: bold;
-}
-
-.navbar .nav-link {
-    font-size: 1.1em;
-}
-
-.navbar-nav .nav-item.active .nav-link {
-    color: white;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-.navbar-dark .navbar-nav .nav-link {
-    color: whitesmoke;
 }
 

@@ -4,6 +4,8 @@ from typing import Optional, List, Any
 
 from psycopg2.extras import RealDictCursor
 
+from chat.views import trial
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,6 +41,7 @@ class PostgresHelper:
         except (Exception, psycopg2.DatabaseError) as error:
             logger.error(f"Error connecting to the database {self.dbname}: {error}")
             self.connection = None
+            raise error
 
     def _disconnect(self) -> None:
         """Close the database connection."""
@@ -48,6 +51,7 @@ class PostgresHelper:
                 logger.info(f"Disconnected from the database: {self.dbname}")
             except (Exception, psycopg2.DatabaseError) as error:
                 logger.error(f"Error during disconnection from {self.dbname}: {error}")
+                raise error
             finally:
                 self.connection = None
 
@@ -80,3 +84,11 @@ class PostgresHelper:
         finally:
             # Ensure that the connection is closed after execution
             self._disconnect()
+
+    def check_connection(self) -> bool:
+        try:
+            self._connect()
+            self._disconnect()
+            return True
+        except (Exception, psycopg2.DatabaseError) as error:
+            return False

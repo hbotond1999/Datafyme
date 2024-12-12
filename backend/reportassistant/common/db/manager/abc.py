@@ -32,3 +32,7 @@ class DatabaseManagerAbc(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
         pass
+
+    @abc.abstractmethod
+    def check_connection(self) -> bool:
+        pass

@@ -29,7 +29,7 @@ function sendMessage(event) {
 function clearChat() {
     $.ajax({
         type: 'POST',
-        url: '{% url "clear_chat" %}',
+        url: '{% url "chat:clear_chat" %}',
         data: {
             'csrfmiddlewaretoken': '{{ csrf_token }}'
         },

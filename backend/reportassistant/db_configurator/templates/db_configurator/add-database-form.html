@@ -1,0 +1,128 @@
+{% load static %}
+<div class="modal fade" id="addDatabaseModal">
+         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+             <div class="modal-content">
+                 <div class="modal-header">
+                    <h5 class="modal-title">Establish a New Connection</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                 <div class="modal-body">
+                     <div class="container mt-4 form-container">
+                        <div class="col-md-12">
+                        <form id="databaseForm" method="POST" novalidate >
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_type" class="form-label">Database Type</label>
+                            <select class="form-select" id="id_type" name="type">
+                                <option value="">Select a type</option>
+                                {% for value, label in form.type.field.choices %}
+                                    <option value="{{ value }}" {% if value == form.type.value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">Database name</label>
+                            <input type="text" class="form-control" id="id_name" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="id_username" name="username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="id_password" name="password">
+                                <button type="button" class="btn btn-outline-secondary" id="togglePassword" aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye password-eye-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_host" class="form-label">Host</label>
+                            <input type="text" class="form-control" id="id_host" name="host">
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_port" class="form-label">Port</label>
+                            <input type="number" class="form-control" id="id_port" name="port">
+                        </div>
+{#                        <button type="submit" class="btn btn-primary w-100">Save Connection</button>#}
+                        </form>
+                        </div>
+
+                    </div>
+                 </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" id="submitButton" class="btn btn-primary">Save Connection</button>
+                         <div id="db-loader-spinner" class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                     </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    const submitButton = document.getElementById("submitButton");
+    const dbLoaderSpinner = document.getElementById('db-loader-spinner');
+
+    dbLoaderSpinner.style.display = 'none';
+    submitButton.style.display = 'block';
+
+    submitButton.addEventListener('click', () => {
+        const form = document.getElementById("databaseForm");
+        const formData = new FormData(form);
+
+        submitButton.style.display = 'none';
+        dbLoaderSpinner.style.display = 'block';
+
+        // Töröljük az előző hibajelzéseket
+        document.querySelectorAll(".error-message").forEach(el => el.remove());
+        document.querySelectorAll(".is-invalid").forEach(el => el.classList.remove("is-invalid"));
+
+        fetch("{% url 'db_configurator:add_connection' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken') // Django CSRF token
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Validation failed');
+            }
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('openAddDatabaseModal').click();
+                location.reload();
+            } else {
+                const errors = JSON.parse(data.errors);
+
+                // Hibák megjelenítése
+                for (const [field, errorList] of Object.entries(errors)) {
+                    const inputElement = form.querySelector(`[name="${field}"]`);
+                    if (inputElement) {
+                        inputElement.classList.add("is-invalid");
+
+                        const errorMessage = document.createElement("div");
+                        errorMessage.className = "invalid-feedback error-message";
+                        errorMessage.textContent = errorList.map(error => error.message).join(", ");
+                        inputElement.parentElement.appendChild(errorMessage);
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred.');
+        })
+        .finally(() => {
+            dbLoaderSpinner.style.display = 'none';
+            submitButton.style.display = 'block';
+        });
+    });
+</script>

@@ -57,3 +57,6 @@ class DatabaseManager(DatabaseManagerAbc):
             return self.handler.execute_sql(sql, response_format)
         except Exception as e:
             raise ExecuteQueryError(f"Failed to execute query: {sql}", original_exception=e)
+
+    def check_connection(self) -> bool:
+        return self.handler.check_connection()
