@@ -1,34 +1,3 @@
-/* static/db_connector/css/styles.css */
-
-/* Center the form vertically and horizontally */
-.form-container {
-    min-height: 80vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Ensure the password field and button align properly */
-.password-field-container {
-    position: relative;
-}
-
-.password-field-container input {
-    padding-right: 40px; /* Add space on the right for the eye icon */
-}
-
-.password-field-container button {
-    position: absolute;
-    top: 50%;
-    right: 10px; /* Align the button to the right */
-    padding-top: 40px;
-    transform: translateY(-50%); /* Vertically center the button */
-    background: transparent;
-    border: none;
-    color: #6c757d;
-    cursor: pointer;
-}
-
-.password-field-container button i {
-    font-size: 1.2rem; /* Slightly bigger icon for better visibility */
+.button-transparent {
+    background-color: transparent;
 }

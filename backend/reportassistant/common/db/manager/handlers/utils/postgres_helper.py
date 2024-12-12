@@ -41,6 +41,7 @@ class PostgresHelper:
         except (Exception, psycopg2.DatabaseError) as error:
             logger.error(f"Error connecting to the database {self.dbname}: {error}")
             self.connection = None
+            raise error
 
     def _disconnect(self) -> None:
         """Close the database connection."""
@@ -50,6 +51,7 @@ class PostgresHelper:
                 logger.info(f"Disconnected from the database: {self.dbname}")
             except (Exception, psycopg2.DatabaseError) as error:
                 logger.error(f"Error during disconnection from {self.dbname}: {error}")
+                raise error
             finally:
                 self.connection = None
 

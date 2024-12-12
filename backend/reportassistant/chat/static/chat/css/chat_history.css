@@ -84,26 +84,3 @@ body {
 .card-footer a.btn:hover {
     background-color: #0056b3;
 }
-
-.navbar {
-    margin-bottom: 20px;
-}
-
-.navbar .navbar-brand {
-    font-weight: bold;
-}
-
-.navbar .nav-link {
-    font-size: 1.1em;
-}
-
-/* In your CSS file (e.g., styles.css) */
-.navbar-nav .nav-item.active .nav-link {
-    color: white;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-.navbar-dark .navbar-nav .nav-link {
-    color: whitesmoke;
-}

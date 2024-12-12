@@ -1,61 +1,44 @@
+{% extends 'base_generic.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat History</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'chat/css/chat_history.css' %}">
-</head>
-<body>
-
-    {% include 'chat/navbar.html' %}
-
-
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow-sm">
-                    <div class="card-header text-center bg-primary text-white">
-                        <h2>Chat History</h2>
-                    </div>
-                    <div class="card-body">
-                        {% if history %}
-                            <div class="list-group">
-                                {% for conversation in history %}
-                                    <div class="list-group-item mb-3">
-                                        <div class="conversation-header">
-                                            <h4 class="mb-2">Conversation ID: {{ conversation.conversation_id }}</h4>
-                                            <p class="small text-muted">Started on: {{ conversation.timestamp }}</p>
-                                        </div>
-                                        <div class="conversation-body">
-                                            {% for message in conversation.messages %}
-                                                <div class="message mb-3">
-                                                    <p><strong>You:</strong> {{ message.user_message }}</p>
-                                                    <p><strong>System:</strong> {{ message.system_response }}</p>
-                                                    <small class="text-muted">{{ message.timestamp }}</small>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
+{% block content %}
+    <link href="{% static 'chat/css/chat_history.css' %}" rel="stylesheet">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-primary text-white">
+                    <h2>Chat History</h2>
+                </div>
+                <div class="card-body">
+                    {% if history %}
+                        <div class="list-group">
+                            {% for conversation in history %}
+                                <div class="list-group-item mb-3">
+                                    <div class="conversation-header">
+                                        <h4 class="mb-2">Conversation ID: {{ conversation.conversation_id }}</h4>
+                                        <p class="small text-muted">Started on: {{ conversation.timestamp }}</p>
                                     </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <p class="text-center text-muted">No chat history available.</p>
-                        {% endif %}
-                    </div>
-                    <div class="card-footer text-center">
-                        <a href="{% url 'chat' %}" class="btn btn-primary">Start New Conversation</a>
-                    </div>
+                                    <div class="conversation-body">
+                                        {% for message in conversation.messages %}
+                                            <div class="message mb-3">
+                                                <p><strong>You:</strong> {{ message.user_message }}</p>
+                                                <p><strong>System:</strong> {{ message.system_response }}</p>
+                                                <small class="text-muted">{{ message.timestamp }}</small>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">No chat history available.</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'chat:chat' %}" class="btn btn-primary">Start New Conversation</a>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-</body>
-</html>
+</div>
+{% endblock %}

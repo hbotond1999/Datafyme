@@ -1,122 +1,106 @@
+{% extends 'base_generic.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'chat/css/styles.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
+{%  block content %}
+<link rel="stylesheet" type='text/css' href="{% static 'chat/css/styles.css' %}">
+<div class="chat-icon" onclick="toggleChat()">
+    <i class="fas fa-comments"></i>
+</div>
 
-    {% include 'chat/navbar.html' %}
-
-    <div class="chat-icon" onclick="toggleChat()">
-        <i class="fas fa-comments"></i>
+<div class="chat-container" id="chatContainer">
+    <div class="chat-header">
+        <span>Chat</span>
+        <button class="close" onclick="toggleChat()" aria-label="Close">&times;</button>
     </div>
-    
-    <div class="chat-container" id="chatContainer">
-        <div class="chat-header">
-            <span>Chat</span>
-            <button class="close" onclick="toggleChat()" aria-label="Close">&times;</button>
+    <div class="chat-body">
+        <div id="messagesContainer">
+            {% for message in messages %}
+                <div class="message user-message">
+                    <strong>You:</strong> {{ message.user_message }}
+                </div>
+                <div class="message reply-message">
+                    <strong>System:</strong> {{ message.system_response }}
+                </div>
+            {% endfor %}
         </div>
-        <div class="chat-body">
-            <div id="messagesContainer">
-                {% for message in messages %}
-                    <div class="message user-message">
-                        <strong>You:</strong> {{ message.user_message }}
-                    </div>
-                    <div class="message reply-message">
-                        <strong>System:</strong> {{ message.system_response }}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        <form method="post" id="chatForm" onsubmit="return sendMessage(event);">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ form.user_message }}
-            </div>
-            <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary btn-send">
-                    <i class="fas fa-paper-plane"></i> Send
-                </button>
-                <button type="button" class="btn btn-danger btn-sm" onclick="clearChat()">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-        </form>
     </div>
+    <form method="post" id="chatForm" onsubmit="return sendMessage(event);">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.user_message }}
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary btn-send">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="clearChat()">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </form>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'chat/js/chat.js' %}"></script>
-    <script>
-        function toggleChat() {
-            var chatContainer = document.getElementById('chatContainer');
-            chatContainer.style.display = chatContainer.style.display === 'none' || chatContainer.style.display === '' 
-                ? 'block' : 'none';
-        }
+<script src="{% static 'chat/js/chat.js' %}"></script>
+<script>
+    function toggleChat() {
+        var chatContainer = document.getElementById('chatContainer');
+        chatContainer.style.display = chatContainer.style.display === 'none' || chatContainer.style.display === ''
+            ? 'block' : 'none';
+    }
 
-        function sendMessage(event) {
-            event.preventDefault();
-            var form = $('#chatForm');
-            $.ajax({
-                type: form.attr('method'),
-                url: form.attr('action'),
-                data: form.serialize(),
-                success: function(response) {
-                    var messagesContainer = $('#messagesContainer');
-                    
-                    messagesContainer.append('<div class="message user-message"><strong>You:</strong> ' + response.user_message + '</div>');
-                    messagesContainer.append('<div class="message reply-message"><strong>System:</strong> ' + response.system_response + '</div>');
+    function sendMessage(event) {
+        event.preventDefault();
+        var form = $('#chatForm');
+        $.ajax({
+            type: form.attr('method'),
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response) {
+                var messagesContainer = $('#messagesContainer');
 
-                    if (response.chart_data) {
-                        var chartCanvasId = 'chart-' + Date.now();
-                        var chartHTML = `<div class="chart-container">
-                                            <canvas id="${chartCanvasId}" width="200" height="200"></canvas>
-                                         </div>`;
-                        messagesContainer.append(chartHTML);
-                        renderChart(chartCanvasId, response.chart_data);
-                    }
+                messagesContainer.append('<div class="message user-message"><strong>You:</strong> ' + response.user_message + '</div>');
+                messagesContainer.append('<div class="message reply-message"><strong>System:</strong> ' + response.system_response + '</div>');
 
-                    form[0].reset();
-                    messagesContainer.animate({ scrollTop: messagesContainer.prop("scrollHeight") }, 1000);
+                if (response.chart_data) {
+                    var chartCanvasId = 'chart-' + Date.now();
+                    var chartHTML = `<div class="chart-container">
+                                        <canvas id="${chartCanvasId}" width="200" height="200"></canvas>
+                                     </div>`;
+                    messagesContainer.append(chartHTML);
+                    renderChart(chartCanvasId, response.chart_data);
                 }
-            });
-            return false;
-        }
 
-        function renderChart(canvasId, chartData) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            new Chart(ctx, {
-                type: chartData.type,
-                data: {
-                    labels: chartData.labels,
-                    datasets: chartData.datasets
-                },
-                options: chartData.options || {}
-            });
-        }
+                form[0].reset();
+                messagesContainer.animate({ scrollTop: messagesContainer.prop("scrollHeight") }, 1000);
+            }
+        });
+        return false;
+    }
 
-        function clearChat() {
-            $.ajax({
-                type: 'POST',
-                url: '{% url "clear_chat" %}',
-                data: {
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        location.reload();
-                    }
+    function renderChart(canvasId, chartData) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+            type: chartData.type,
+            data: {
+                labels: chartData.labels,
+                datasets: chartData.datasets
+            },
+            options: chartData.options || {}
+        });
+    }
+
+    function clearChat() {
+        $.ajax({
+            type: 'POST',
+            url: '{% url "chat:clear_chat" %}',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    location.reload();
                 }
-            });
-        }
-    </script>
-</body>
-</html>
+            }
+        });
+    }
+</script>
+{% endblock %}

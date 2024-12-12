@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Delete Database</title>
-</head>
-<body>
-    <h1>Delete Database Connection</h1>
-    <p>Are you sure you want to delete {{ database.name }}?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Yes, Delete</button>
-        <a href="{% url 'db_configurator:manage_connections' %}">Cancel</a>
-    </form>
-</body>
-</html>
+<h1>Delete Database Connection</h1>
+<p>Are you sure you want to delete {{ database.name }}?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Delete</button>
+    <a href="{% url 'db_configurator:manage_connections' %}">Cancel</a>
+</form>

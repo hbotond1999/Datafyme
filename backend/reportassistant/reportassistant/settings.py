@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "reporter_agent",
     "dashboard",
     "accounts",
-    "chat"
+    "chat",
+    'home'
 ]
 
 MIDDLEWARE = [

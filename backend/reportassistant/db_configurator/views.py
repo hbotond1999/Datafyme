@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from common.db.manager.database_manager import DatabaseManager
+from dbloader.services import DBLoader
 from .models import DatabaseSource
 from .forms import DatabaseSourceForm
 
@@ -31,10 +32,17 @@ def add_connection(request):
         )
         success = DatabaseManager(database_source).check_connection()
         if success:
-            form.save()
+            saved_data = form.save()
+            errors = DBLoader(saved_data).load()
+            if len(errors) > 0:
+                saved_data.delete()
+                for error in errors:
+                    form.add_error('type', error)
+                return JsonResponse({"success": False, "errors": form.errors.as_json()})
+
             return JsonResponse({'success': True})
         else:
-            for field in ['host', 'port', 'username', 'password']:
+            for field in ['host', 'port', 'username', 'password', "name", "type"]:
                 form.add_error(field, ValidationError("Could not connect to database", code="ConnectionError"))
             return JsonResponse({'success': False, "errors": form.errors.as_json()})
 
