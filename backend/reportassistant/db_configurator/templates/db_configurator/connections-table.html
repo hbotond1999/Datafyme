@@ -1,6 +1,7 @@
 <div class="container mt-4">
+{% if perms.db_configurator.add_databasesource %}
         <button id="openAddDatabaseModal" class="btn btn-primary w-25 mb-2" data-bs-toggle="modal" data-bs-target="#addDatabaseModal">Add new database</button>
-
+{% endif %}
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead>
@@ -29,17 +30,21 @@
                         </td>
                         <td>
                             <div class="btn-group" role="group">
-                                <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
-                                    {% if database.is_paused %}
-                                        <i class="fas fa-play"></i> Resume
-                                    {% else %}
-                                        <i class="fas fa-pause"></i> Pause
-                                    {% endif %}
-                                </a>
+                                {% if perms.db_configurator.change_databasesource %}
+                                    <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
+                                        {% if database.is_paused %}
+                                            <i class="fas fa-play"></i> Resume
+                                        {% else %}
+                                            <i class="fas fa-pause"></i> Pause
+                                        {% endif %}
+                                    </a>
+                               {% endif %}
+                                {% if perms.db_configurator.delete_databasesource %}
+                                    <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                {% endif %}
 
-                                <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
-                                    <i class="fas fa-trash"></i> Delete
-                                </a>
                             </div>
                         </td>
                     </tr>

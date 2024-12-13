@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Message
 from .forms import MessageForm
 from django.http import JsonResponse
 import uuid
 
+@login_required
 def chat_view(request):
     if 'conversation_id' not in request.session:
         request.session['conversation_id'] = str(uuid.uuid4())  # Start a new conversation if none exists
@@ -145,13 +147,14 @@ def chat_view(request):
     messages = Message.objects.filter(conversation_id=conversation_id).order_by('-timestamp')
     return render(request, 'chat/chat.html', {'form': form, 'messages': messages, 'conversation_id': conversation_id})
 
-
+@login_required
 def clear_chat(request):
     if request.method == 'POST':
         request.session['conversation_id'] = str(uuid.uuid4())
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
 
+@login_required
 def chat_history(request):
     # Get all conversations ordered by the most recent first
     conversations = Message.objects.values('conversation_id').distinct().order_by('-timestamp')
@@ -165,6 +168,7 @@ def chat_history(request):
     return render(request, 'chat/chat_history.html', {'history': history})
 
 # New view to reset the conversation ID (without deleting from the DB)
+@login_required
 def clear_chat(request):
     if request.method == 'POST':
         # Generate a new conversation ID and update the session
@@ -172,8 +176,10 @@ def clear_chat(request):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
 
+@login_required
 def trial(request):
     return render(request, 'chat/trial.html')
 
+@login_required
 def trial_simple(request):
     return render(request, 'chat/trial_simple.html')
