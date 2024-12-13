@@ -19,3 +19,9 @@
 
 ### Check todo list for production
 `python manage.py check --deploy`
+
+### I18N
+`django-admin makemessages -l en`
+`django-admin makemessages -l en`
+
+Majd a http://localhost:8000/en/rosetta/ szerkeszük meg az új szövegek fordítását
