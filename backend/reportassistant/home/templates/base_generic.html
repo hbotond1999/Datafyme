@@ -24,13 +24,21 @@
             <li class="nav-item {% if request.path == '/chat/history/' %}active{% endif %}">
                 <a class="nav-link" href="{% url 'chat:chat_history' %}">Chat History</a>
             </li>
-            <li class="nav-item {% if request.path == '/db_configurator/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'db_configurator:manage_connections' %}">DB connections</a>
+            {% if perms.db_configurator.view_databasesource %}
+                <li class="nav-item {% if request.path == '/db_configurator/' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'db_configurator:manage_connections' %}">DB connections</a>
+                </li>
+            {% endif %}
+        </ul>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'accounts:logout' %}" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
             </li>
         </ul>
     </div>
 </nav>
-
 {%  block content %}
 {% endblock %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

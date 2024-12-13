@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,7 +11,7 @@ from dbloader.services import DBLoader
 from .models import DatabaseSource
 from .forms import DatabaseSourceForm
 
-
+@permission_required("db_configurator.view_databasesource")
 def manage_connections(request):
     databases = DatabaseSource.objects.all()
     form = DatabaseSourceForm()
@@ -19,6 +20,7 @@ def manage_connections(request):
         'databases': databases,
     })
 
+@permission_required("db_configurator.add_databasesource")
 def add_connection(request):
     if request.method == 'POST':
         form = DatabaseSourceForm(request.POST)
@@ -49,6 +51,9 @@ def add_connection(request):
                 form.add_error(field, ValidationError("Could not connect to database", code="ConnectionError"))
             return JsonResponse({'success': False, "errors": form.errors.as_json()})
 
+
+
+@permission_required("db_configurator.delete_databasesource")
 def delete_database(request, pk):
     database = get_object_or_404(DatabaseSource, pk=pk)
     delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=database.id)
@@ -57,6 +62,7 @@ def delete_database(request, pk):
     database.delete()
     return redirect('db_configurator:manage_connections')
 
+@permission_required("db_configurator.change_databasesource")
 def pause_connection(request, pk):
     database = get_object_or_404(DatabaseSource, pk=pk)
     # Toggle the is_paused value
