@@ -1,9 +1,10 @@
+{% load i18n %}
 {% load static %}
 <div class="modal fade" id="addDatabaseModal">
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
              <div class="modal-content">
                  <div class="modal-header">
-                    <h5 class="modal-title">Establish a New Connection</h5>
+                    <h5 class="modal-title">{% trans "Establish a New Connection" %}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                  <div class="modal-body">
@@ -14,22 +15,22 @@
                         <div class="mb-3">
                             <label for="id_type" class="form-label">Database Type</label>
                             <select class="form-select" id="id_type" name="type">
-                                <option value="">Select a type</option>
+                                <option value="">{% trans  "Select a type" %}</option>
                                 {% for value, label in form.type.field.choices %}
                                     <option value="{{ value }}" {% if value == form.type.value %}selected{% endif %}>{{ label }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="id_name" class="form-label">Database name</label>
+                            <label for="id_name" class="form-label">{% trans  "Database name" %}</label>
                             <input type="text" class="form-control" id="id_name" name="name">
                         </div>
                         <div class="mb-3">
-                            <label for="id_username" class="form-label">Username</label>
+                            <label for="id_username" class="form-label">{% trans  "Username"%}</label>
                             <input type="text" class="form-control" id="id_username" name="username">
                         </div>
                         <div class="mb-3">
-                            <label for="id_password" class="form-label">Password</label>
+                            <label for="id_password" class="form-label">{% trans "Password" %}</label>
                             <div class="input-group">
                                 <input type="password" class="form-control" id="id_password" name="password">
                                 <button type="button" class="btn btn-outline-secondary" id="togglePassword" aria-label="Toggle password visibility">
@@ -38,11 +39,11 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="id_host" class="form-label">Host</label>
+                            <label for="id_host" class="form-label">{% trans "Host" %}</label>
                             <input type="text" class="form-control" id="id_host" name="host">
                         </div>
                         <div class="mb-3">
-                            <label for="id_port" class="form-label">Port</label>
+                            <label for="id_port" class="form-label">{% trans "Port" %}</label>
                             <input type="number" class="form-control" id="id_port" name="port">
                         </div>
 {#                        <button type="submit" class="btn btn-primary w-100">Save Connection</button>#}
@@ -52,8 +53,8 @@
                     </div>
                  </div>
                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" id="submitButton" class="btn btn-primary">Save Connection</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+                        <button type="submit" id="submitButton" class="btn btn-primary">{% trans 'Save Connection'%}</button>
                          <div id="db-loader-spinner" class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>

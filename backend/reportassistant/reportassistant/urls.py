@@ -16,12 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.i18n import i18n_patterns
 
-urlpatterns = [
+urlpatterns = i18n_patterns(
     path("dbloader/", include("dbloader.urls")),
     path("reporter_agent/", include("reporter_agent.urls")),
     path('accounts/', include('accounts.urls')),
     path('db_configurator/', include('db_configurator.urls')),
     path('chat/', include('chat.urls')),
     path('admin/', admin.site.urls),
-]
+    path('rosetta/', include('rosetta.urls')),
+)

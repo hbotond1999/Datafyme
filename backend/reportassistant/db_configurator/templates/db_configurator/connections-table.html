@@ -1,17 +1,18 @@
+{% load i18n %}
 <div class="container mt-4">
 {% if perms.db_configurator.add_databasesource %}
-        <button id="openAddDatabaseModal" class="btn btn-primary w-25 mb-2" data-bs-toggle="modal" data-bs-target="#addDatabaseModal">Add new database</button>
+        <button id="openAddDatabaseModal" class="btn btn-primary w-25 mb-2" data-bs-toggle="modal" data-bs-target="#addDatabaseModal">{% trans 'Add new database' %}</button>
 {% endif %}
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Host</th>
-                        <th>Port</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>{% trans 'Name' %}</th>
+                        <th>{% trans 'Type' %}</th>
+                        <th>{% trans 'Host' %}</th>
+                        <th>{% trans 'Port' %}</th>
+                        <th>{% trans 'Status' %}</th>
+                        <th>{% trans 'Actions' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,9 +24,9 @@
                         <td>{{ database.port }}</td>
                         <td>
                             {% if database.is_paused %}
-                                <span class="badge bg-danger">Paused</span>
+                                <span class="badge bg-danger">{% trans 'Paused' %}</span>
                             {% else %}
-                                <span class="badge bg-success">Running</span>
+                                <span class="badge bg-success">{% trans 'Running' %}</span>
                             {% endif %}
                         </td>
                         <td>
@@ -33,15 +34,15 @@
                                 {% if perms.db_configurator.change_databasesource %}
                                     <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
                                         {% if database.is_paused %}
-                                            <i class="fas fa-play"></i> Resume
+                                            <i class="fas fa-play"></i> {% trans 'Resume' %}
                                         {% else %}
-                                            <i class="fas fa-pause"></i> Pause
+                                            <i class="fas fa-pause"></i>  {% trans 'Pause' %}
                                         {% endif %}
                                     </a>
                                {% endif %}
                                 {% if perms.db_configurator.delete_databasesource %}
                                     <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> Delete
+                                        <i class="fas fa-trash"></i> {% trans 'Delete' %}
                                     </a>
                                 {% endif %}
 

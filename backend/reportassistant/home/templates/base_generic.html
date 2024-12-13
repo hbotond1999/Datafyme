@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -19,14 +20,14 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item {% if request.path == '/chat/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'chat:chat' %}">Start Chat</a>
+                <a class="nav-link" href="{% url 'chat:chat' %}">{% trans "Start Chat" %}</a>
             </li>
             <li class="nav-item {% if request.path == '/chat/history/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'chat:chat_history' %}">Chat History</a>
+                <a class="nav-link" href="{% url 'chat:chat_history' %}">{% trans "Chat history" %}</a>
             </li>
             {% if perms.db_configurator.view_databasesource %}
                 <li class="nav-item {% if request.path == '/db_configurator/' %}active{% endif %}">
-                    <a class="nav-link" href="{% url 'db_configurator:manage_connections' %}">DB connections</a>
+                    <a class="nav-link" href="{% url 'db_configurator:manage_connections' %}">{% trans "DB connections" %}</a>
                 </li>
             {% endif %}
         </ul>
