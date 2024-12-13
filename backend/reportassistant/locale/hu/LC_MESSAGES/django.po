@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-13 22:29+0100\n"
-"PO-Revision-Date: 2024-12-13 22:33+0000\n"
+"POT-Creation-Date: 2024-12-13 22:37+0100\n"
+"PO-Revision-Date: 2024-12-13 22:39+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -54,7 +54,6 @@ msgid "Close"
 msgstr "Bezárás"
 
 #: .\db_configurator\templates\db_configurator\add-database-form.html:57
-#| msgid "DB connections"
 msgid "Save Connection"
 msgstr "Kapcsolat mentése"
 
@@ -109,6 +108,10 @@ msgstr "Chat történet"
 #: .\home\templates\base_generic.html:30
 msgid "DB connections"
 msgstr "Adatbázis kapcsolatok"
+
+#: .\home\templates\base_generic.html:36
+msgid "Logout"
+msgstr "Kilépés"
 
 #: .\reportassistant\settings.py:126
 msgid "English"
