@@ -125,4 +125,13 @@
             submitButton.style.display = 'block';
         });
     });
+    const passWordField = document.getElementById("id_password")
+
+    document.getElementById("togglePassword").addEventListener('click', () => {
+          if (passWordField.type === "password") {
+            passWordField.type = "text";
+          } else {
+           passWordField.type = "password";
+          }
+    })
 </script>

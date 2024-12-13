@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from common.db.manager.database_manager import DatabaseManager
+from common.graph_db.graph_db import Neo4JInstance
+from common.vectordb.db import COLLECTION_NAME
+from common.vectordb.db.utils import delete_docs_from_collection
 from dbloader.services import DBLoader
 from .models import DatabaseSource
 from .forms import DatabaseSourceForm
@@ -48,6 +51,9 @@ def add_connection(request):
 
 def delete_database(request, pk):
     database = get_object_or_404(DatabaseSource, pk=pk)
+    delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=database.id)
+    neo4j_instance = Neo4JInstance()
+    neo4j_instance.clear_graph_database(database.id)
     database.delete()
     return redirect('db_configurator:manage_connections')
 
