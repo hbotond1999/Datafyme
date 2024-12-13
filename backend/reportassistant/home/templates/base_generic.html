@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -17,22 +18,58 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item {% if request.path == '/chat/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'chat:chat' %}">Start Chat</a>
+        <ul class="navbar-nav ms-auto">
+            {% url 'chat:chat' as chat_url%}
+            {% url 'chat:chat_history' as chat_history_url%}
+            {% url 'db_configurator:manage_connections' as manage_connections_url %}
+            <li class="nav-item {% if request.path == chat_url %}active{% endif %}">
+                <a class="nav-link" href="{{ chat_url }}">{% trans "Start Chat" %}</a>
             </li>
-            <li class="nav-item {% if request.path == '/chat/history/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'chat:chat_history' %}">Chat History</a>
+            <li class="nav-item {% if request.path == chat_history_url %}active{% endif %}">
+                <a class="nav-link" href="{{ chat_history_url }}">{% trans "Chat history" %}</a>
             </li>
             {% if perms.db_configurator.view_databasesource %}
-                <li class="nav-item {% if request.path == '/db_configurator/' %}active{% endif %}">
-                    <a class="nav-link" href="{% url 'db_configurator:manage_connections' %}">DB connections</a>
+                <li class="nav-item {% if request.path == manage_connections_url%}active{% endif %}">
+                    <a class="nav-link" href="{{ manage_connections_url }}">{% trans "DB connections" %}</a>
                 </li>
             {% endif %}
         </ul>
+
+        <div>
+
+            {% get_current_language as CURRENT_LANGUAGE %}
+            {% get_available_languages as LANGUAGES %}
+            {% get_language_info_list for LANGUAGES as languages %}
+            <div  class="navbar-nav">
+                <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+                    <input name="next" type="hidden" value="{{ redirect_to }}">
+                    <div class="dropdown">
+                        <button style="color: white" class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                                {% if language.code == LANGUAGE_CODE %}
+                                    {{ language.name_local }} ({{ language.code }})
+                                {% endif %}
+                            {% endfor %}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                            {% for language in languages %}
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="document.getElementById('languageSelect').value='{{ language.code }}'; this.closest('form').submit();">
+                                        {{ language.name_local }} ({{ language.code }})
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <input type="hidden" name="language" id="languageSelect">
+                    </div>
+                </form>
+            </div>
+        </div>
         <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-                <a class="nav-link text-white" href="{% url 'accounts:logout' %}" title="Logout">
+                <a class="nav-link text-white" href="{% url 'accounts:logout' %}" title="{% trans "Logout" %}">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </li>
