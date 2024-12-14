@@ -75,7 +75,7 @@ def delete_database(request, pk):
 @permission_required("db_configurator.change_databasesource")
 def pause_connection(request, pk):
     database = get_object_or_404(DatabaseSource, pk=pk)
-    # Toggle the is_paused value
+
     if database.status != Status.ERROR.value and database.status != Status.LOADING.value:
         database.status = Status.PAUSED.value if database.status == Status.READY.value else Status.READY.value
         database.save()
@@ -84,8 +84,11 @@ def pause_connection(request, pk):
 @login_required
 def get_user_databases(request):
     if request.method == 'GET':
-        user_groups = request.user.groups.all()
-        databases = DatabaseSource.objects.filter(group__in=user_groups)
+        if not request.user.is_superuser:
+            user_groups = request.user.groups.all()
+            databases = DatabaseSource.objects.filter(group__in=user_groups, status=Status.READY.value)
+        else:
+            databases = DatabaseSource.objects.filter(status=Status.READY.value)
 
         return JsonResponse(data=[{'id': database.id, 'name': database.name, 'display_name': database.display_name} for database in databases], safe=False)
     else:
