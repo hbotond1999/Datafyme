@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-14 12:31+0100\n"
-"PO-Revision-Date: 2024-12-14 12:32+0000\n"
+"POT-Creation-Date: 2024-12-14 17:39+0100\n"
+"PO-Revision-Date: 2024-12-14 17:42+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -91,18 +91,26 @@ msgid "Paused"
 msgstr "Felfügesztett"
 
 #: .\db_configurator\templates\db_configurator\connections-table.html:33
-msgid "Running"
-msgstr "Futó"
+msgid "LOADING"
+msgstr "Feldolgozás"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:41
+#: .\db_configurator\templates\db_configurator\connections-table.html:35
+msgid "READY"
+msgstr "Kész"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:37
+msgid "ERROR"
+msgstr "Hiba"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:45
 msgid "Resume"
 msgstr "Folytatás"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:43
+#: .\db_configurator\templates\db_configurator\connections-table.html:47
 msgid "Pause"
 msgstr "Felfügeszt"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:49
+#: .\db_configurator\templates\db_configurator\connections-table.html:53
 msgid "Delete"
 msgstr "Törlés"
 
@@ -122,10 +130,13 @@ msgstr "Adatbázis kapcsolatok"
 msgid "Logout"
 msgstr "Kilépés"
 
-#: .\reportassistant\settings.py:126
+#: .\reportassistant\settings.py:137
 msgid "English"
 msgstr "Angol"
 
-#: .\reportassistant\settings.py:127
+#: .\reportassistant\settings.py:138
 msgid "Hungarian"
 msgstr "Magyar"
+
+#~ msgid "Running"
+#~ msgstr "Futó"

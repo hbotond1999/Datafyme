@@ -1,4 +1,3 @@
-from django.contrib.auth import user_logged_in
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
@@ -9,9 +8,10 @@ from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db import COLLECTION_NAME
 from common.vectordb.db.utils import delete_docs_from_collection
-from dbloader.services import DBLoader
-from .models import DatabaseSource
+from .models import DatabaseSource, Status
 from .forms import DatabaseSourceForm
+from .tasks import load_db
+
 
 @permission_required("db_configurator.view_databasesource")
 def manage_connections(request):
@@ -52,12 +52,7 @@ def add_connection(request):
 
             form.instance.group = new_group
             saved_data = form.save()
-            errors = DBLoader(saved_data).load()
-            if len(errors) > 0:
-                saved_data.delete()
-                for error in errors:
-                    form.add_error('type', error)
-                return JsonResponse({"success": False, "errors": form.errors.as_json()})
+            load_db.enqueue(saved_data.id)
 
             return JsonResponse({'success': True})
         else:
@@ -81,8 +76,9 @@ def delete_database(request, pk):
 def pause_connection(request, pk):
     database = get_object_or_404(DatabaseSource, pk=pk)
     # Toggle the is_paused value
-    database.is_paused = not database.is_paused
-    database.save()
+    if database.status != Status.ERROR.value and database.status != Status.LOADING.value:
+        database.status = Status.PAUSED.value if database.status == Status.READY.value else Status.READY.value
+        database.save()
     return redirect('db_configurator:manage_connections')
 
 @login_required

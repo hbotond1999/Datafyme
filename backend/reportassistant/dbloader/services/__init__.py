@@ -12,16 +12,11 @@ class DBLoader:
         self.datasource = datasource
         self.extractor = DatabaseManager(datasource)
 
-    def load(self):
-        errors = []
-        error = self.vector_loader()
-        if error:
-            errors.append(error)
-        error = self.create_realiation_graph()
-        if error:
-            errors.append(error)
 
-        return errors
+    def load(self):
+        self.vector_loader()
+        self.create_realiation_graph()
+
 
     def vector_loader(self):
         tables_schemas = self.extractor.get_tables_schemas()
