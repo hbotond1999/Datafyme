@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-14 12:31+0100\n"
-"PO-Revision-Date: 2024-12-14 12:31+0000\n"
+"POT-Creation-Date: 2024-12-14 17:39+0100\n"
+"PO-Revision-Date: 2024-12-14 17:42+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -91,18 +91,26 @@ msgid "Paused"
 msgstr "Paused"
 
 #: .\db_configurator\templates\db_configurator\connections-table.html:33
-msgid "Running"
-msgstr "Running"
+msgid "LOADING"
+msgstr "Loading"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:41
+#: .\db_configurator\templates\db_configurator\connections-table.html:35
+msgid "READY"
+msgstr "Ready"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:37
+msgid "ERROR"
+msgstr "Error"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:45
 msgid "Resume"
 msgstr "Resume"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:43
+#: .\db_configurator\templates\db_configurator\connections-table.html:47
 msgid "Pause"
 msgstr "Pause"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:49
+#: .\db_configurator\templates\db_configurator\connections-table.html:53
 msgid "Delete"
 msgstr "Delete"
 
@@ -122,10 +130,13 @@ msgstr "DB connections"
 msgid "Logout"
 msgstr "Logout"
 
-#: .\reportassistant\settings.py:126
+#: .\reportassistant\settings.py:137
 msgid "English"
 msgstr "English"
 
-#: .\reportassistant\settings.py:127
+#: .\reportassistant\settings.py:138
 msgid "Hungarian"
 msgstr "Hungarian"
+
+#~ msgid "Running"
+#~ msgstr "Running"

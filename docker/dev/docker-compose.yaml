@@ -90,6 +90,17 @@ services:
       - "etcd"
       - "minio"
 # vektor db end
+
+  django-db:
+    image: postgres:17
+    restart: always
+    env_file:
+      - ./database/.env
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+
 # nem végleges még, inkább localban indítsd el a python manage.py runserver
   backend:
     image: report_assistant/backend

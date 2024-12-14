@@ -27,24 +27,28 @@
                         <td>{{ database.port }}</td>
                       <td>{{ database.group.name }}</td>
                         <td>
-                            {% if database.is_paused %}
-                                <span class="badge bg-danger">{% trans 'Paused' %}</span>
-                            {% else %}
-                                <span class="badge bg-success">{% trans 'Running' %}</span>
+                            {% if database.status == 'PAUSED'  %}
+                                <span class="badge bg-warning">{% trans 'Paused' %}</span>
+                            {% elif database.status == 'LOADING' %}
+                                <span class="badge bg-info">{% trans 'LOADING' %}</span>
+                            {% elif database.status == 'READY' %}
+                                <span class="badge bg-success">{% trans 'READY' %}</span>
+                             {% elif database.status == 'ERROR' %}
+                                <span class="badge bg-danger">{% trans 'ERROR' %}</span>
                             {% endif %}
                         </td>
                         <td>
                             <div class="btn-group" role="group">
-                                {% if perms.db_configurator.change_databasesource %}
+                                {% if perms.db_configurator.change_databasesource and database.status != 'LOADING' and database.status != 'ERROR'%}
                                     <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
-                                        {% if database.is_paused %}
+                                        {% if database.status == 'PAUSED' %}
                                             <i class="fas fa-play"></i> {% trans 'Resume' %}
                                         {% else %}
                                             <i class="fas fa-pause"></i>  {% trans 'Pause' %}
                                         {% endif %}
                                     </a>
                                {% endif %}
-                                {% if perms.db_configurator.delete_databasesource %}
+                                {% if perms.db_configurator.delete_databasesource and database.status != 'LOADING'%}
                                     <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
                                         <i class="fas fa-trash"></i> {% trans 'Delete' %}
                                     </a>

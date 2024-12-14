@@ -1,5 +1,7 @@
 ## Report Assistant Backend
 
+### Background task lett bekonfigolva ehhez el kell indítani a background workert: `python manage.py db_worker`
+
 ### Usefully commands
 `python manage.py startapp <app_name>`
 
@@ -11,7 +13,7 @@
 
 ### Runserver
 
-`python manage.py createsuperuser`
+`python manage.py runserver`
 
 
 ### Create a superuser account to log in to the admin panel
@@ -19,6 +21,11 @@
 
 ### Check todo list for production
 `python manage.py check --deploy`
+
+
+### Background task start worker:
+`python manage.py db_worker`
+
 
 ### I18N
 `django-admin makemessages -l en`
