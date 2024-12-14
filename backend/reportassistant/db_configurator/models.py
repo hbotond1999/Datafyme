@@ -12,6 +12,7 @@ class DatabaseSource(models.Model):
 
     type = models.CharField(max_length=50, choices=DB_TYPES)
     name = models.CharField(max_length=50)
+    display_name = models.CharField(max_length=300)
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=50)
     host = models.CharField(max_length=1000)

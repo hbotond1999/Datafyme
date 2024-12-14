@@ -1,7 +1,8 @@
+from django.contrib.auth import user_logged_in
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 
 from common.db.manager.database_manager import DatabaseManager
@@ -83,3 +84,13 @@ def pause_connection(request, pk):
     database.is_paused = not database.is_paused
     database.save()
     return redirect('db_configurator:manage_connections')
+
+@login_required
+def get_user_databases(request):
+    if request.method == 'GET':
+        user_groups = request.user.groups.all()
+        databases = DatabaseSource.objects.filter(group__in=user_groups)
+
+        return JsonResponse(data=[{'id': database.id, 'name': database.name, 'display_name': database.display_name} for database in databases], safe=False)
+    else:
+        return HttpResponseNotAllowed(permitted_methods=["GET"])

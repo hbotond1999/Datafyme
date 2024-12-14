@@ -8,6 +8,7 @@
                 <thead>
                     <tr>
                         <th>{% trans 'Name' %}</th>
+                         <th>{% trans 'Display name' %}</th>
                         <th>{% trans 'Type' %}</th>
                         <th>{% trans 'Host' %}</th>
                         <th>{% trans 'Port' %}</th>
@@ -20,6 +21,7 @@
                     {% for database in databases %}
                     <tr>
                         <td>{{ database.name }}</td>
+                        <td>{{ database.display_name }}</td>
                         <td>{{ database.type }}</td>
                         <td>{{ database.host }}</td>
                         <td>{{ database.port }}</td>
