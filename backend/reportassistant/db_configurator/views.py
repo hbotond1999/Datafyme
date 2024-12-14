@@ -85,7 +85,7 @@ def pause_connection(request, pk):
 def get_user_databases(request):
     if request.method == 'GET':
         user_groups = request.user.groups.all()
-        databases = DatabaseSource.objects.filter(group__in=user_groups)
+        databases = DatabaseSource.objects.filter(group__in=user_groups, status=Status.READY.value)
 
         return JsonResponse(data=[{'id': database.id, 'name': database.name, 'display_name': database.display_name} for database in databases], safe=False)
     else:
