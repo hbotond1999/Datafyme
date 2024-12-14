@@ -72,6 +72,7 @@ def delete_database(request, pk):
     delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=database.id)
     neo4j_instance = Neo4JInstance()
     neo4j_instance.clear_graph_database(database.id)
+    database.group.delete()
     database.delete()
     return redirect('db_configurator:manage_connections')
 
