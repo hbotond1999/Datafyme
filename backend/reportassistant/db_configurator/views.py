@@ -75,7 +75,7 @@ def delete_database(request, pk):
 @permission_required("db_configurator.change_databasesource")
 def pause_connection(request, pk):
     database = get_object_or_404(DatabaseSource, pk=pk)
-    # Toggle the is_paused value
+
     if database.status != Status.ERROR.value and database.status != Status.LOADING.value:
         database.status = Status.PAUSED.value if database.status == Status.READY.value else Status.READY.value
         database.save()
