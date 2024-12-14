@@ -84,8 +84,11 @@ def pause_connection(request, pk):
 @login_required
 def get_user_databases(request):
     if request.method == 'GET':
-        user_groups = request.user.groups.all()
-        databases = DatabaseSource.objects.filter(group__in=user_groups, status=Status.READY.value)
+        if not request.user.is_superuser:
+            user_groups = request.user.groups.all()
+            databases = DatabaseSource.objects.filter(group__in=user_groups, status=Status.READY.value)
+        else:
+            databases = DatabaseSource.objects.all()
 
         return JsonResponse(data=[{'id': database.id, 'name': database.name, 'display_name': database.display_name} for database in databases], safe=False)
     else:
