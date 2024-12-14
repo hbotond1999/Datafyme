@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-13 22:37+0100\n"
-"PO-Revision-Date: 2024-12-13 22:39+0000\n"
+"POT-Creation-Date: 2024-12-14 12:02+0100\n"
+"PO-Revision-Date: 2024-12-14 12:03+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -70,46 +70,50 @@ msgid "Type"
 msgstr "Típus"
 
 #: .\db_configurator\templates\db_configurator\connections-table.html:14
+msgid "Access group"
+msgstr "Hozzáférő csoport"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:15
 msgid "Status"
 msgstr "Státusz"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:15
+#: .\db_configurator\templates\db_configurator\connections-table.html:16
 msgid "Actions"
 msgstr "Műveletek"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:27
+#: .\db_configurator\templates\db_configurator\connections-table.html:29
 msgid "Paused"
 msgstr "Felfügesztett"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:29
+#: .\db_configurator\templates\db_configurator\connections-table.html:31
 msgid "Running"
 msgstr "Futó"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:37
+#: .\db_configurator\templates\db_configurator\connections-table.html:39
 msgid "Resume"
 msgstr "Folytatás"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:39
+#: .\db_configurator\templates\db_configurator\connections-table.html:41
 msgid "Pause"
 msgstr "Felfügeszt"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:45
+#: .\db_configurator\templates\db_configurator\connections-table.html:47
 msgid "Delete"
 msgstr "Törlés"
 
-#: .\home\templates\base_generic.html:23
+#: .\home\templates\base_generic.html:26
 msgid "Start Chat"
 msgstr "Chat kezdése"
 
-#: .\home\templates\base_generic.html:26
+#: .\home\templates\base_generic.html:29
 msgid "Chat history"
 msgstr "Chat történet"
 
-#: .\home\templates\base_generic.html:30
+#: .\home\templates\base_generic.html:33
 msgid "DB connections"
 msgstr "Adatbázis kapcsolatok"
 
-#: .\home\templates\base_generic.html:36
+#: .\home\templates\base_generic.html:72
 msgid "Logout"
 msgstr "Kilépés"
 

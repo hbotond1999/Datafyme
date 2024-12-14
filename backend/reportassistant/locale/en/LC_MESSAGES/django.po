@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-13 22:37+0100\n"
-"PO-Revision-Date: 2024-12-13 22:40+0000\n"
+"POT-Creation-Date: 2024-12-14 12:02+0100\n"
+"PO-Revision-Date: 2024-12-14 12:03+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -70,46 +70,50 @@ msgid "Type"
 msgstr "Type"
 
 #: .\db_configurator\templates\db_configurator\connections-table.html:14
+msgid "Access group"
+msgstr "Access group"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:15
 msgid "Status"
 msgstr "Status"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:15
+#: .\db_configurator\templates\db_configurator\connections-table.html:16
 msgid "Actions"
 msgstr "Actions"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:27
+#: .\db_configurator\templates\db_configurator\connections-table.html:29
 msgid "Paused"
 msgstr "Paused"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:29
+#: .\db_configurator\templates\db_configurator\connections-table.html:31
 msgid "Running"
 msgstr "Running"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:37
+#: .\db_configurator\templates\db_configurator\connections-table.html:39
 msgid "Resume"
 msgstr "Resume"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:39
+#: .\db_configurator\templates\db_configurator\connections-table.html:41
 msgid "Pause"
 msgstr "Pause"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:45
+#: .\db_configurator\templates\db_configurator\connections-table.html:47
 msgid "Delete"
 msgstr "Delete"
 
-#: .\home\templates\base_generic.html:23
+#: .\home\templates\base_generic.html:26
 msgid "Start Chat"
 msgstr "Start Chat"
 
-#: .\home\templates\base_generic.html:26
+#: .\home\templates\base_generic.html:29
 msgid "Chat history"
 msgstr "Chat history"
 
-#: .\home\templates\base_generic.html:30
+#: .\home\templates\base_generic.html:33
 msgid "DB connections"
 msgstr "DB connections"
 
-#: .\home\templates\base_generic.html:36
+#: .\home\templates\base_generic.html:72
 msgid "Logout"
 msgstr "Logout"
 

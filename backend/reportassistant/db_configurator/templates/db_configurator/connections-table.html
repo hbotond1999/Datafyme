@@ -11,6 +11,7 @@
                         <th>{% trans 'Type' %}</th>
                         <th>{% trans 'Host' %}</th>
                         <th>{% trans 'Port' %}</th>
+                        <th>{% trans 'Access group' %}</th>
                         <th>{% trans 'Status' %}</th>
                         <th>{% trans 'Actions' %}</th>
                     </tr>
@@ -22,6 +23,7 @@
                         <td>{{ database.type }}</td>
                         <td>{{ database.host }}</td>
                         <td>{{ database.port }}</td>
+                      <td>{{ database.group.name }}</td>
                         <td>
                             {% if database.is_paused %}
                                 <span class="badge bg-danger">{% trans 'Paused' %}</span>
