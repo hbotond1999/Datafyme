@@ -1,5 +1,6 @@
 import enum
 
+from django.contrib.auth.models import Group
 from django.db import models
 
 class DBType(enum.Enum):
@@ -15,4 +16,8 @@ class DatabaseSource(models.Model):
     password = models.CharField(max_length=50)
     host = models.CharField(max_length=1000)
     port = models.IntegerField()
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
     is_paused = models.BooleanField(default=False) 
+
+    class Meta:
+        unique_together = ('host', 'port', 'name')
