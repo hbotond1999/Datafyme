@@ -8,9 +8,11 @@
                 <thead>
                     <tr>
                         <th>{% trans 'Name' %}</th>
+                         <th>{% trans 'Display name' %}</th>
                         <th>{% trans 'Type' %}</th>
                         <th>{% trans 'Host' %}</th>
                         <th>{% trans 'Port' %}</th>
+                        <th>{% trans 'Access group' %}</th>
                         <th>{% trans 'Status' %}</th>
                         <th>{% trans 'Actions' %}</th>
                     </tr>
@@ -19,9 +21,11 @@
                     {% for database in databases %}
                     <tr>
                         <td>{{ database.name }}</td>
+                        <td>{{ database.display_name }}</td>
                         <td>{{ database.type }}</td>
                         <td>{{ database.host }}</td>
                         <td>{{ database.port }}</td>
+                      <td>{{ database.group.name }}</td>
                         <td>
                             {% if database.is_paused %}
                                 <span class="badge bg-danger">{% trans 'Paused' %}</span>

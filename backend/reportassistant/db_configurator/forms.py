@@ -4,7 +4,7 @@ from .models import DatabaseSource, DBType
 class DatabaseSourceForm(forms.ModelForm):
     class Meta:
         model = DatabaseSource
-        fields = ['type', 'name', 'username', 'password', 'host', 'port', 'is_paused']
+        fields = ['type', 'name', 'username', 'password', 'host', 'port', 'is_paused', 'display_name']
         widgets = {
             'password': forms.PasswordInput(render_value=True),
         }

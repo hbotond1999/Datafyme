@@ -1,6 +1,8 @@
+from django.contrib.auth import user_logged_in
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 
 from common.db.manager.database_manager import DatabaseManager
@@ -29,6 +31,7 @@ def add_connection(request):
             return JsonResponse({"success": False, "errors": form.errors.as_json()})
 
         database_source = DatabaseSource(
+            name=form.cleaned_data['name'],
             type=form.cleaned_data["type"],
             host=form.cleaned_data["host"],
             port=form.cleaned_data["port"],
@@ -37,6 +40,17 @@ def add_connection(request):
         )
         success = DatabaseManager(database_source).check_connection()
         if success:
+            group_name = "database_source_group_" + form.cleaned_data["name"] + "_" + form.cleaned_data["type"]
+            existing_groups = Group.objects.filter(name__startswith=group_name)
+
+            if existing_groups.exists():
+                count = existing_groups.count()
+                unique_name = f"{group_name}_{count + 1}"
+            else:
+                unique_name = group_name
+            new_group = Group.objects.create(name=unique_name)
+
+            form.instance.group = new_group
             saved_data = form.save()
             errors = DBLoader(saved_data).load()
             if len(errors) > 0:
@@ -59,6 +73,7 @@ def delete_database(request, pk):
     delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=database.id)
     neo4j_instance = Neo4JInstance()
     neo4j_instance.clear_graph_database(database.id)
+    database.group.delete()
     database.delete()
     return redirect('db_configurator:manage_connections')
 
@@ -69,3 +84,13 @@ def pause_connection(request, pk):
     database.is_paused = not database.is_paused
     database.save()
     return redirect('db_configurator:manage_connections')
+
+@login_required
+def get_user_databases(request):
+    if request.method == 'GET':
+        user_groups = request.user.groups.all()
+        databases = DatabaseSource.objects.filter(group__in=user_groups)
+
+        return JsonResponse(data=[{'id': database.id, 'name': database.name, 'display_name': database.display_name} for database in databases], safe=False)
+    else:
+        return HttpResponseNotAllowed(permitted_methods=["GET"])
