@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-14 17:39+0100\n"
-"PO-Revision-Date: 2024-12-14 17:42+0000\n"
+"POT-Creation-Date: 2024-12-15 16:08+0100\n"
+"PO-Revision-Date: 2024-12-15 15:53+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -18,6 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.10.1\n"
+
+#: .\db_configurator\tasks.py:12
+msgid "DATABASE_LOADED_SUCCESSFULLY"
+msgstr "Database loaded successfully"
+
+#: .\db_configurator\tasks.py:13
+msgid "ERROR_TO_LOAD_DATABASE"
+msgstr "Something went wrong to load database"
 
 #: .\db_configurator\templates\db_configurator\add-database-form.html:7
 msgid "Establish a New Connection"
@@ -99,6 +107,7 @@ msgid "READY"
 msgstr "Ready"
 
 #: .\db_configurator\templates\db_configurator\connections-table.html:37
+#: .\home\models.py:13
 msgid "ERROR"
 msgstr "Error"
 
@@ -113,6 +122,22 @@ msgstr "Pause"
 #: .\db_configurator\templates\db_configurator\connections-table.html:53
 msgid "Delete"
 msgstr "Delete"
+
+#: .\home\models.py:10
+msgid "SUCCESS"
+msgstr "Success"
+
+#: .\home\models.py:11
+msgid "INFO"
+msgstr "Info"
+
+#: .\home\models.py:12
+msgid "WARNING"
+msgstr "Warning"
+
+#: .\home\models.py:14
+msgid "CRITICAL"
+msgstr "Critical"
 
 #: .\home\templates\base_generic.html:26
 msgid "Start Chat"

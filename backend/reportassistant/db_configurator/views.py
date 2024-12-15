@@ -52,7 +52,7 @@ def add_connection(request):
 
             form.instance.group = new_group
             saved_data = form.save()
-            load_db.enqueue(saved_data.id)
+            load_db.enqueue(saved_data.id, request.user.id)
 
             return JsonResponse({'success': True})
         else:
