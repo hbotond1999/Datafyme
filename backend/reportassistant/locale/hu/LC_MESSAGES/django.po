@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 16:08+0100\n"
-"PO-Revision-Date: 2024-12-15 16:09+0000\n"
+"POT-Creation-Date: 2024-12-15 16:40+0100\n"
+"PO-Revision-Date: 2024-12-15 16:40+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -122,6 +122,10 @@ msgstr "Felfügeszt"
 #: .\db_configurator\templates\db_configurator\connections-table.html:53
 msgid "Delete"
 msgstr "Törlés"
+
+#: .\db_configurator\views.py:60
+msgid "Could not connect to database"
+msgstr "Nem lehet csatlakozni az adatbázishoz"
 
 #: .\home\models.py:10
 msgid "SUCCESS"

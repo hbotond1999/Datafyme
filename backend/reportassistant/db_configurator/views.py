@@ -11,6 +11,7 @@ from common.vectordb.db.utils import delete_docs_from_collection
 from .models import DatabaseSource, Status
 from .forms import DatabaseSourceForm
 from .tasks import load_db
+from django.utils.translation import gettext as _
 
 
 @permission_required("db_configurator.view_databasesource")
@@ -57,7 +58,7 @@ def add_connection(request):
             return JsonResponse({'success': True})
         else:
             for field in ['host', 'port', 'username', 'password', "name", "type"]:
-                form.add_error(field, ValidationError("Could not connect to database", code="ConnectionError"))
+                form.add_error(field, ValidationError(_("Could not connect to database"), code="ConnectionError"))
             return JsonResponse({'success': False, "errors": form.errors.as_json()})
 
 
