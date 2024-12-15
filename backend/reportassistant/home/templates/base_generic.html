@@ -76,11 +76,10 @@
         </ul>
     </div>
 </nav>
+
 {%  block content %}
 {% endblock %}
-<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer">
-    <!-- Toast messages will be dynamically added here -->
-</div>
+<div class="toast-container position-fixed bottom-0 start-0 p-3" id="toastContainer"></div>
 <script src="{% static 'js/pull-notes.js' %}"></script>
 <script>
     const csrftoken = '{{ csrf_token }}';

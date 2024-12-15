@@ -10,7 +10,7 @@ from home.models import Notification, Level
 def get_messages(request):
     if request.method == 'GET':
         notifications = Notification.objects.filter(user=request.user)
-        notes = [{"level": _(n.level), 'text': _(n.text), 'created': n.created_at} for n in notifications]
+        notes = [{"level_id": n.level, "level": _(n.level), 'text': _(n.text), 'created': n.created_at} for n in notifications]
         for note in notifications:
             note.delete()
         return JsonResponse(data=notes, status=200, safe=False)
