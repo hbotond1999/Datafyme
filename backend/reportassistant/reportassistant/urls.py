@@ -20,6 +20,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import set_language
 
 urlpatterns = i18n_patterns(
+    path("home/", include("home.urls")),
     path("dbloader/", include("dbloader.urls")),
     path("reporter_agent/", include("reporter_agent.urls")),
     path('accounts/', include('accounts.urls')),

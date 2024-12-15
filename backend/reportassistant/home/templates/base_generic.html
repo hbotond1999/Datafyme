@@ -76,8 +76,17 @@
         </ul>
     </div>
 </nav>
+
 {%  block content %}
 {% endblock %}
+<div class="toast-container position-fixed bottom-0 start-0 p-3" id="toastContainer"></div>
+<script src="{% static 'js/pull-notes.js' %}"></script>
+<script>
+    const csrftoken = '{{ csrf_token }}';
+    fetchNotifications("{% url 'home:get_notifications' %}", csrftoken)
+    setInterval(() =>  fetchNotifications("{% url 'home:get_notifications' %}", csrftoken), 10000)
+
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
