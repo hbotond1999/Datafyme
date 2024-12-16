@@ -16,3 +16,5 @@ class DashboardSlot(models.Model):
     chart = models.OneToOneField(Chart, on_delete=models.CASCADE)
     row_num = models.IntegerField()
     col_num = models.IntegerField()
+    height = models.IntegerField()
+    width = models.IntegerField()

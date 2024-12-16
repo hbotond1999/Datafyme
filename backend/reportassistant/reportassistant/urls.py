@@ -29,5 +29,6 @@ urlpatterns = i18n_patterns(
     path('admin/', admin.site.urls),
     path('rosetta/', include('rosetta.urls')),
     path('set_language/', set_language, name='set_language'),
+    path('dashboard/', include('dashboard.urls')),
 
 )

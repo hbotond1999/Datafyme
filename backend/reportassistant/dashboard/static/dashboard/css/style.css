@@ -1,0 +1,12 @@
+.dashboard-container {
+    display: flex;
+    gap: 10px;
+    justify-content: left;
+}
+.custom-dashboard {
+    width: 95vw;
+    margin: auto;
+}
+.grid-stack-item-content {
+    border: 2px black solid;
+}
