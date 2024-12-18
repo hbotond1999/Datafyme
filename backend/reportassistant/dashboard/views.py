@@ -49,7 +49,7 @@ def create_dashboard(request):
     else:
         return HttpResponseNotAllowed(permitted_methods=["POST"])
 
-@login_required()
+@login_required
 def update_dashboard_slots(request):
     if request.method == 'POST':
         slots = json.loads(request.body).get('slots', [])
@@ -70,3 +70,25 @@ def update_dashboard_slots(request):
         return JsonResponse({'ok': True}, status=200)
     else:
         return HttpResponseNotAllowed(permitted_methods=["POST"])
+
+
+@login_required
+def delete_dashboard_slot(request, slot_id: int):
+    if request.method == 'DELETE':
+        dashboard_slot = DashboardSlot.objects.get(id=slot_id)
+        dashboard_slot.delete()
+        return JsonResponse({'ok': True}, status=200)
+    else:
+        return HttpResponseNotAllowed(permitted_methods=["DELETE"])
+
+@login_required
+def delete_dashboard(request, dashboard_id: int):
+    if request.method == 'DELETE':
+        dashboard = Dashboard.objects.get(id=dashboard_id)
+        if not dashboard:
+            return JsonResponse({'error': 'dashboard not exists'}, status=404)
+
+        dashboard.delete()
+        return JsonResponse({'ok': True}, status=200)
+    else:
+        return HttpResponseNotAllowed(permitted_methods=["DELETE"])

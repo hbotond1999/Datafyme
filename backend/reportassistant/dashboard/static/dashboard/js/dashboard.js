@@ -5,7 +5,9 @@ class DashboardHelper {
                 createDashboardUrl,
                 dashboard_url,
                 dashboard_slot_url,
-                updateSlotsUrl
+                updateSlotsUrl,
+                deleteDashboardSlotUrl,
+                deleteDashboardUrl
     ) {
         GridStack.renderCB = function(el, w) {
             el.innerHTML = w.content;
@@ -18,6 +20,9 @@ class DashboardHelper {
         this.dashboard_url = dashboard_url
         this.dashboard_slot_url = dashboard_slot_url
         this.updateSlotsUrl = updateSlotsUrl
+        this.deleteDashboardSlotUrl = deleteDashboardSlotUrl
+        this.deleteDashboardUrl = deleteDashboardUrl
+
     }
 
     resetErrors() {
@@ -50,7 +55,7 @@ class DashboardHelper {
                 const data = await response.json();
                 document.getElementById("DashboardModalClose").click();
                 console.log('Dashboard created successfully:', data);
-                await this.getDashboardOptions(this.dashboard_url);
+                await this.getDashboardOptions();
                 return data;
             } else {
                 const errorData = await response.json();
@@ -104,9 +109,14 @@ class DashboardHelper {
         }
     }
 
-    async fetchDashboardData(id) {
+    async fetchDashboardData() {
         try {
-            const response = await fetch(this.dashboard_slot_url.replace('0', id), {
+            const dashboardId = document.getElementById("existingDashboards").value
+            if (!dashboardId) {
+                this.initGridStack([]);
+                return
+            }
+            const response = await fetch(this.dashboard_slot_url.replace('0', dashboardId), {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -121,7 +131,7 @@ class DashboardHelper {
             const data = await response.json();
             this.initGridStack(data);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            this.initGridStack([])
         }
     }
 
@@ -132,7 +142,14 @@ class DashboardHelper {
                 y: slot.row_num,
                 w: slot.width,
                 h: slot.height,
-                content: `<div class="slot-content">Slot ID: ${slot.id}</div>`,
+                content: `<div class="slot-container" data-slot-id="${slot.id}">
+                                <div class="slot-header">
+                                    <h3>${slot.id}</h3>
+                                    <div>
+                                       <i class="fas fa-trash slot-trash"></i>
+                                    </div>
+                                </div>
+                        </div>`,
                 slot_id: slot.id
             };
         });
@@ -152,13 +169,15 @@ class DashboardHelper {
         gridStackElement.classList.add("grid-stack");
         document.getElementById(this.gridContainerId).appendChild(gridStackElement);
 
-        this.grid = GridStack.init({ children });
+        this.grid = GridStack.init({ children, margin: '6px'});
 
         this.grid.on('change', () => {
             const slots = this.grid.save();
             console.log(slots);
             this.updateDashboardSlots(slots)
         });
+
+        this.addDeleteSlotEventListeners()
     }
 
      updateDashboardSlots(slots) {
@@ -174,4 +193,66 @@ class DashboardHelper {
                 console.error('Request failed', error);
             });
     }
+
+    addDeleteSlotEventListeners() {
+        const gridContainer = document.getElementById(this.gridContainerId);
+        gridContainer.querySelectorAll('.slot-trash').forEach(trashButton => {
+            trashButton.addEventListener('click', (event) => {
+                const slotContainer = event.target.closest('.slot-container');
+                const slotId = slotContainer.getAttribute('data-slot-id');
+                this.deleteDashboardSlot(slotId);
+            });
+        });
+    }
+
+   deleteDashboardSlot(id) {
+    const url = this.deleteDashboardSlotUrl.replace('0', id)
+
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken':  Cookies.get('csrftoken'),
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        this.fetchDashboardData().then()
+    })
+    .catch(error => {
+        console.error("Error deleting slot:", error);
+    });
+}
+
+   deleteDashboard() {
+   const dashboardId = document.getElementById("existingDashboards").value
+    if (!dashboardId) {
+        return
+    }
+    fetch(this.deleteDashboardUrl.replace('0', dashboardId), {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken':  Cookies.get('csrftoken'),
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        this.getDashboardOptions().then(() => this.fetchDashboardData().then());
+
+    })
+    .catch(error => {
+        console.error("Error deleting slot:", error);
+    });
+}
 }

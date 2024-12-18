@@ -9,8 +9,8 @@
     {% include 'add_dashboard.html' %}
     <div class="dashboard-container">
 
-        <button id="openAddDatabaseModal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDashboardModal"><i class="fas fa-add"></i></button>
-
+        <button id="openAddDatabaseModal" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDashboardModal"><i class="fas fa-add"></i></button>
+        <button id="deleteDashBoardButton" class="btn  btn-outline-danger"><i class="fas fa-trash"></i></button>
         {% include 'dashboard_selector.html' %}
     </div>
     <div id="dashboard-container"></div>
@@ -18,27 +18,34 @@
 <script src="{% static 'dashboard/js/dashboard.js' %}"></script>
 <script>
         const dashboardHelper = new DashboardHelper(
-        "dashboardTitle",
-        "dashboardTitleValidationError",
-        "dashboard-container",
-        "{% url 'dashboard:create_dashboard' %}",
-        "{% url 'dashboard:get_dashboards' %}",
-        "{% url 'dashboard:get_dashboard_slots' 0 %}",
-        "{% url 'dashboard:update_dashboard_slots' %}"
-    )
+            "dashboardTitle",
+            "dashboardTitleValidationError",
+            "dashboard-container",
+            "{% url 'dashboard:create_dashboard' %}",
+            "{% url 'dashboard:get_dashboards' %}",
+            "{% url 'dashboard:get_dashboard_slots' 0 %}",
+            "{% url 'dashboard:update_dashboard_slots' %}",
+            "{% url 'dashboard:delete_dashboard_slot' 0 %}",
+            "{% url 'dashboard:delete_dashboard' 0 %}",
+        )
 
-    document.getElementById('saveDashboard').addEventListener(('click'), () => dashboardHelper.createDashboard()
+        document.getElementById('saveDashboard').addEventListener(('click'), () => dashboardHelper.createDashboard()
 
-    )
-    document.getElementById("DashboardModalClose").addEventListener('click', () => dashboardHelper.resetErrors())
+        )
+        document.getElementById("DashboardModalClose").addEventListener('click', () => dashboardHelper.resetErrors())
 
-    dashboardHelper.getDashboardOptions("{% url 'dashboard:get_dashboards' %}", "{% url 'dashboard:get_dashboard_slots' dashboard_id=0 %}")
+        dashboardHelper.getDashboardOptions("{% url 'dashboard:get_dashboards' %}", "{% url 'dashboard:get_dashboard_slots' dashboard_id=0 %}")
 
-    document.getElementById("existingDashboards").addEventListener("change", (event) => {
-        const value = event.target.value;
-        dashboardHelper.fetchDashboardData(value)
-    }
-    )
+        document.getElementById("existingDashboards").addEventListener("change", (event) => {
+            console.log(event)
+            dashboardHelper.fetchDashboardData()
+            }
+        )
+
+        document.getElementById('deleteDashBoardButton').addEventListener("click", (event) => {
+            dashboardHelper.deleteDashboard()
+        })
+
 </script>
 <script type="text/javascript">
 
