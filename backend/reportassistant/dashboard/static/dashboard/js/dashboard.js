@@ -9,8 +9,8 @@ class DashboardHelper {
                 deleteDashboardSlotUrl,
                 deleteDashboardUrl
     ) {
-        GridStack.renderCB = function(el, w) {
-            el.innerHTML = w.content;
+        GridStack.renderCB = (el, w)=> {
+            el.appendChild(this.createGirdContent(w.data))
         };
         this.titleElement = document.getElementById(titleElementId);
         this.dashboardTitleValidationError = document.getElementById(dashboardTitleValidationErrorId);
@@ -142,14 +142,7 @@ class DashboardHelper {
                 y: slot.row_num,
                 w: slot.width,
                 h: slot.height,
-                content: `<div class="slot-container" data-slot-id="${slot.id}">
-                                <div class="slot-header">
-                                    <h3>${slot.id}</h3>
-                                    <div>
-                                       <i class="fas fa-trash slot-trash"></i>
-                                    </div>
-                                </div>
-                        </div>`,
+                data: slot,
                 slot_id: slot.id
             };
         });
@@ -177,7 +170,6 @@ class DashboardHelper {
             this.updateDashboardSlots(slots)
         });
 
-        this.addDeleteSlotEventListeners()
     }
 
      updateDashboardSlots(slots) {
@@ -194,16 +186,28 @@ class DashboardHelper {
             });
     }
 
-    addDeleteSlotEventListeners() {
-        const gridContainer = document.getElementById(this.gridContainerId);
-        gridContainer.querySelectorAll('.slot-trash').forEach(trashButton => {
-            trashButton.addEventListener('click', (event) => {
-                const slotContainer = event.target.closest('.slot-container');
-                const slotId = slotContainer.getAttribute('data-slot-id');
-                this.deleteDashboardSlot(slotId);
-            });
-        });
-    }
+   createGirdContent(slot) {
+
+        const slotContainer = document.createElement("div");
+        slotContainer.className = "slot-container";
+        slotContainer.dataset.slotId = slot.id;
+
+        const slotHeader = document.createElement("div");
+        slotHeader.className = "slot-header";
+
+        const slotTitle = document.createElement("h3");
+        slotTitle.textContent = slot.id;
+
+        const trashIconContainer = document.createElement("div");
+        const trashIcon = document.createElement("i");
+        trashIcon.className = "fas fa-trash slot-trash";
+        trashIcon.addEventListener("click", () => this.deleteDashboardSlot(slot.id));
+        trashIconContainer.appendChild(trashIcon);
+        slotHeader.appendChild(slotTitle);
+        slotHeader.appendChild(trashIconContainer);
+        slotContainer.appendChild(slotHeader);
+        return slotContainer
+   }
 
    deleteDashboardSlot(id) {
     const url = this.deleteDashboardSlotUrl.replace('0', id)
@@ -221,7 +225,7 @@ class DashboardHelper {
         }
         return response.json();
     })
-    .then(data => {
+    .then(() => {
         this.fetchDashboardData().then()
     })
     .catch(error => {

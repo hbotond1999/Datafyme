@@ -34,17 +34,17 @@
         )
         document.getElementById("DashboardModalClose").addEventListener('click', () => dashboardHelper.resetErrors())
 
-        dashboardHelper.getDashboardOptions("{% url 'dashboard:get_dashboards' %}", "{% url 'dashboard:get_dashboard_slots' dashboard_id=0 %}")
+        document.getElementById("existingDashboards").addEventListener("change", () => {
 
-        document.getElementById("existingDashboards").addEventListener("change", (event) => {
-            console.log(event)
             dashboardHelper.fetchDashboardData()
             }
         )
 
-        document.getElementById('deleteDashBoardButton').addEventListener("click", (event) => {
+        document.getElementById('deleteDashBoardButton').addEventListener("click", () => {
             dashboardHelper.deleteDashboard()
         })
+
+        dashboardHelper.getDashboardOptions()
 
 </script>
 <script type="text/javascript">
