@@ -14,3 +14,35 @@ class BubbleChart(BaseModel, Chart):
             "y_axis": self.Y_axis_column_name,
             "size": self.size_column_name
         }
+
+    @classmethod
+    def create_chart_data(cls, chart, data):
+        x_axis = chart.meta_data["metadata"]["x_axis"]
+        y_axis = chart.meta_data["metadata"]["y_axis"]
+        size = chart.meta_data["metadata"]["size"]
+
+        # Create data in the format required for a bubble chart
+        new_data = [{"x": x, "y": y, "r": r} for x, y, r in zip(data[x_axis], data[y_axis], data[size])]
+
+        return {
+            "type": "bubble",
+            "data": {
+                "datasets": [{
+                    "label": chart.title,
+                    "data": new_data,
+                    "backgroundColor": "rgba(255, 99, 132, 0.6)",
+                    "borderColor": "rgba(255, 99, 132, 1)",
+                    "borderWidth": 1
+                }]
+            },
+            "options": {
+                "scales": {
+                    "x": {
+                        "beginAtZero": True
+                    },
+                    "y": {
+                        "beginAtZero": True
+                    }
+                }
+            }
+        }

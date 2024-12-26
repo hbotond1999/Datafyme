@@ -12,3 +12,26 @@ class BarChart(BaseModel, Chart):
             "x_axis": self.category_column_name,
             "y_axis": self.values_column_name
         }
+
+    @classmethod
+    def create_chart_data(cls, chart, data):
+        x_axis = chart.meta_data["metadata"]["x_axis"]
+        y_axis = chart.meta_data["metadata"]["y_axis"]
+        return {
+            "type": "bar",
+            "data": {
+                "labels": data[x_axis],
+                "datasets": [{
+                    "label": y_axis,
+                    "data": data[y_axis],
+                    "borderWidth": 1
+                }]
+            },
+            "options": {
+                "scales": {
+                    "y": {
+                        "beginAtZero": True
+                    }
+                }
+            }
+        }

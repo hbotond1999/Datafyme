@@ -25,7 +25,7 @@ def chat_view(request):
             user_message = form.cleaned_data['user_message']
             datasource = form.cleaned_data['database_source']
             messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
-            chat_hist =[msg.type + ": " + msg.message for msg in messages]
+            chat_hist =[msg.type + ": " + (msg.message if msg.message else "") for msg in messages]
             Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message,chart=None).save()
             reporter_graph = create_reporter_graph()
             final_state: GraphState = reporter_graph.invoke(

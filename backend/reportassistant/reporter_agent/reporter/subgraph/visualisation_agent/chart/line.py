@@ -12,3 +12,32 @@ class LineChart(BaseModel, Chart):
             "x_axis": self.x_axis_column_name,
             "y_axis": self.y_axis_column_name
         }
+
+    @classmethod
+    def create_chart_data(cls, chart, data):
+        x_axis = chart.meta_data["metadata"]["x_axis"]
+        y_axis = chart.meta_data["metadata"]["y_axis"]
+
+        return {
+            "type": "line",
+            "data": {
+                "labels": data[x_axis],
+                "datasets": [{
+                    "label": y_axis,
+                    "data": data[y_axis],
+                    "borderColor": "rgba(75, 192, 192, 1)",
+                    "backgroundColor": "rgba(75, 192, 192, 0.4)",
+                    "fill": True
+                }]
+            },
+            "options": {
+                "scales": {
+                    "x": {
+                        "beginAtZero": True
+                    },
+                    "y": {
+                        "beginAtZero": True
+                    }
+                }
+            }
+        }

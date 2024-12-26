@@ -10,3 +10,28 @@ class HistogramChart(BaseModel, Chart):
         return {
             "y_axis": self.y_axis_column
         }
+
+    @classmethod
+    def create_chart_data(cls, chart, data):
+        y_axis = chart.meta_data["metadata"]["y_axis"]
+
+        return {
+            "type": "bar",
+            "data": {
+                "labels": [*range(len(data[y_axis]))],
+                "datasets": [{
+                    "label": y_axis,
+                    "data": data[y_axis],
+                    "backgroundColor": "rgba(75, 192, 192, 0.6)",
+                    "borderColor": "rgba(75, 192, 192, 1)",
+                    "borderWidth": 1
+                }]
+            },
+            "options": {
+                "scales": {
+                    "y": {
+                        "beginAtZero": True
+                    }
+                }
+            }
+        }

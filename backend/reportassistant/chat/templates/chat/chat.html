@@ -2,12 +2,12 @@
 {% load static %}
 {%  block content %}
 <link rel="stylesheet" type='text/css' href="{% static 'chat/css/styles.css' %}">
-<div class="chat-icon" onclick="toggleChat()">
+<div class="chat-icon" id="toggleChat">
     <i class="fas fa-comments"></i>
 </div>
 {% include 'dashboard.html' %}
 <div class="chat-container" id="chatContainer">
- <form method="post" id="chatForm" onsubmit="return sendMessage(event);">
+ <form method="post" id="chatForm" onsubmit="sendMessage(event);">
     <div class="chat-header">
             {% csrf_token %}
             <div class="chat-settings">
@@ -17,7 +17,7 @@
                 </div>
             </div>
         <span>Chat</span>
-        <button class="close" onclick="toggleChat()" aria-label="Close">&times;</button>
+        <button class="close" aria-label="Close" type="button">&times;</button>
     </div>
     <!-- Üzenetek -->
     <div class="chat-body">
@@ -28,9 +28,16 @@
                         <strong>You:</strong> {{ message.message }}
                     </div>
                 {% else %}
-                    <div class="message reply-message">
-                        <strong>System:</strong> {{ message.message }}
-                    </div>
+                    {% if message.message %}
+                        <div class="message reply-message">
+
+                            <strong>System:</strong> {{ message.message }}
+
+                        </div>
+                    {% endif %}
+                {% endif %}
+                {% if message.chart %}
+                         <div class="custom-chart" data-id="{{ message.chart.id }}"></div>
                 {% endif %}
             {% endfor %}
         </div>
@@ -50,20 +57,27 @@
 </div>
 
 
-<script src="{% static 'chat/js/chat.js' %}"></script>
+<script src="{% static 'chat/js/chart.js' %}"></script>
 <script>
-    function toggleChat() {
-        var chatContainer = document.getElementById('chatContainer');
+    let chatLoaded = false;
+    document.getElementById("toggleChat").addEventListener("click", function toggleChat() {
+        let chatContainer = document.getElementById('chatContainer');
         chatContainer.style.display = chatContainer.style.display === 'none' || chatContainer.style.display === ''
             ? 'block' : 'none';
-    }
+
+        if (chatContainer.style.display === 'block' && chatLoaded === false) {
+            document.querySelectorAll('.custom-chart').forEach(function(element) {
+                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), element)
+            });
+        }
+
+    })
 
    function sendMessage(event) {
         event.preventDefault();
         const form = document.getElementById("chatForm");
         const formData = new FormData(form);
         const messagesContainer = document.getElementById('messagesContainer')
-
         messagesContainer.append(createElementFromString('<div class="message user-message"><strong>You:</strong> ' + formData.get('user_message') + '</div>'));
 
         fetch("{% url 'chat:chat' %}", {
@@ -75,30 +89,18 @@
         })
         .then(response => response.json())
         .then(data => {
-            messagesContainer.append(createElementFromString('<div class="message reply-message"><strong>System:</strong> ' + data.message + '</div>'));
-            form.reset();
-            messagesContainer.animate({ scrollTop: messagesContainer.prop("scrollHeight") }, 1000);
+            if (data.message) {
+                messagesContainer.append(createElementFromString('<div class="message reply-message"><strong>System:</strong> ' + data.message + '</div>'));
+            }
+            new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), messagesContainer)
+
+            //messagesContainer.animate({ scrollTop: messagesContainer.prop("scrollHeight") }, 1000);
         })
         .catch(error => {
             console.error('Hiba történt:', error);
-            alert('Hiba történt az üzenet küldésekor.');
         });
     return false;
 }
-
-
-
-    function renderChart(canvasId, chartData) {
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        new Chart(ctx, {
-            type: chartData.type,
-            data: {
-                labels: chartData.labels,
-                datasets: chartData.datasets
-            },
-            options: chartData.options || {}
-        });
-    }
 
     function clearChat() {
         $.ajax({
