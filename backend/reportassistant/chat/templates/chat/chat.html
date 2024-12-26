@@ -7,24 +7,34 @@
 </div>
 {% include 'dashboard.html' %}
 <div class="chat-container" id="chatContainer">
+ <form method="post" id="chatForm" onsubmit="return sendMessage(event);">
     <div class="chat-header">
+            {% csrf_token %}
+            <div class="chat-settings">
+                <div class="form-group">
+                    <label for="database_source">Data Source:</label>
+                    {{ form.database_source }}
+                </div>
+            </div>
         <span>Chat</span>
         <button class="close" onclick="toggleChat()" aria-label="Close">&times;</button>
     </div>
+    <!-- Üzenetek -->
     <div class="chat-body">
         <div id="messagesContainer">
             {% for message in messages %}
-                <div class="message user-message">
-                    <strong>You:</strong> {{ message.user_message }}
-                </div>
-                <div class="message reply-message">
-                    <strong>System:</strong> {{ message.system_response }}
-                </div>
+                {% if message.type == 'HUMAN' %}
+                    <div class="message user-message">
+                        <strong>You:</strong> {{ message.message }}
+                    </div>
+                {% else %}
+                    <div class="message reply-message">
+                        <strong>System:</strong> {{ message.message }}
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
-    <form method="post" id="chatForm" onsubmit="return sendMessage(event);">
-        {% csrf_token %}
         <div class="form-group">
             {{ form.user_message }}
         </div>
@@ -39,6 +49,7 @@
     </form>
 </div>
 
+
 <script src="{% static 'chat/js/chat.js' %}"></script>
 <script>
     function toggleChat() {
@@ -47,34 +58,35 @@
             ? 'block' : 'none';
     }
 
-    function sendMessage(event) {
+   function sendMessage(event) {
         event.preventDefault();
-        var form = $('#chatForm');
-        $.ajax({
-            type: form.attr('method'),
-            url: form.attr('action'),
-            data: form.serialize(),
-            success: function(response) {
-                var messagesContainer = $('#messagesContainer');
+        const form = document.getElementById("chatForm");
+        const formData = new FormData(form);
+        const messagesContainer = document.getElementById('messagesContainer')
 
-                messagesContainer.append('<div class="message user-message"><strong>You:</strong> ' + response.user_message + '</div>');
-                messagesContainer.append('<div class="message reply-message"><strong>System:</strong> ' + response.system_response + '</div>');
+        messagesContainer.append(createElementFromString('<div class="message user-message"><strong>You:</strong> ' + formData.get('user_message') + '</div>'));
 
-                if (response.chart_data) {
-                    var chartCanvasId = 'chart-' + Date.now();
-                    var chartHTML = `<div class="chart-container">
-                                        <canvas id="${chartCanvasId}" width="200" height="200"></canvas>
-                                     </div>`;
-                    messagesContainer.append(chartHTML);
-                    renderChart(chartCanvasId, response.chart_data);
-                }
-
-                form[0].reset();
-                messagesContainer.animate({ scrollTop: messagesContainer.prop("scrollHeight") }, 1000);
-            }
+        fetch("{% url 'chat:chat' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                    'X-CSRFToken': Cookies.get('csrftoken')
+               }
+        })
+        .then(response => response.json())
+        .then(data => {
+            messagesContainer.append(createElementFromString('<div class="message reply-message"><strong>System:</strong> ' + data.message + '</div>'));
+            form.reset();
+            messagesContainer.animate({ scrollTop: messagesContainer.prop("scrollHeight") }, 1000);
+        })
+        .catch(error => {
+            console.error('Hiba történt:', error);
+            alert('Hiba történt az üzenet küldésekor.');
         });
-        return false;
-    }
+    return false;
+}
+
+
 
     function renderChart(canvasId, chartData) {
         const ctx = document.getElementById(canvasId).getContext('2d');
@@ -102,5 +114,6 @@
             }
         });
     }
+
 </script>
 {% endblock %}

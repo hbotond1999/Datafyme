@@ -13,4 +13,4 @@ class Chart(models.Model):
     description = models.CharField(max_length=2500)
     type = models.CharField(max_length=100, choices=TYPES)
     sql_query = models.TextField()
-    meta_data = models.JSONField()
+    meta_data = models.JSONField(null=True, blank=True)
