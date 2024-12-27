@@ -1,8 +1,10 @@
 class ChartHelper {
-    constructor(url, parentContainer) {
+    constructor(url, parentContainer, chartId, draggable = false) {
         this.parent = parentContainer;
         this.url = url;
+        this.chartId = chartId;
         this.getChartData();
+        this.draggable = draggable
     }
 
     renderChart(data) {
@@ -14,18 +16,26 @@ class ChartHelper {
     }
 
     renderCanvasChart(charData) {
-        const div = document.createElement("div");
-        div.classList.add("chart-container");
         const canvas = document.createElement('canvas');
-        canvas.height = 200;
-        canvas.width = 200;
-        div.append(canvas);
-        this.parent.append(div);
+        if (this.draggable) {
+            canvas.height = 300
+            const contEl = this.createDraggableContainer()
+            contEl.append(canvas);
+            this.parent.append(contEl);
+            GridStack.setupDragIn('.sidepanel .sidepanel-item');
+        } else {
+            const div = document.createElement("div")
+            div.append(canvas)
+            this.parent.append(div)
+        }
+
         const ctx = canvas.getContext('2d');
-        new Chart(ctx, charData.chart_data);
+        const chart = new Chart(ctx, charData.chart_data);
+
     }
 
     renderTable(tableData) {
+
         const table = document.createElement('table');
         table.classList.add('table', 'table-striped'); // Bootstrap classes
 
@@ -51,10 +61,24 @@ class ChartHelper {
                 cell.textContent = tableData[header][i];
             });
         }
-
-        this.parent.appendChild(table);
+        if (this.draggable) {
+            const contEl = this.createDraggableContainer()
+            contEl.append(table)
+            this.parent.appendChild(contEl);
+            GridStack.setupDragIn('.sidepanel .sidepanel-item');
+        } else {
+            this.parent.append(table)
+        }
     }
 
+    createDraggableContainer() {
+        const contEl = document.createElement("div");
+        contEl.classList.add("grid-stack-item");
+        contEl.classList.add("sidepanel-item");
+        contEl.setAttribute("data-id", this.chartId)
+        console.log("Hahó")
+        return contEl
+    }
 
 
     getChartData() {

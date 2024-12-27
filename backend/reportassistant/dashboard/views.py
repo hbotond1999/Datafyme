@@ -59,7 +59,8 @@ def update_dashboard_slots(request):
             new_width = slot.get('w', 0)
             new_height = slot.get('h', 0)
             slot_id = slot.get('slot_id')
-
+            if not slot_id:
+                continue
             dashboard_slot = DashboardSlot.objects.get(id=slot_id)
             dashboard_slot.col_num = new_col_num
             dashboard_slot.row_num = new_row_num
@@ -92,3 +93,21 @@ def delete_dashboard(request, dashboard_id: int):
         return JsonResponse({'ok': True}, status=200)
     else:
         return HttpResponseNotAllowed(permitted_methods=["DELETE"])
+
+@login_required
+def add_dashboard_slot(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        dashboard_slot = DashboardSlot(
+            dashboard_id=body['dashboard_id'],
+            chart_id=body['chart_id'],
+            col_num=body['x'],
+            row_num=body['y'],
+            width=body['w'],
+            height=body['h'],
+        )
+
+        dashboard_slot.save()
+        return JsonResponse({'ok': True}, status=200)
+    else:
+        return HttpResponseNotAllowed(permitted_methods=["POST"])

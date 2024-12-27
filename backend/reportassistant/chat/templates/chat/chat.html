@@ -21,7 +21,8 @@
     </div>
     <!-- Üzenetek -->
     <div class="chat-body">
-        <div id="messagesContainer">
+        <div id="messagesContainer" class="sidepanel">
+
             {% for message in messages %}
                 {% if message.type == 'HUMAN' %}
                     <div class="message user-message">
@@ -37,7 +38,7 @@
                     {% endif %}
                 {% endif %}
                 {% if message.chart %}
-                         <div class="custom-chart" data-id="{{ message.chart.id }}"></div>
+                     <div class="custom-chart" data-id="{{ message.chart.id }}"></div>
                 {% endif %}
             {% endfor %}
         </div>
@@ -67,7 +68,7 @@
 
         if (chatContainer.style.display === 'block' && chatLoaded === false) {
             document.querySelectorAll('.custom-chart').forEach(function(element) {
-                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), element)
+                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), element, element.dataset.id, true)
             });
         }
 
@@ -92,9 +93,11 @@
             if (data.message) {
                 messagesContainer.append(createElementFromString('<div class="message reply-message"><strong>System:</strong> ' + data.message + '</div>'));
             }
-            new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), messagesContainer)
+            if (data.chart_id) {
+                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), messagesContainer, data.chart_id, true)
+            }
 
-            //messagesContainer.animate({ scrollTop: messagesContainer.prop("scrollHeight") }, 1000);
+            messagesContainer.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
         })
         .catch(error => {
             console.error('Hiba történt:', error);

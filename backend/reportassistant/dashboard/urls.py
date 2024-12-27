@@ -11,4 +11,5 @@ urlpatterns = [
     path('update_dashboard/', views.update_dashboard_slots, name='update_dashboard_slots'),
     path('delete_dashboard_slots/<int:slot_id>/', views.delete_dashboard_slot, name='delete_dashboard_slot'),
     path('delete_dashboard/<int:dashboard_id>/', views.delete_dashboard, name='delete_dashboard'),
+    path('add_dashboard_slot/', views.add_dashboard_slot, name='add_dashboard_slot'),
 ]

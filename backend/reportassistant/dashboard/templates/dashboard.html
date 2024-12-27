@@ -27,6 +27,8 @@
             "{% url 'dashboard:update_dashboard_slots' %}",
             "{% url 'dashboard:delete_dashboard_slot' 0 %}",
             "{% url 'dashboard:delete_dashboard' 0 %}",
+            "{% url 'dashboard:add_dashboard_slot' %}",
+            '{% url "reporter_agent:get_chart" 0 %}'
         )
 
         document.getElementById('saveDashboard').addEventListener(('click'), () => dashboardHelper.createDashboard()

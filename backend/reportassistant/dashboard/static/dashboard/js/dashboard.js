@@ -7,11 +7,14 @@ class DashboardHelper {
                 dashboard_slot_url,
                 updateSlotsUrl,
                 deleteDashboardSlotUrl,
-                deleteDashboardUrl
+                deleteDashboardUrl,
+                addDashboardSlotUrl,
+                getChartUrl
     ) {
         GridStack.renderCB = (el, w)=> {
-            el.appendChild(this.createGirdContent(w.data))
+            el.appendChild(this.createGirdContent(w.data, getChartUrl))
         };
+
         this.titleElement = document.getElementById(titleElementId);
         this.dashboardTitleValidationError = document.getElementById(dashboardTitleValidationErrorId);
         this.gridContainerId = gridContainerId;
@@ -22,6 +25,7 @@ class DashboardHelper {
         this.updateSlotsUrl = updateSlotsUrl
         this.deleteDashboardSlotUrl = deleteDashboardSlotUrl
         this.deleteDashboardUrl = deleteDashboardUrl
+        this.addDashboardSlotUrl = addDashboardSlotUrl
 
     }
 
@@ -154,15 +158,17 @@ class DashboardHelper {
             this.grid = null;
         }
 
-        if (children.length === 0) {
-            return;
-        }
+        // if (children.length === 0) {
+        //     return;
+        // }
 
         const gridStackElement = document.createElement("div");
         gridStackElement.classList.add("grid-stack");
         document.getElementById(this.gridContainerId).appendChild(gridStackElement);
 
-        this.grid = GridStack.init({ children, margin: '6px'});
+        this.grid = GridStack.init({ children, margin: '6px', acceptWidgets: true, minRow: 2});
+
+        GridStack.setupDragIn('.sidepanel .sidepanel-item');
 
         this.grid.on('change', () => {
             const slots = this.grid.save();
@@ -170,7 +176,50 @@ class DashboardHelper {
             this.updateDashboardSlots(slots)
         });
 
+        this.grid.on("dropped", (event, previousWidget, newWidget) => {
+            if (!previousWidget) {
+                console.log(newWidget.el)
+                const chartId = newWidget.el.dataset.id
+                const dashboardId = document.getElementById("existingDashboards").value
+                const data = {x: newWidget.x, y: newWidget.y, w: newWidget.w, h: newWidget.h, chart_id: chartId, dashboard_id: dashboardId}
+                this.addDashboardSlot(data)
+            }
+        })
+        this.grid.on('resizestop', function(event, el) {
+                const canvas = el.querySelector('canvas');
+                console.log("resize")
+                if (canvas) {
+                  const chart = Chart.getChart(canvas); // Get Chart.js instance
+                  chart.resize(); // Resize the chart
+                }
+        });
+
     }
+
+   addDashboardSlot(data) {
+        fetch(this.addDashboardSlotUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': Cookies.get('csrftoken') // Add CSRF token if needed
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            this.fetchDashboardData().then()
+            console.log('Server response:', result);
+        })
+        .catch(error => {
+            console.error('Error during fetch:', error);
+        });
+    }
+
 
      updateDashboardSlots(slots) {
             fetch(this.updateSlotsUrl, {
@@ -186,7 +235,7 @@ class DashboardHelper {
             });
     }
 
-   createGirdContent(slot) {
+   createGirdContent(slot, getChartUrl) {
 
         const slotContainer = document.createElement("div");
         slotContainer.className = "slot-container";
@@ -206,6 +255,7 @@ class DashboardHelper {
         slotHeader.appendChild(slotTitle);
         slotHeader.appendChild(trashIconContainer);
         slotContainer.appendChild(slotHeader);
+        new ChartHelper(getChartUrl.replace('0', slot.chart_id), slotContainer, slot.chart_id)
         return slotContainer
    }
 

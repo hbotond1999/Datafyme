@@ -28,6 +28,7 @@ class BarChart(BaseModel, Chart):
                 }]
             },
             "options": {
+                "maintainAspectRatio": False,
                 "scales": {
                     "y": {
                         "beginAtZero": True
