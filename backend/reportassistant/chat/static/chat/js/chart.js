@@ -22,16 +22,18 @@ class ChartHelper {
             const contEl = this.createDraggableContainer()
             contEl.append(canvas);
             this.parent.append(contEl);
-            GridStack.setupDragIn('.sidepanel .sidepanel-item');
+            setupDragIn()
         } else {
             const div = document.createElement("div")
             div.append(canvas)
             this.parent.append(div)
         }
+        this.createChart(canvas, charData)
+    }
 
+    createChart(canvas, charData) {
         const ctx = canvas.getContext('2d');
         const chart = new Chart(ctx, charData.chart_data);
-
     }
 
     renderTable(tableData) {
@@ -65,7 +67,7 @@ class ChartHelper {
             const contEl = this.createDraggableContainer()
             contEl.append(table)
             this.parent.appendChild(contEl);
-            GridStack.setupDragIn('.sidepanel .sidepanel-item');
+             setupDragIn()
         } else {
             this.parent.append(table)
         }
@@ -76,7 +78,6 @@ class ChartHelper {
         contEl.classList.add("grid-stack-item");
         contEl.classList.add("sidepanel-item");
         contEl.setAttribute("data-id", this.chartId)
-        console.log("Hahó")
         return contEl
     }
 

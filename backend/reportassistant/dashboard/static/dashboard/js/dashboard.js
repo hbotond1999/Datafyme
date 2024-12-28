@@ -168,7 +168,7 @@ class DashboardHelper {
 
         this.grid = GridStack.init({ children, margin: '6px', acceptWidgets: true, minRow: 2});
 
-        GridStack.setupDragIn('.sidepanel .sidepanel-item');
+        setupDragIn()
 
         this.grid.on('change', () => {
             const slots = this.grid.save();
@@ -309,4 +309,33 @@ class DashboardHelper {
         console.error("Error deleting slot:", error);
     });
 }
+}
+
+function setupDragIn() {
+    let selector = '.sidepanel .sidepanel-item';
+    GridStack.setupDragIn(selector, {
+        helper: (el) => {
+            const canvas = el.querySelector("canvas");
+            if (!canvas) {
+                return el.cloneNode(true);
+            }
+            const clonedCanvas = cloneCanvas(canvas);
+
+            const newEl = el.cloneNode(true);
+            const removeCanvas = newEl.querySelector("canvas")
+            newEl.removeChild(removeCanvas)
+            newEl.appendChild(clonedCanvas)
+            return newEl
+        }
+    });
+}
+
+function cloneCanvas(originalCanvas) {
+    const newCanvas = document.createElement('canvas');
+    newCanvas.width = originalCanvas.width;
+    newCanvas.height = originalCanvas.height;
+    const context = newCanvas.getContext('2d');
+    context.drawImage(originalCanvas, 0, 0);
+
+    return newCanvas;
 }
