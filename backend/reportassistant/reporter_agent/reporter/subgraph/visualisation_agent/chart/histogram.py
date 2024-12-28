@@ -28,6 +28,7 @@ class HistogramChart(BaseModel, Chart):
                 }]
             },
             "options": {
+                "maintainAspectRatio": False,
                 "scales": {
                     "y": {
                         "beginAtZero": True

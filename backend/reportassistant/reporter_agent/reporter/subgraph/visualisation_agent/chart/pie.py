@@ -26,5 +26,8 @@ class PieChart(BaseModel, Chart):
                     "data": data[y_axis],
                     "borderWidth": 1
                 }]
+            },
+            "options": {
+                "maintainAspectRatio": False,
             }
         }

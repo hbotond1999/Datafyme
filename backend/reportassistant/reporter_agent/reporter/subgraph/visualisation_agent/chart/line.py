@@ -31,6 +31,7 @@ class LineChart(BaseModel, Chart):
                 }]
             },
             "options": {
+                "maintainAspectRatio": False,
                 "scales": {
                     "x": {
                         "beginAtZero": True

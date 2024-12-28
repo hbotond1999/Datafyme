@@ -30,5 +30,8 @@ class ScatterChart(BaseModel, Chart):
                     "borderColor": "rgba(255, 99, 132, 1)",
                     "borderWidth": 1
                 }]
+            },
+            "options": {
+                "maintainAspectRatio": False,
             }
         }

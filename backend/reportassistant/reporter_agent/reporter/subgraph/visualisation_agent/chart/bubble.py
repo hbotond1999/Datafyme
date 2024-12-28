@@ -36,6 +36,7 @@ class BubbleChart(BaseModel, Chart):
                 }]
             },
             "options": {
+                "maintainAspectRatio": False,
                 "scales": {
                     "x": {
                         "beginAtZero": True
