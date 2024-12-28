@@ -32,5 +32,4 @@ urlpatterns = i18n_patterns(
     path('rosetta/', include('rosetta.urls')),
     path('set_language/', set_language, name='set_language'),
     path('dashboard/', include('dashboard.urls')),
-    path('reporter_agent/', include('reporter_agent.urls')),
 )
