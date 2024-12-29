@@ -1,6 +1,5 @@
 from typing import Optional
 
-
 from django import forms
 from django.contrib.auth.models import User
 
@@ -21,13 +20,15 @@ class MessageForm(forms.Form):
     database_source = forms.ModelChoiceField(
         queryset=DatabaseSource.objects.none(),
         widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Select Data Source',
         empty_label="Choose a source"
     )
 
     def __init__(self, *args, **kwargs):
         user: Optional[User] = kwargs.pop('user', None)
+        database_source_id: Optional[int] = kwargs.pop('database_source_id', None)
         super().__init__(*args, **kwargs)
+
+        # Set queryset for database_source field based on user permissions
         if user:
             if not user.is_superuser:
                 user_groups = user.groups.all()
@@ -39,4 +40,14 @@ class MessageForm(forms.Form):
                 self.fields['database_source'].queryset = DatabaseSource.objects.filter(
                     status=Status.READY.value
                 )
+
+        if database_source_id is not None:
+            try:
+                default_source = DatabaseSource.objects.get(id=database_source_id)
+                if default_source in self.fields['database_source'].queryset:
+                    self.fields['database_source'].initial = default_source
+            except DatabaseSource.DoesNotExist:
+                pass  # Handle the case where the ID is invalid
+
+        # Customize label representation
         self.fields['database_source'].label_from_instance = lambda obj: obj.display_name

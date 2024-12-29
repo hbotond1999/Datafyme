@@ -1,10 +1,11 @@
 class ChartHelper {
-    constructor(url, parentContainer, chartId, draggable = false) {
+    constructor(url, parentContainer, chartId, draggable = false, scrollToInit = false) {
         this.parent = parentContainer;
         this.url = url;
         this.chartId = chartId;
         this.getChartData();
         this.draggable = draggable
+        this.scrollToInit = scrollToInit
     }
 
     renderChart(data) {
@@ -29,6 +30,9 @@ class ChartHelper {
             this.parent.append(div)
         }
         this.createChart(canvas, charData)
+        if (this.scrollToInit) {
+            canvas.scrollIntoView({behavior: "smooth", block: "end"})
+        }
     }
 
     createChart(canvas, charData) {
@@ -70,6 +74,9 @@ class ChartHelper {
              setupDragIn()
         } else {
             this.parent.append(table)
+        }
+        if (this.scrollToInit) {
+            table.scrollIntoView({behavior: "smooth"})
         }
     }
 

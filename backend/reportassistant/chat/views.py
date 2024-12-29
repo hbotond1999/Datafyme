@@ -24,6 +24,7 @@ def chat_view(request):
         if form.is_valid():
             user_message = form.cleaned_data['user_message']
             datasource = form.cleaned_data['database_source']
+            request.session["database_source_id"] = datasource.id
             messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
             chat_hist =[msg.type + ": " + (msg.message if msg.message else "") for msg in messages]
             Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message,chart=None).save()
@@ -41,7 +42,7 @@ def chat_view(request):
         else:
             return JsonResponse({"error": form.errors})
     else:
-        form = MessageForm(user=request.user)
+        form = MessageForm(user=request.user, database_source_id=request.session.get("database_source_id", None))
 
     messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
     return render(request, 'chat/chat.html', {'form': form, 'messages': messages, 'conversation_id': conversation_id})
@@ -70,8 +71,9 @@ def chat_history(request):
 @login_required
 def clear_chat(request):
     if request.method == 'POST':
-        # Generate a new conversation ID and update the session
-        request.session['conversation_id'] = str(uuid.uuid4())
+        conversation = Conversation(user=request.user)
+        conversation.save()
+        request.session['conversation_id'] = conversation.id
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'}, status=400)
 

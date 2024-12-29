@@ -11,13 +11,13 @@
     <div class="chat-header">
             {% csrf_token %}
             <div class="chat-settings">
+
                 <div class="form-group">
-                    <label for="database_source">Data Source:</label>
                     {{ form.database_source }}
                 </div>
             </div>
-        <span>Chat</span>
-        <button class="close" aria-label="Close" type="button">&times;</button>
+
+        <i id="closeChat" class="fas fa-close" style="cursor: pointer"></i>
     </div>
     <!-- Üzenetek -->
     <div class="chat-body">
@@ -43,16 +43,18 @@
             {% endfor %}
         </div>
     </div>
-        <div class="form-group">
+         <div class="d-flex justify-content-between">
+
+        <div class="form-group user-typer">
             {{ form.user_message }}
         </div>
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary btn-send">
-                <i class="fas fa-paper-plane"></i> Send
+             <button type="button" class="btn btn-danger btn-sm clear-chat-btn" onclick="clearChat()" >
+                    <i class="fas fa-trash-alt"></i>
             </button>
-            <button type="button" class="btn btn-danger btn-sm" onclick="clearChat()">
-                <i class="fas fa-trash-alt"></i>
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-paper-plane"></i>
             </button>
+
         </div>
     </form>
 </div>
@@ -61,49 +63,64 @@
 <script src="{% static 'chat/js/chart.js' %}"></script>
 <script>
     let chatLoaded = false;
-    document.getElementById("toggleChat").addEventListener("click", function toggleChat() {
-        let chatContainer = document.getElementById('chatContainer');
-        chatContainer.style.display = chatContainer.style.display === 'none' || chatContainer.style.display === ''
-            ? 'block' : 'none';
+    document.getElementById("toggleChat").addEventListener("click", toggleChat)
+    document.getElementById("closeChat").addEventListener("click", toggleChat)
+    function toggleChat() {
+            let chatContainer = document.getElementById('chatContainer');
+            chatContainer.style.display = chatContainer.style.display === 'none' || chatContainer.style.display === ''
+                ? 'block' : 'none';
 
-        if (chatContainer.style.display === 'block' && chatLoaded === false) {
-            document.querySelectorAll('.custom-chart').forEach(function(element) {
-                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), element, element.dataset.id, true)
-            });
+            if (chatContainer.style.display === 'block' && chatLoaded === false) {
+                document.querySelectorAll('.custom-chart').forEach(function(element) {
+                    new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), element, element.dataset.id, true)
+                });
+            }
+
         }
 
-    })
-
-   function sendMessage(event) {
+      function sendMessage(event) {
         event.preventDefault();
         const form = document.getElementById("chatForm");
         const formData = new FormData(form);
-        const messagesContainer = document.getElementById('messagesContainer')
-        messagesContainer.append(createElementFromString('<div class="message user-message"><strong>You:</strong> ' + formData.get('user_message') + '</div>'));
+        const messagesContainer = document.getElementById('messagesContainer');
+        const sendButton = form.querySelector('button[type="submit"]');
+        const userMessage = createElementFromString('<div class="message user-message"><strong>You:</strong> ' + formData.get('user_message') + '</div>')
+        messagesContainer.append(userMessage);
+        userMessage.scrollIntoView({behavior: "smooth", block: "end"})
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
         fetch("{% url 'chat:chat' %}", {
             method: "POST",
             body: formData,
             headers: {
-                    'X-CSRFToken': Cookies.get('csrftoken')
-               }
+                'X-CSRFToken': Cookies.get('csrftoken')
+            }
         })
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                messagesContainer.append(createElementFromString('<div class="message reply-message"><strong>System:</strong> ' + data.message + '</div>'));
+                const message = createElementFromString('<div class="message reply-message"><strong>System:</strong> ' + data.message + '</div>')
+                message.scrollIntoView({behavior: "smooth", block: "end"})
+                sendButton.disabled = true;
+                messagesContainer.append(message);
             }
             if (data.chart_id) {
-                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), messagesContainer, data.chart_id, true)
+                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), messagesContainer, data.chart_id, true, true);
             }
-
-            messagesContainer.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
         })
         .catch(error => {
             console.error('Hiba történt:', error);
+        })
+        .finally(() => {
+            // Spinner eltávolítása és Send gomb visszaállítása
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
         });
-    return false;
-}
+
+        return false;
+    }
+
 
     function clearChat() {
         $.ajax({
@@ -114,7 +131,10 @@
             },
             success: function(response) {
                 if (response.status === 'success') {
-                    location.reload();
+                    const messages = document.getElementById("messagesContainer")
+                    while (messages.firstChild) {
+                        messages.removeChild(messages.lastChild)
+                    }
                 }
             }
         });
