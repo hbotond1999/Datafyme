@@ -8,7 +8,9 @@ from db_configurator.models import Status, DatabaseSource
 
 class MessageForm(forms.Form):
     user_message = forms.CharField(
+
         widget=forms.Textarea(attrs={
+            'id': "chatUserMessage",
             'placeholder': 'Type your message...',
             'rows': 2,
             'class': 'form-control'

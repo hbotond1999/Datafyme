@@ -74,8 +74,8 @@
                 document.querySelectorAll('.custom-chart').forEach(function(element) {
                     new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), element, element.dataset.id, true)
                 });
+                chatLoaded = true
             }
-
         }
 
       function sendMessage(event) {
@@ -89,7 +89,8 @@
         userMessage.scrollIntoView({behavior: "smooth", block: "end"})
         sendButton.disabled = true;
         sendButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-
+        const userMessageField = document.getElementById('chatUserMessage');
+        userMessageField.value = ''
         fetch("{% url 'chat:chat' %}", {
             method: "POST",
             body: formData,
@@ -113,7 +114,6 @@
             console.error('Hiba történt:', error);
         })
         .finally(() => {
-            // Spinner eltávolítása és Send gomb visszaállítása
             sendButton.disabled = false;
             sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
         });
