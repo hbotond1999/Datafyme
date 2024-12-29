@@ -13,6 +13,8 @@ class Dashboard(models.Model):
 
 class DashboardSlot(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
-    chart = models.OneToOneField(Chart, on_delete=models.CASCADE)
+    chart = models.ForeignKey(Chart, on_delete=models.CASCADE)
     row_num = models.IntegerField()
     col_num = models.IntegerField()
+    height = models.IntegerField()
+    width = models.IntegerField()

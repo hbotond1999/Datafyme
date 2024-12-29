@@ -1,7 +1,7 @@
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from dotenv import load_dotenv
 
-from common.db.manager.database_manager import DatabaseManager
 from db_configurator.models import DatabaseSource
 from reporter_agent.reporter.graph import create_reporter_graph
 from reporter_agent.reporter.state import GraphState
@@ -66,6 +66,8 @@ class VizuAgentTests(TestCase):
 class ReporterAgentTests(TestCase):
     def setUp(self):
         self.agent = create_reporter_graph()
+        group = Group(name="test")
+        group.save()
         self.datasource, _ = DatabaseSource.objects.get_or_create(
             name="postgres",
             defaults={
@@ -74,6 +76,9 @@ class ReporterAgentTests(TestCase):
                 "password": "password",
                 "host": "localhost",
                 "port": 5432,
+                "display_name": "postgres",
+                "status": "READY",
+                "group_id": group.id
             }
         )
 

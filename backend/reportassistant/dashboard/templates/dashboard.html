@@ -1,0 +1,56 @@
+{% load i18n %}
+{% load static %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gridstack.js/11.1.2/gridstack.min.css" integrity="sha512-KAu0PHHBy9kkFY2fkQ7+RNHftQuJ+DB2Rb39LM28TKfzu+nzPIrC4TKtiZsq/3iP+ZTfV7O8cUGNl6VZvCg6Ag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="{% static 'dashboard/css/style.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gridstack.js/11.1.2/gridstack-all.js" integrity="sha512-bWZb58MURxm/28F6eCGWg8tIp4rxuPdFgqtRwesJLW2DUOzIT7yqNSeLAySxs2FzFUcQyUhUnE33kvNZxkhe+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+<div class="custom-dashboard">
+    {% include 'add_dashboard.html' %}
+    <div class="dashboard-container">
+
+        <button id="openAddDatabaseModal" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDashboardModal"><i class="fas fa-add"></i></button>
+        <button id="deleteDashBoardButton" class="btn  btn-outline-danger"><i class="fas fa-trash"></i></button>
+        {% include 'dashboard_selector.html' %}
+    </div>
+    <div id="dashboard-container"></div>
+</div>
+<script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+<script>
+        const dashboardHelper = new DashboardHelper(
+            "dashboardTitle",
+            "dashboardTitleValidationError",
+            "dashboard-container",
+            "{% url 'dashboard:create_dashboard' %}",
+            "{% url 'dashboard:get_dashboards' %}",
+            "{% url 'dashboard:get_dashboard_slots' 0 %}",
+            "{% url 'dashboard:update_dashboard_slots' %}",
+            "{% url 'dashboard:delete_dashboard_slot' 0 %}",
+            "{% url 'dashboard:delete_dashboard' 0 %}",
+            "{% url 'dashboard:add_dashboard_slot' %}",
+            '{% url "reporter_agent:get_chart" 0 %}'
+        )
+
+        document.getElementById('saveDashboard').addEventListener(('click'), () => dashboardHelper.createDashboard()
+
+        )
+        document.getElementById("DashboardModalClose").addEventListener('click', () => dashboardHelper.resetErrors())
+
+        document.getElementById("existingDashboards").addEventListener("change", () => {
+
+            dashboardHelper.fetchDashboardData()
+            }
+        )
+
+        document.getElementById('deleteDashBoardButton').addEventListener("click", () => {
+            dashboardHelper.deleteDashboard()
+        })
+
+        dashboardHelper.getDashboardOptions()
+
+</script>
+<script type="text/javascript">
+
+
+</script>
+

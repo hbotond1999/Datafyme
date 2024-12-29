@@ -1,7 +1,10 @@
 from django.urls import path
 
-from . import views
+from reporter_agent import views
+
+app_name = "reporter_agent"
 
 urlpatterns = [
     path('sql_agent', views.sql_agent, name="sql_agent"),
+    path('chart/<int:chart_id>', views.get_chart, name="get_chart"),
 ]

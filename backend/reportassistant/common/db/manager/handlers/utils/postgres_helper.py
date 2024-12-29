@@ -4,8 +4,6 @@ from typing import Optional, List, Any
 
 from psycopg2.extras import RealDictCursor
 
-from chat.views import trial
-
 logger = logging.getLogger(__name__)
 
 
@@ -79,7 +77,7 @@ class PostgresHelper:
                     results: List[Any] = cursor.fetchall()
                     return results
         except (Exception, psycopg2.DatabaseError) as error:
-            logger.error(f"Error executing query in {self.dbname}: {error}")
+            logger.error(f"Error executing query in {self.dbname}: {error} - {query}")
             raise
         finally:
             # Ensure that the connection is closed after execution

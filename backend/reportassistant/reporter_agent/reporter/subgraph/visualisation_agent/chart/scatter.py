@@ -12,3 +12,26 @@ class ScatterChart(BaseModel, Chart):
             "x_axis": self.x_axis_column_name,
             "y_axis": self.y_axis_column_name
         }
+
+    @classmethod
+    def create_chart_data(cls, chart, data):
+        x_axis = chart.meta_data["metadata"]["x_axis"]
+        y_axis = chart.meta_data["metadata"]["y_axis"]
+
+        new_data = [{"x": x, "y": y} for x, y in zip(data[x_axis], data[y_axis])]
+
+        return {
+            "type": "scatter",
+            "data": {
+                "datasets": [{
+                    "label": y_axis,
+                    "data": new_data,
+                    "backgroundColor": "rgba(255, 99, 132, 0.6)",
+                    "borderColor": "rgba(255, 99, 132, 1)",
+                    "borderWidth": 1
+                }]
+            },
+            "options": {
+                "maintainAspectRatio": False,
+            }
+        }

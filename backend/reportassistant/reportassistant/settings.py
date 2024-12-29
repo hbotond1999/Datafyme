@@ -27,8 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+CSRF_COOKIE_SECURE=True
+SESSION_COOKIE_SECURE=True
+
+DEBUG = True if int(os.getenv('DEBUG')) == 1 else False
 
 ALLOWED_HOSTS = []
 

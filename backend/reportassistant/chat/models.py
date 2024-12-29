@@ -1,11 +1,28 @@
+import enum
+from django.contrib.auth.models import User
 from django.db import models
-import uuid
+from django.utils.translation import gettext_noop
+
+from reporter_agent.models import Chart
+
+
+class MessageType(enum.Enum):
+    AI = gettext_noop('AI')
+    HUMAN = gettext_noop('HUMAN')
+
+class Conversation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
 class Message(models.Model):
-    user_message = models.TextField()
-    system_response = models.TextField()
+    TYPES = [(t.value, t.value) for t in MessageType]
+    conversation = models.ForeignKey(
+        Conversation,
+        related_name='messages',
+        on_delete=models.CASCADE
+    )
+    type = models.CharField(max_length=11, choices=TYPES)
+    message = models.TextField(null=True, blank=True)
+    chart = models.ForeignKey(Chart, on_delete=models.CASCADE, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    conversation_id = models.UUIDField(default=uuid.uuid4, editable=False)  # Unique ID for each conversation
 
-    def __str__(self):
-        return f"User: {self.user_message}, Response: {self.system_response}, Conversation ID: {self.conversation_id}"

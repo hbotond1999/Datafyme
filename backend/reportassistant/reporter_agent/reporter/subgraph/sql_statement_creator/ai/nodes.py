@@ -71,6 +71,8 @@ def relation_graph(state: GraphState):
     neo4j_instance = Neo4JInstance()
 
     tables_all = []
+    # TODO: gyors fixnek van itt ell kell távolítani a rendes javítás után
+    tables_all.extend([{"schema": table["schema"], "table_name": table["name"]} for table in state['filtered_table_ddls']])
     seen = set()
     for schema_name, table_name in filtered_tables:
         for neighbour in neo4j_instance.find_table_neighbours(state["database_source"].id, schema_name, table_name):
@@ -93,7 +95,6 @@ def get_final_ddls(state: GraphState):
     tables_schemas = extractor.get_tables_schemas()
     matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["tables_all"]]
     json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
-
     return {"table_final_ddls": json_data}
 
 

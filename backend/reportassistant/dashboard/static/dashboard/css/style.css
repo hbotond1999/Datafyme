@@ -1,0 +1,45 @@
+.dashboard-container {
+    display: flex;
+    gap: 10px;
+    justify-content: left;
+    margin-bottom: 10px;
+}
+.custom-dashboard {
+    width: 95vw;
+    margin: auto;
+}
+.grid-stack-item .ui-resizable-se {
+    visibility: hidden;
+}
+
+.grid-stack-item-content {
+     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.grid-stack-item-content .slot-trash {
+    display: none;
+}
+
+.grid-stack-item-content:hover .slot-trash{
+    display: block;
+}
+
+.grid-stack-item:hover .ui-resizable-se {
+    visibility: visible;
+}
+.slot-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px;
+}
+
+.slot-trash {
+    height: 5px;
+    color: red;
+    cursor: pointer;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
