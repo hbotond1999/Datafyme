@@ -1,4 +1,5 @@
 {% extends 'base_generic.html' %}
+{% load i18n %}
 {% load static %}
 {%  block content %}
 <link rel="stylesheet" type='text/css' href="{% static 'chat/css/styles.css' %}">
@@ -26,13 +27,13 @@
             {% for message in messages %}
                 {% if message.type == 'HUMAN' %}
                     <div class="message user-message">
-                        <strong>You:</strong> {{ message.message }}
+                        <strong>{% trans 'You' %}:</strong> {{ message.message }}
                     </div>
                 {% else %}
                     {% if message.message %}
                         <div class="message reply-message">
 
-                            <strong>System:</strong> {{ message.message }}
+                            <strong>{% translate 'System' %}:</strong> {{ message.message }}
 
                         </div>
                     {% endif %}
@@ -84,7 +85,7 @@
         const formData = new FormData(form);
         const messagesContainer = document.getElementById('messagesContainer');
         const sendButton = form.querySelector('button[type="submit"]');
-        const userMessage = createElementFromString('<div class="message user-message"><strong>You:</strong> ' + formData.get('user_message') + '</div>')
+        const userMessage = createElementFromString('<div class="message user-message"><strong>{% trans 'You' %}:</strong> ' + formData.get('user_message') + '</div>')
         messagesContainer.append(userMessage);
         userMessage.scrollIntoView({behavior: "smooth", block: "end"})
         sendButton.disabled = true;
@@ -101,7 +102,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                const message = createElementFromString('<div class="message reply-message"><strong>System:</strong> ' + data.message + '</div>')
+                const message = createElementFromString('<div class="message reply-message"><strong>{% trans System %}:</strong> ' + data.message + '</div>')
                 message.scrollIntoView({behavior: "smooth", block: "end"})
                 sendButton.disabled = true;
                 messagesContainer.append(message);

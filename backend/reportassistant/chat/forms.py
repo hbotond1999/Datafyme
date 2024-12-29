@@ -2,6 +2,7 @@ from typing import Optional
 
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.translation import gettext as _
 
 from db_configurator.models import Status, DatabaseSource
 
@@ -11,7 +12,7 @@ class MessageForm(forms.Form):
 
         widget=forms.Textarea(attrs={
             'id': "chatUserMessage",
-            'placeholder': 'Type your message...',
+            'placeholder': _('Type your message...'),
             'rows': 2,
             'class': 'form-control'
         }),
@@ -22,7 +23,7 @@ class MessageForm(forms.Form):
     database_source = forms.ModelChoiceField(
         queryset=DatabaseSource.objects.none(),
         widget=forms.Select(attrs={'class': 'form-control'}),
-        empty_label="Choose a source"
+        empty_label=_("Choose a source")
     )
 
     def __init__(self, *args, **kwargs):
