@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Dict, AnyStr, Any, Literal
 
 import pandas as pd
@@ -198,7 +199,9 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
 
     def _convert_to_serializable(self, record: Any) -> Any:
         if isinstance(record, (pd.Timestamp, datetime)):
-            return record.isoformat()  # Convert datetime to ISO format string
+            return record.isoformat()
+        elif isinstance(record, Decimal):
+            return float(record)
         return record
 
     def _convert_to_serializable_dict(self, data: Dict[str, List[Any]]):
