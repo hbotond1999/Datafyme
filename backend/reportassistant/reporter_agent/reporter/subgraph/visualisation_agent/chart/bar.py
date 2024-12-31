@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
+from reporter_agent.reporter.subgraph.visualisation_agent.chart.color import ColorPalette
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.utils import axis_date_str_converter
 
 
@@ -28,6 +29,9 @@ class BarChart(BaseModel, Chart):
             labels = axis_date_str_converter(dates=data[x_axis], date_format=date_format)
         else:
             labels = data[x_axis]
+
+        color_palette = ColorPalette()
+        border_colors, background_colors  = color_palette.get_colors(len(labels))
         return {
             "type": "bar",
             "data": {
@@ -35,6 +39,8 @@ class BarChart(BaseModel, Chart):
                 "datasets": [{
                     "label": y_axis,
                     "data": data[y_axis],
+                    "backgroundColor": background_colors,
+                    "borderColor": border_colors,
                     "borderWidth": 1
                 }]
             },

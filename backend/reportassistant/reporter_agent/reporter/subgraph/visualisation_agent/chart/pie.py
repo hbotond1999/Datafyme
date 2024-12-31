@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
+from reporter_agent.reporter.subgraph.visualisation_agent.chart.color import ColorPalette
 
 
 class PieChart(BaseModel, Chart):
@@ -18,13 +19,17 @@ class PieChart(BaseModel, Chart):
         x_axis = chart.meta_data["metadata"]["x_axis"]
         y_axis = chart.meta_data["metadata"]["y_axis"]
 
+        color_palette = ColorPalette()
+        border_colors, background_colors  = color_palette.get_colors(len(data[x_axis]))
         return {
             "type": "pie",
             "data": {
                 "labels": data[x_axis],
                 "datasets": [{
                     "data": data[y_axis],
-                    "borderWidth": 1
+                    "borderWidth": 1,
+                    "borderColor": border_colors,
+                    "backgroundColor": background_colors,
                 }]
             },
             "options": {
