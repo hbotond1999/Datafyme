@@ -9,7 +9,8 @@ class DashboardHelper {
                 deleteDashboardSlotUrl,
                 deleteDashboardUrl,
                 addDashboardSlotUrl,
-                getChartUrl
+                getChartUrl,
+                chartUpdateUrl
     ) {
         GridStack.renderCB = (el, w)=> {
             el.appendChild(this.createGirdContent(w.data, getChartUrl))
@@ -26,6 +27,7 @@ class DashboardHelper {
         this.deleteDashboardSlotUrl = deleteDashboardSlotUrl
         this.deleteDashboardUrl = deleteDashboardUrl
         this.addDashboardSlotUrl = addDashboardSlotUrl
+        this.chartUpdateUrl = chartUpdateUrl
 
     }
 
@@ -235,29 +237,67 @@ class DashboardHelper {
             });
     }
 
-   createGirdContent(slot, getChartUrl) {
+    createGirdContent(slot, getChartUrl) {
 
         const slotContainer = document.createElement("div");
+        const chartHelper = new ChartHelper(getChartUrl.replace('0', slot.chart_id), this.chartUpdateUrl, slotContainer, slot.chart_id, false, false, false);
         slotContainer.className = "slot-container";
         slotContainer.dataset.slotId = slot.id;
 
         const slotHeader = document.createElement("div");
         slotHeader.className = "slot-header";
 
-        const slotTitle = document.createElement("h3");
-        slotTitle.textContent = slot.id;
+        const slotTitle = document.createElement("h5");
+        slotTitle.textContent = slot.title ? slot.title : '';
+        slotTitle.className = "slot-title";
+
+        slotTitle.addEventListener("dblclick", () => {
+            const input = document.createElement("input");
+            input.maxLength = 200;
+            input.type = "text";
+            input.className = "form-control";
+            input.value = slotTitle.textContent;
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "invalid-feedback";
+
+            input.addEventListener("blur", () => {
+                if (!input.value.trim()) {
+                    input.classList.add("is-invalid");
+                    input.parentElement.appendChild(errorMessage);
+                    return;
+                }
+
+                input.classList.remove("is-invalid");
+                errorMessage.textContent = ""
+                slotTitle.textContent = input.value;
+                slot.title = input.value;
+
+                chartHelper.updateChartTitle(input.value).then().catch((error) => {alert('An error occurred while updating the chart title: ' + error.message)});
+                input.replaceWith(slotTitle);
+            });
+
+            input.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    input.blur();
+                }
+            });
+
+            slotTitle.replaceWith(input);
+            input.focus();
+        });
 
         const trashIconContainer = document.createElement("div");
         const trashIcon = document.createElement("i");
         trashIcon.className = "fas fa-trash slot-trash";
         trashIcon.addEventListener("click", () => this.deleteDashboardSlot(slot.id));
         trashIconContainer.appendChild(trashIcon);
+
         slotHeader.appendChild(slotTitle);
         slotHeader.appendChild(trashIconContainer);
         slotContainer.appendChild(slotHeader);
-        new ChartHelper(getChartUrl.replace('0', slot.chart_id), slotContainer, slot.chart_id)
-        return slotContainer
-   }
+        chartHelper.init()
+        return slotContainer;
+    }
 
    deleteDashboardSlot(id) {
     const url = this.deleteDashboardSlotUrl.replace('0', id)

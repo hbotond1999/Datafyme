@@ -73,7 +73,7 @@
 
             if (chatContainer.style.display === 'block' && chatLoaded === false) {
                 document.querySelectorAll('.custom-chart').forEach(function(element) {
-                    new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), element, element.dataset.id, true)
+                    new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', element, element.dataset.id, true)
                 });
                 chatLoaded = true
             }
@@ -108,7 +108,7 @@
                 messagesContainer.append(message);
             }
             if (data.chart_id) {
-                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), messagesContainer, data.chart_id, true, true);
+                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), '', messagesContainer, data.chart_id, true, true);
             }
         })
         .catch(error => {

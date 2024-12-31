@@ -9,8 +9,8 @@ TYPES["TABLE"] = "TABLE"
 # Create your models here.
 class Chart(models.Model):
     data_source = models.ForeignKey(DatabaseSource, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    description = models.CharField(max_length=2500)
+    title = models.CharField(max_length=200, null=True)
+    description = models.CharField(max_length=2500, null=True)
     type = models.CharField(max_length=100, choices=TYPES)
     sql_query = models.TextField()
     meta_data = models.JSONField(null=True, blank=True)

@@ -15,4 +15,5 @@ class RepType(Enum):
 class FinalData(BaseModel):
     type: RepType
     chart_type: ChartTypes | None
+    chart_title: str | None
     data: str | Dict[str, List[Any]] | Dict[str, Dict[str, Union[str, List[Any]]]]

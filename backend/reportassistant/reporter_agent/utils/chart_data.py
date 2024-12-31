@@ -3,7 +3,6 @@ import logging
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from reporter_agent.models import Chart
-from reporter_agent.reporter.subgraph.visualisation_agent.ai import RepType
 from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartTypes, PieChart, BarChart, LineChart, \
     BubbleChart, HistogramChart, ScatterChart
 

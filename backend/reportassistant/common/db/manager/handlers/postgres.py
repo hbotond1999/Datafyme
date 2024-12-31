@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import List, Dict, AnyStr, Any, Literal
 
 import pandas as pd
@@ -184,6 +185,8 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             result = self.db_manager.execute_query(sql)
             if result and isinstance(result, list):
                 result_df = pd.DataFrame(result)
+                if response_format == "list":
+                    return self._convert_to_serializable_dict(result_df.to_dict(orient=response_format))
                 return result_df.to_dict(orient=response_format)
         except Exception as e:
             logger.error(f"An error occurred while execute query: {e}")
@@ -191,3 +194,15 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
 
     def check_connection(self) -> bool:
         return self.db_manager.check_connection()
+
+
+    def _convert_to_serializable(self, record: Any) -> Any:
+        if isinstance(record, (pd.Timestamp, datetime)):
+            return record.isoformat()  # Convert datetime to ISO format string
+        return record
+
+    def _convert_to_serializable_dict(self, data: Dict[str, List[Any]]):
+        return {
+            key: [self._convert_to_serializable(record) for record in values]
+            for key, values in data.items()
+        }
