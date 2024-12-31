@@ -60,10 +60,10 @@ class Neo4JInstance:
             raise
 
     def clear_graph_database(self, database_id):
-        query = f"MATCH (n) WHERE n.database_id = '{database_id}' DETACH DELETE n"
+        query = f"MATCH (n) WHERE n.database_id = {database_id} DETACH DELETE n"
         try:
             self.driver.execute_query(query, database_=self.database)
-            logging.info(f"{database_id} database deleted")
+            logging.info(f"Database with {database_id} database_id deleted")
         except (DriverError, Neo4jError) as exception:
             logging.error(f"Error occurred during database_id: {database_id} database delete: {exception}")
             raise
@@ -77,7 +77,7 @@ class Neo4JInstance:
         )
 
         results = self.driver.execute_query(query,
-                                            database_id=str(database_id),
+                                            database_id=database_id,
                                             schema_name=schema_name,
                                             table_name=table_name,
                                             database_=self.database,
@@ -97,7 +97,7 @@ class Neo4JInstance:
         results = []
         for neighbour in neighbours:
             records, summary, keys = self.driver.execute_query(query,
-                                                               database_id=str(database_id),
+                                                               database_id=database_id,
                                                                schema_name=schema_name,
                                                                table_name=table_name,
                                                                neighbour_schema=neighbour["neighbour_schema"],

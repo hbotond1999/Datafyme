@@ -49,7 +49,7 @@ class DBLoader:
 
                     if table_name and foreign_table_name:
                         edge = {
-                            "database_name": self.datasource.name,
+                            "database_id": self.datasource.id,
                             "table_schema": table_schema,
                             "table_name": table_name,
                             "column_name": column_name,
@@ -67,7 +67,7 @@ class DBLoader:
 
         try:
             for table_pair in table_foreign_pairs:
-                neo4j_instance.create_relation(table_pair["database_name"],
+                neo4j_instance.create_relation(table_pair["database_id"],
                                                table_pair["table_schema"],
                                                table_pair["table_name"],
                                                table_pair["column_name"],
