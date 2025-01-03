@@ -15,9 +15,11 @@ def sql_agent():
     Your task is to write an SQL query that answers the following user message. Message: {message}. 
     You must use the following DDL-s containing the useful data columns. DDLs: {ddls}. 
     The generated query can only use the columns included in the ddls. 
+    In the generated query you must use schema reference before every table name.
     The source database is {database}. 
-    The system time is {systemtime}. 
+    The system time is {systemtime} 
     """
+
     prompt = PromptTemplate(template=prompt_str, input_variables=["ddls", "message", "database", "systemtime"])
 
     return prompt | get_llm_model().with_structured_output(SQLCommand)
