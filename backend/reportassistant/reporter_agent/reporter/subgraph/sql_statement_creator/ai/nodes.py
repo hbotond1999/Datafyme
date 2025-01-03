@@ -1,7 +1,6 @@
 import asyncio
 import json
 from datetime import datetime
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai import logger as sql_agent_logger
 from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
@@ -31,7 +30,6 @@ def hybrid_search_node(state: GraphState):
         if key not in seen:
             seen.add(key)
             tables.append({'schema': table_doc.schema_name, 'table_name': table_doc.table_name})
-    sql_agent_logger.debug("Similar tables: %s", tables)
     return {"matching_tables": tables}
 
 
@@ -47,13 +45,11 @@ def get_ddls(state: GraphState):
     tables_schemas = extractor.get_tables_schemas()
     matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["matching_tables"]]
     json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
-    sql_agent_logger.debug("Tables ddls: %s", json_data)
     return {"matching_table_ddls": json_data}
 
 
 def reranker(state: GraphState):
     filtered_ddls = asyncio.run(grade_ddls(state))
-    sql_agent_logger.debug("Filtered ddls: %s", filtered_ddls )
     return {"filtered_table_ddls": filtered_ddls}
 
 
@@ -63,7 +59,6 @@ def refine_user_question(state: GraphState):
 
     if RECURSIVE_LIMIT >= 0:
         result = refine_user_question_agent().invoke({'message': state["message"]})
-        sql_agent_logger.debug("Refined user question: " + result['message'])
         return {"message": result.message}
     else:
         raise SystemExit("Recursive limit exceeded")
@@ -87,7 +82,6 @@ def relation_graph(state: GraphState):
                                    "table_name": neighbour['neighbour_table_name']})
 
     neo4j_instance.close()
-    sql_agent_logger.debug("Tables ddls: %s", tables_all)
     return {"tables_all": tables_all}
 
 
@@ -96,8 +90,6 @@ def get_final_ddls(state: GraphState):
     tables_schemas = extractor.get_tables_schemas()
     matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["tables_all"]]
     json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
-    sql_agent_logger.debug("Final ddls: %s", json_data)
-    sql_agent_logger.debug(json_data)
     return {"table_final_ddls": json_data}
 
 
@@ -115,6 +107,5 @@ def create_query(state: GraphState):
                                  'message': state["message"],
                                  'database': state["database_source"].type,
                                  'systemtime': datetime.now().isoformat()})
-    sql_agent_logger.debug("Created query: " + result.sql_query)
     return {"sql_query": result.sql_query, "query_description": result.query_description,
             "table_final_ddls": state["table_final_ddls"]}
