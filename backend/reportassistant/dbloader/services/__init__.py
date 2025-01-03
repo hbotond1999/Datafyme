@@ -12,11 +12,9 @@ class DBLoader:
         self.datasource = datasource
         self.extractor = DatabaseManager(datasource)
 
-
     def load(self):
         self.vector_loader()
-        self.create_realiation_graph()
-
+        self.create_relation_graph()
 
     def vector_loader(self):
         tables_schemas = self.extractor.get_tables_schemas()
@@ -25,14 +23,15 @@ class DBLoader:
         except Exception as e:
             return str(e)
 
-    def create_realiation_graph(self):
+    def create_relation_graph(self):
 
         database_relations = self.extractor.get_relations()
 
         defined_relations = [dataclasses.asdict(t) for t in database_relations]
 
-        table_previews = self.extractor.get_table_previews()
-        found_relations = RelationFinder(table_previews).find_relation()
+        tables_schemas = self.extractor.get_tables_schemas()
+        table_ddls = [table.to_dict() for table in tables_schemas]
+        found_relations = RelationFinder(table_ddls).find_relation()
         found_relations = [rel.model_dump() for rel in found_relations.relations]
 
         relations = defined_relations + found_relations
@@ -49,7 +48,7 @@ class DBLoader:
 
                     if table_name and foreign_table_name:
                         edge = {
-                            "database_name": self.datasource.name,
+                            "database_id": self.datasource.id,
                             "table_schema": table_schema,
                             "table_name": table_name,
                             "column_name": column_name,
@@ -67,7 +66,7 @@ class DBLoader:
 
         try:
             for table_pair in table_foreign_pairs:
-                neo4j_instance.create_relation(table_pair["database_name"],
+                neo4j_instance.create_relation(table_pair["database_id"],
                                                table_pair["table_schema"],
                                                table_pair["table_name"],
                                                table_pair["column_name"],

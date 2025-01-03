@@ -8,5 +8,6 @@ CREATE TABLE movies_metadata.movies_metadata (
 	production_budget int4 NULL,
 	age_limit varchar(50) NULL,
 	imdb_rating float4 NULL,
-	country_of_origin varchar(50) NULL
+	country_of_origin varchar(50) NULL,
+	CONSTRAINT movies_metadata_pk PRIMARY KEY (movie_id)
 );
