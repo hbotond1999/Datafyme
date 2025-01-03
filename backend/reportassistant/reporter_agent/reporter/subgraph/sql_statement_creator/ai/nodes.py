@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 
 from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
@@ -8,6 +9,9 @@ from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_ddls
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
+
+
+logger = logging.getLogger('reportassistant.custom')
 
 
 def hybrid_search_node(state: GraphState):
@@ -54,12 +58,14 @@ def reranker(state: GraphState):
 
 def refine_user_question(state: GraphState):
     refine_recursive_limit = state["refine_recursive_limit"] - 1
+    logger.info(f"Actual REFINE RECURSIVE LIMIT value: {refine_recursive_limit}")
 
     if refine_recursive_limit >= 0:
         result = refine_user_question_agent().invoke({'message': state["message"]})
         return {"message": result.message, "refine_recursive_limit": refine_recursive_limit}
     else:
-        raise SystemExit("Refine recursive limit exceeded")
+        logger.error(f"Refine user message recursive limit exceeded")
+        raise SystemExit("Refine user message recursive limit exceeded")
 
 
 def relation_graph(state: GraphState):
