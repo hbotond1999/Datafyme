@@ -186,7 +186,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "WARNING",  # Csak külső logok szintje
+        "level": "WARNING"
     },
     "loggers": {
         "sql_agent": {
