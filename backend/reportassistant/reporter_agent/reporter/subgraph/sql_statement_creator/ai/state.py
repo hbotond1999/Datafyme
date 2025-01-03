@@ -20,3 +20,4 @@ class GraphState(TypedDict):
     table_final_ddls: List[Dict[str, Any]]
     sql_query: str
     query_description: str
+    refine_recursive_limit: int
