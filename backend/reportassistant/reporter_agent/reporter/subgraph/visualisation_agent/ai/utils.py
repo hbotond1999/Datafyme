@@ -1,10 +1,8 @@
-from datetime import datetime
-from typing import Dict, List, Any
-
-import pandas as pd
+from typing import Dict, List, Any, Union
 
 
-def get_first_ten_records(data: Dict[str, List[Any]]) -> Dict[str, List[Any]]:
+
+def get_first_ten_records(data: Dict[str, List[Any]]) -> Dict[str, Union[List[Any], str]]:
     """
     Returns the first ten records for each key in the dictionary.
 
@@ -14,4 +12,6 @@ def get_first_ten_records(data: Dict[str, List[Any]]) -> Dict[str, List[Any]]:
     Returns:
         Dict[str, List[Any]]: A dictionary with the same keys but only containing the first ten records.
     """
+    if not data:
+        return {'results': "No records found."}
     return {key: values[:10] for key, values in data.items()}

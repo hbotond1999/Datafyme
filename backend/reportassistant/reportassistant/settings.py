@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os.path
 from pathlib import Path
+
+from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
@@ -152,6 +154,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/accounts/login/'
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -159,7 +163,7 @@ LOGGING = {
         "verbose": {
             "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
             "style": "{",
-            "datefmt": "%Y-%m-%d %H:%M:%S",  # Időpont formátum
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
         "simple": {
             "format": "{levelname} {asctime} {message}",
@@ -169,30 +173,35 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "INFO",
+            "level": LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
         "file": {
-            "level": "INFO",
+            "level": LOG_LEVEL,
             "class": "logging.FileHandler",
-            "filename": "django_app.log",
+            "filename": "django_apps.log",
             "formatter": "verbose",
         },
     },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",  # Csak külső logok szintje
+    },
     "loggers": {
-        "django": {
+        "sql_agent": {
             "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": True,
+            "level": LOG_LEVEL,
+            "propagate": False,
         },
-        "reportassistant.custom": {
+        "django": {
             "handlers": ["console", "file"],
             "level": "INFO",
             "propagate": False,
         },
     },
 }
+
 
 
 TASKS = {
