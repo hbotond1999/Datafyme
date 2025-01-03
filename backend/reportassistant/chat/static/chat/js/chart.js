@@ -1,11 +1,16 @@
 class ChartHelper {
-    constructor(url, parentContainer, chartId, draggable = false, scrollToInit = false) {
+    constructor(url, chartUpdateUrl = '', parentContainer, chartId, draggable = false, scrollToInit = false, init = true) {
         this.parent = parentContainer;
         this.url = url;
         this.chartId = chartId;
-        this.getChartData();
+
+        this.chartUpdateUrl = chartUpdateUrl
         this.draggable = draggable
         this.scrollToInit = scrollToInit
+
+        if (init) {
+            this.init()
+        }
     }
 
     renderChart(data) {
@@ -14,6 +19,10 @@ class ChartHelper {
         } else {
             this.renderCanvasChart(data);
         }
+    }
+
+    init () {
+        this.getChartData();
     }
 
     renderCanvasChart(charData) {
@@ -132,5 +141,30 @@ class ChartHelper {
         }
 
         return colorArray;
+    }
+    async updateChartTitle(newTitle) {
+        try {
+            const response = await fetch(this.chartUpdateUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'X-CSRFToken': Cookies.get('csrftoken'),
+                },
+                body: JSON.stringify({
+                    id: this.chartId,
+                    title: newTitle,
+                }),
+            });
+
+            if (!response.ok) {
+                console.error("Failed to update chart title.");
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("Error while updating chart title:", error);
+            return false;
+        }
     }
 }

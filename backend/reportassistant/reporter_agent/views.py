@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseNotAllowed
 
@@ -28,3 +30,23 @@ def get_chart(request, chart_id: int):
         return JsonResponse(data={"chart_data": chart_data, "type": chart.type}, safe=False, status=200)
     else:
         return HttpResponseNotAllowed(['GET'])
+
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse, HttpResponseNotAllowed
+
+
+@login_required
+def edit_chart(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        chart_id = body['id']
+
+        chart = get_object_or_404(Chart, id=chart_id)
+
+        chart.title = body['title']
+        chart.save()
+
+        return JsonResponse({'message': 'Chart updated successfully'})
+    else:
+        return HttpResponseNotAllowed(['POST'])

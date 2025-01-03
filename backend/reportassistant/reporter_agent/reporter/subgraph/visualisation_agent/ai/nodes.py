@@ -63,14 +63,15 @@ def create_final_data(state: GraphState):
     if rep_type == RepType.TEXT:
         response = create_summarize_agent().invoke({"data": state["input_data"], "question": state["question"]}).content
         return {
-            "final_data": FinalData(type=rep_type, chart_type= None, data=response)
+            "final_data": FinalData(type=rep_type, chart_type= None, data=response, chart_title=None)
         }
     elif rep_type == RepType.CHART:
         return {
             "final_data": FinalData(
                 type=rep_type,
                 chart_type=ChartTypes(state["chart_type"]),
-                data={"metadata": state["chart_column_data"].create_meta_data(), "data": state["input_data"]})
+                data={"metadata": state["chart_column_data"].create_meta_data(), "data": state["input_data"]},
+                chart_title=state["chart_column_data"].title)
         }
     else:
-        return {"final_data": FinalData(type=rep_type, chart_type=None, data=state["input_data"])}
+        return {"final_data": FinalData(type=rep_type, chart_type=None, data=state["input_data"], chart_title=None)}

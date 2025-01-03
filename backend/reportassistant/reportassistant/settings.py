@@ -188,7 +188,7 @@ LOGGING = {
         },
         "reportassistant.custom": {
             "handlers": ["console", "file"],
-            "level": "INFO",
+            "level": os.getenv("LOG_LEVEL", "INFO"),
             "propagate": False,
         },
     },

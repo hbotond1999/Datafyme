@@ -19,7 +19,8 @@ def get_dashboard_slots(request, dashboard_id: int):
              "height": slot.height,
              "row_num": slot.row_num,
              "col_num": slot.col_num,
-             "chart_id": slot.chart_id
+             "chart_id": slot.chart_id,
+             "title": slot.chart.title,
             } for slot in dashboard_slots]
         return JsonResponse(slots, safe=False, status=200)
     else:

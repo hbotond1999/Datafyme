@@ -1,5 +1,6 @@
 import asyncio
 import json
+from datetime import datetime
 import logging
 
 from common.db.manager.database_manager import DatabaseManager
@@ -31,7 +32,6 @@ def hybrid_search_node(state: GraphState):
         if key not in seen:
             seen.add(key)
             tables.append({'schema': table_doc.schema_name, 'table_name': table_doc.table_name})
-
     return {"matching_tables": tables}
 
 
@@ -47,7 +47,6 @@ def get_ddls(state: GraphState):
     tables_schemas = extractor.get_tables_schemas()
     matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["matching_tables"]]
     json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
-
     return {"matching_table_ddls": json_data}
 
 
@@ -86,7 +85,6 @@ def relation_graph(state: GraphState):
                                    "table_name": neighbour['neighbour_table_name']})
 
     neo4j_instance.close()
-
     return {"tables_all": tables_all}
 
 
@@ -110,7 +108,7 @@ def create_query(state: GraphState):
     """
     result = sql_agent().invoke({'ddls': json.dumps(state["table_final_ddls"]),
                                  'message': state["message"],
-                                 'database': state["database_source"].type})
-
+                                 'database': state["database_source"].type,
+                                 'systemtime': datetime.now().isoformat()})
     return {"sql_query": result.sql_query, "query_description": result.query_description,
             "table_final_ddls": state["table_final_ddls"]}

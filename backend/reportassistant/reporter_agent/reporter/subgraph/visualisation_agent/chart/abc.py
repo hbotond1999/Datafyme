@@ -1,9 +1,11 @@
 import abc
 from typing import Dict
 
+from pydantic import Field
 
 
 class Chart(metaclass=abc.ABCMeta):
+    title: str = Field(description="Chart title")
     @abc.abstractmethod
     def create_meta_data(self) -> Dict[str, str]:
         pass

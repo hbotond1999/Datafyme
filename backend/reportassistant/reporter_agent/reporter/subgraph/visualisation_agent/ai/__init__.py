@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Union, Any
+from typing import Dict, List, Union, Any, Optional
 
 from pydantic import BaseModel
 
@@ -15,4 +15,5 @@ class RepType(Enum):
 class FinalData(BaseModel):
     type: RepType
     chart_type: ChartTypes | None
-    data: str | Dict[str, List[Any]] | Dict[str, Dict[str, Union[str, List[Any]]]]
+    chart_title: str | None
+    data: str | Dict[str, List[Any]] | Dict[str, Dict[str, Optional[Union[str, List[Any]]]]]
