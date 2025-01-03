@@ -10,9 +10,6 @@ from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import g
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
 
 
-RECURSIVE_LIMIT = 5
-
-
 def hybrid_search_node(state: GraphState):
     """
     Args:
@@ -56,14 +53,13 @@ def reranker(state: GraphState):
 
 
 def refine_user_question(state: GraphState):
-    global RECURSIVE_LIMIT
-    RECURSIVE_LIMIT -= 1
+    refine_recursive_limit = state["refine_recursive_limit"] - 1
 
-    if RECURSIVE_LIMIT >= 0:
+    if refine_recursive_limit >= 0:
         result = refine_user_question_agent().invoke({'message': state["message"]})
-        return {"message": result.message}
+        return {"message": result.message, "refine_recursive_limit": refine_recursive_limit}
     else:
-        raise SystemExit("Recursive limit exceeded")
+        raise SystemExit("Refine recursive limit exceeded")
 
 
 def relation_graph(state: GraphState):

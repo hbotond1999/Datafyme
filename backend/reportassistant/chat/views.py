@@ -26,11 +26,17 @@ def chat_view(request):
             datasource = form.cleaned_data['database_source']
             request.session["database_source_id"] = datasource.id
             messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
-            chat_hist =[msg.type + ": " + (msg.message if msg.message else "") for msg in messages]
-            Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message,chart=None).save()
+            chat_hist = [msg.type + ": " + (msg.message if msg.message else "") for msg in messages]
+            Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
             reporter_graph = create_reporter_graph()
             final_state: GraphState = reporter_graph.invoke(
-                {"database_source": datasource, "chat_history": chat_hist, "question": user_message}
+                {
+                    "database_source": datasource,
+                    "chat_history": chat_hist,
+                    "question": user_message,
+                    "refine_sql_recursive_limit": 3,
+                    "refine_empty_result_recursive_limit": 3
+                 }
             )
             message = save_message_from_reporter(final_state, datasource, conversation_id)
             return JsonResponse({
