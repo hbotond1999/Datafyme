@@ -43,10 +43,12 @@ def refine_sql_agent():
     You can still only use the following DDLs to rewrite the SQL (these are the ones that contain the useful data 
     columns). DDLs: {ddls}.
     The source database is: {database}.
+    The system time is {systemtime}.
+    
     Try to fix and refine the error in the SQL."""
 
     prompt = PromptTemplate(template=prompt_str, input_variables=["question", "database", "sql_query", "ddls",
-                                                                  "error_message", "exception"])
+                                                                  "error_message", "exception", "systemtime"])
 
     return prompt | get_llm_model().with_structured_output(RefinedSQLCommand)
 
@@ -65,8 +67,10 @@ def refine_empty_result_sql_agent():
     correctly. You can still only use the following DDLs to rewrite the SQL (these are the ones that contain the useful 
     data columns). DDLs: {ddls}.
     The source database is: {database}.
+    The system time is {systemtime}.
     Try refining the query so that it does not return an empty result."""
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["question", "database", "sql_query", "ddls"])
+    prompt = PromptTemplate(template=prompt_str, input_variables=["question", "database", "sql_query", "ddls",
+                                                                  "systemtime"])
 
     return prompt | get_llm_model().with_structured_output(RefinedSQLCommand)

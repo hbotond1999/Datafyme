@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
@@ -46,7 +47,8 @@ def refine_sql_query_node(state: GraphState):
                                             "ddls": state["table_final_ddls"],
                                             "sql_query": state["sql_query"],
                                             "error_message": state["error_message"]["message"],
-                                            "exception": state["error_message"]["original_exception"]})
+                                            "exception": state["error_message"]["original_exception"],
+                                            'systemtime': datetime.now().isoformat()})
         return {"sql_query": result.sql_query, "sql_query_description": result.query_description,
                 "refine_sql_recursive_limit": refine_sql_recursive_limit}
     else:
@@ -62,7 +64,8 @@ def refine_empty_result_sql_query_node(state: GraphState):
         result = refine_empty_result_sql_agent().invoke({"question": state["question"],
                                                          "database": state["database_source"],
                                                          "ddls": state["table_final_ddls"],
-                                                         "sql_query": state["sql_query"]})
+                                                         "sql_query": state["sql_query"],
+                                                         'systemtime': datetime.now().isoformat()})
         return {"sql_query": result.sql_query, "sql_query_description": result.query_description,
                 "refine_empty_result_recursive_limit": refine_empty_result_recursive_limit}
     else:

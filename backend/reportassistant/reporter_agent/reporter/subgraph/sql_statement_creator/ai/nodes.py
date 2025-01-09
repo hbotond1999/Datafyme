@@ -60,7 +60,8 @@ def refine_user_question(state: GraphState):
     logger.info(f"Actual REFINE RECURSIVE LIMIT value: {refine_recursive_limit}")
 
     if refine_recursive_limit >= 0:
-        result = refine_user_question_agent().invoke({'message': state["message"]})
+        result = refine_user_question_agent().invoke({'message': state["message"],
+                                                      'systemtime': datetime.now().isoformat()})
         return {"message": result.message, "refine_recursive_limit": refine_recursive_limit}
     else:
         logger.error(f"Refine user message recursive limit exceeded")
