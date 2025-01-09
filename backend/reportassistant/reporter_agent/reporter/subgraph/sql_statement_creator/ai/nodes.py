@@ -10,7 +10,7 @@ from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_ddls
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
-
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
 
 logger = logging.getLogger('reportassistant.custom')
 
@@ -65,7 +65,8 @@ def refine_user_question(state: GraphState):
         return {"message": result.message, "refine_recursive_limit": refine_recursive_limit}
     else:
         logger.error(f"Refine user message recursive limit exceeded")
-        raise SystemExit("Refine user message recursive limit exceeded")
+        raise RefineLimitExceededError("We cannot answer your question based on the selected database, "
+                                       "please rephrase the question or try a different source.")
 
 
 def relation_graph(state: GraphState):
