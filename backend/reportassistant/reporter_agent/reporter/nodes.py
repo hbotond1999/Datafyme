@@ -6,6 +6,7 @@ from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from reporter_agent.reporter.agents import create_history_summarizer, refine_sql_agent, refine_empty_result_sql_agent
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
 from reporter_agent.reporter.subgraph.visualisation_agent.ai.graph import create_graph as create_visu_graph
 
 
@@ -52,8 +53,9 @@ def refine_sql_query_node(state: GraphState):
         return {"sql_query": result.sql_query, "sql_query_description": result.query_description,
                 "refine_sql_recursive_limit": refine_sql_recursive_limit}
     else:
-        logger.error("Refine sql recursive limit exceeded")
-        raise SystemExit("Refine sql recursive limit exceeded")
+        logger.error("Refine sql query recursive limit exceeded")
+        raise RefineLimitExceededError("We cannot find the correct query for your question, please rephrase the "
+                                       "question or try a different source.")
 
 
 def refine_empty_result_sql_query_node(state: GraphState):
@@ -70,7 +72,8 @@ def refine_empty_result_sql_query_node(state: GraphState):
                 "refine_empty_result_recursive_limit": refine_empty_result_recursive_limit}
     else:
         logger.error("Refine empty result sql recursive limit exceeded")
-        raise SystemExit("Refine empty result sql recursive limit exceeded")
+        raise RefineLimitExceededError("We cannot find any data for your question, please rephrase the "
+                                       "question or try a different source.")
 
 
 def create_visualization_node(state: GraphState):
