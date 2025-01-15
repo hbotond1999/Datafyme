@@ -1,9 +1,11 @@
+import json
 import logging
 from datetime import datetime
 
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from reporter_agent.reporter.agents import create_history_summarizer, refine_sql_agent, refine_empty_result_sql_agent
+from reporter_agent.reporter.response import RefinedSQLCommand
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
@@ -63,13 +65,11 @@ def refine_empty_result_sql_query_node(state: GraphState):
     logger.info(f"Current EMPTY RESULT REFINE RECURSIVE LIMIT value: {refine_empty_result_recursive_limit}")
 
     if refine_empty_result_recursive_limit >= 0:
-        result = refine_empty_result_sql_agent(state["database_source"]).invoke({"input": state["question"],
-                                                                                 "database": state["database_source"].type,
-                                                                                 "ddls": state["table_final_ddls"],
-                                                                                 "sql_query": state["sql_query"],
-                                                                                 "systemtime": datetime.now().isoformat()},
+        output = refine_empty_result_sql_agent(state["database_source"]).invoke({"sql_query": state["sql_query"]},
                                                                                 return_only_outputs=True)
-        print("Result :", result)
+        output_text = output['output']
+        json_str = output_text.split("```json")[1].split("```")[0].strip()
+        result = RefinedSQLCommand(**json.loads(json_str))
         return {"sql_query": result.sql_query, "sql_query_description": result.query_description,
                 "refine_empty_result_recursive_limit": refine_empty_result_recursive_limit}
     else:

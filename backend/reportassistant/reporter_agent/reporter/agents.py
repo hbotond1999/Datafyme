@@ -90,40 +90,24 @@ def refine_empty_result_sql_agent(database_source):
             logger.error(f"Error fetching unique values for {table_name}.{column_name}: {str(e)}")
             raise RuntimeError(f"Failed to fetch unique values for {table_name}.{column_name}")
 
-    prompt_str = """You are a professional SQL command refiner.
-    Your task is to rewrite an SQL query that responds to the following user question. Question: {input}.
-    The faulty SQL query is: {sql_query}.
-    The query syntax is correct, but running the query returns an empty result, so one of the filters is not being used 
-    correctly. You may be trying to filter by the wrong value. You can use a tool to query the unique values of the 
-    columns in the filter.
-    You can still only use the following DDLs to rewrite the SQL (these are the ones that contain the useful data 
-    columns). DDLs: {ddls}.
-    The source database is: {database}.
-    The system time is {systemtime}.
-    Try refining the query so that it does not return an empty result.
+    prompt_str = """Your task is to replace the filter value of the sql query with a real value that you can get with 
+    the help of the tool. The tool lists the unique values in a given column. 
+    Select the appropriate value for filtering and replace it in the input sql.
+    Input sql: {sql_query}
     
-    You have to follow the following steps
-        1. step: look through the filters to see which columns you are filtering by
-        2. step: check if you are filtering on a value that is in the given column. To do this, use the tool which lists 
-        the unique values in the column
-        3. step: in the query update the filter condition with one of the values from the list given by the tool. 
-            Replace the original filter value with one value from the given list.
-            The schema name should always appear before the table.
-        4. step: Return the refined query. The schema name should always appear before the table.
-            Output:
-                Provide the result in the following JSON format:
-                {{
-                    "sql_query": "<refined_sql_query>",
-                    "query_description": "<description_of_the_query>"
-                }}
+    Output:
+        Provide the result in the following JSON format:
+        {{
+            "sql_query": "<refined_sql_query>",
+            "query_description": "<description_of_the_query>"
+        }}
         
     {agent_scratchpad}
     """
 
     parser = PydanticOutputParser(pydantic_object=RefinedSQLCommand)
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["input", "database", "sql_query", "ddls",
-                                                                  "systemtime"], output_parser=parser)
+    prompt = PromptTemplate(template=prompt_str, input_variables=["sql_query"], output_parser=parser)
     tools = [get_unique_column_values_with_db_manager]
     llm = get_llm_model()
 
