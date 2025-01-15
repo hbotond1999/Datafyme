@@ -63,11 +63,13 @@ def refine_empty_result_sql_query_node(state: GraphState):
     logger.info(f"Current EMPTY RESULT REFINE RECURSIVE LIMIT value: {refine_empty_result_recursive_limit}")
 
     if refine_empty_result_recursive_limit >= 0:
-        result = refine_empty_result_sql_agent().invoke({"question": state["question"],
-                                                         "database": state["database_source"],
-                                                         "ddls": state["table_final_ddls"],
-                                                         "sql_query": state["sql_query"],
-                                                         'systemtime': datetime.now().isoformat()})
+        result = refine_empty_result_sql_agent(state["database_source"]).invoke({"input": state["question"],
+                                                                                 "database": state["database_source"].type,
+                                                                                 "ddls": state["table_final_ddls"],
+                                                                                 "sql_query": state["sql_query"],
+                                                                                 "systemtime": datetime.now().isoformat()},
+                                                                                return_only_outputs=True)
+        print("Result :", result)
         return {"sql_query": result.sql_query, "sql_query_description": result.query_description,
                 "refine_empty_result_recursive_limit": refine_empty_result_recursive_limit}
     else:
