@@ -4,7 +4,7 @@ from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from reporter_agent.models import Chart
 from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartTypes, PieChart, BarChart, LineChart, \
-    BubbleChart, HistogramChart, ScatterChart
+    BubbleChart, HistogramChart, ScatterChart, MixedChart, CHART_RESPONSE_MAPPING
 
 
 def create_chart_data(chart: Chart):
@@ -14,21 +14,12 @@ def create_chart_data(chart: Chart):
         if chart.type == "TABLE":
             return data
         else:
-            if chart.type == ChartTypes.PIE.value:
-                chart_data = PieChart.create_chart_data(chart, data)
-            elif  chart.type == ChartTypes.BAR.value:
-                chart_data = BarChart.create_chart_data(chart, data)
-            elif chart.type == ChartTypes.LINE.value:
-                chart_data = LineChart.create_chart_data(chart, data)
-            elif chart.type == ChartTypes.BUBBLE.value:
-                chart_data = BubbleChart.create_chart_data(chart, data)
-            elif chart.type == ChartTypes.HISTOGRAM.value:
-                chart_data = HistogramChart.create_chart_data(chart, data)
-            elif chart.type == ChartTypes.SCATTER.value:
-                chart_data = ScatterChart.create_chart_data(chart, data)
-            else:
-                raise ValueError("Unknown chart type")
-            return chart_data
+            chart_class = CHART_RESPONSE_MAPPING.get(chart.type, None)
+
+            if chart_class is None:
+                raise ValueError("Unknown chart type: " + str(chart.type))
+
+            return chart_class.create_chart_data(chart, data)
     except ExecuteQueryError as e:
         logging.error(f"Error to get chart data {chart.id} " + e.message)
         raise ExecuteQueryError(e)
