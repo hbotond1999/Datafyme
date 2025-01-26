@@ -70,3 +70,16 @@ def refine_empty_result_sql_agent():
     prompt = PromptTemplate(template=prompt_str, input_variables=["question", "database", "sql_query", "ddls"])
 
     return prompt | get_llm_model().with_structured_output(RefinedSQLCommand)
+
+
+def generate_title_agent():
+
+    prompt_str = """
+    Generate a title for the conversation based on the first message from the user.
+    
+    First message: {first_message}
+    """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["first_message"])
+
+    return prompt | get_llm_model() | StrOutputParser()

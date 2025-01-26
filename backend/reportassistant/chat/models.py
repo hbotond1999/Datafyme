@@ -11,6 +11,7 @@ class MessageType(enum.Enum):
     HUMAN = gettext_noop('HUMAN')
 
 class Conversation(models.Model):
+    title = models.CharField(max_length=300)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
