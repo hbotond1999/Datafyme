@@ -75,7 +75,7 @@ def refine_empty_result_sql_agent():
 def generate_title_agent():
 
     prompt_str = """
-    Generate a title for the conversation based on the first message from the user.
+    Generate a title for the conversation based on the first message from the user. Formulate the title in the language in which you received the message.
     
     First message: {first_message}
     """

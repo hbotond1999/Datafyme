@@ -6,7 +6,6 @@ from reporter_agent.reporter.agents import generate_title_agent
 
 @task()
 def generate_title(conversation_id: int, message: str):
-    print("generate_title", message)
     title = generate_title_agent().invoke({"first_message": message})
     conversation = Conversation.objects.get(id=conversation_id)
     conversation.title = title

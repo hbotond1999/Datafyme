@@ -8,7 +8,7 @@
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm">
                 <div class="card-header text-center bg-primary text-white">
-                    <h2>Chat History</h2>
+                    <h2>{% trans 'Chat History' %}</h2>
                 </div>
                 <div class="card-body">
                     {% if history %}
@@ -45,11 +45,11 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <p class="text-center text-muted">No chat history available.</p>
+                        <p class="text-center text-muted">{% trans 'No chat history available.' %}</p>
                     {% endif %}
                 </div>
                 <div class="card-footer text-center">
-                    <a href="{% url 'chat:chat' %}" class="btn btn-primary">Start New Conversation</a>
+                    <a href="{% url 'chat:chat' %}" class="btn btn-primary">{% trans 'Start New Conversation'%}</a>
                 </div>
             </div>
         </div>

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-29 13:23+0100\n"
-"PO-Revision-Date: 2025-01-03 10:56+0000\n"
+"POT-Creation-Date: 2025-01-26 16:00+0100\n"
+"PO-Revision-Date: 2025-01-26 16:06+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -36,12 +36,28 @@ msgid "HUMAN"
 msgstr "Ember"
 
 #: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:88
+#: .\chat\templates\chat\chat_history.html:32
 msgid "You"
 msgstr "Te"
 
-#: .\chat\templates\chat\chat.html:36
+#: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:105
+#: .\chat\templates\chat\chat_history.html:34
 msgid "System"
 msgstr "Rendszer"
+
+#: .\chat\templates\chat\chat_history.html:11
+#| msgid "Chat history"
+msgid "Chat History"
+msgstr "Chat történet"
+
+#: .\chat\templates\chat\chat_history.html:48
+msgid "No chat history available."
+msgstr "No chat history available."
+
+#: .\chat\templates\chat\chat_history.html:52
+#| msgid "Save Connection"
+msgid "Start New Conversation"
+msgstr "Új beszélgetés kezdése"
 
 #: .\dashboard\templates\add_dashboard.html:8
 msgid "Add Dashboard"
@@ -184,19 +200,19 @@ msgstr "Veszély"
 msgid "CRITICAL"
 msgstr "Hiba"
 
-#: .\home\templates\base_generic.html:34
+#: .\home\templates\base_generic.html:28
 msgid "Start Chat"
 msgstr "Chat kezdése"
 
-#: .\home\templates\base_generic.html:37
+#: .\home\templates\base_generic.html:31
 msgid "Chat history"
 msgstr "Chat történet"
 
-#: .\home\templates\base_generic.html:41
+#: .\home\templates\base_generic.html:35
 msgid "DB connections"
 msgstr "Adatbázis kapcsolatok"
 
-#: .\home\templates\base_generic.html:80
+#: .\home\templates\base_generic.html:74
 msgid "Logout"
 msgstr "Kilépés"
 
