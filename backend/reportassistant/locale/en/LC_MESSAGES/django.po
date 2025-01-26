@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-26 16:00+0100\n"
-"PO-Revision-Date: 2025-01-26 16:02+0000\n"
+"POT-Creation-Date: 2025-01-26 16:37+0100\n"
+"PO-Revision-Date: 2025-01-26 16:37+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -35,12 +35,12 @@ msgstr "AI"
 msgid "HUMAN"
 msgstr "Human"
 
-#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:88
+#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:89
 #: .\chat\templates\chat\chat_history.html:32
 msgid "You"
 msgstr "You"
 
-#: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:105
+#: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:106
 #: .\chat\templates\chat\chat_history.html:34
 msgid "System"
 msgstr "System"
@@ -51,11 +51,16 @@ msgstr "System"
 msgid "Chat History"
 msgstr "Chat history"
 
-#: .\chat\templates\chat\chat_history.html:48
+#: .\chat\templates\chat\chat_history.html:42
+#| msgid "Save Connection"
+msgid "Continue Conversation"
+msgstr "Continue Conversation"
+
+#: .\chat\templates\chat\chat_history.html:49
 msgid "No chat history available."
 msgstr "No chat history available."
 
-#: .\chat\templates\chat\chat_history.html:52
+#: .\chat\templates\chat\chat_history.html:53
 #, fuzzy
 #| msgid "Save Connection"
 msgid "Start New Conversation"

@@ -39,6 +39,7 @@
                                                     <small class="text-muted">{{ message.timestamp }}</small>
                                                 </div>
                                             {% endfor %}
+                                          <a href="{% url 'chat:continue_conversation' conversation.conversation_id %}" class="btn btn-primary">{% trans 'Continue Conversation'%}</a>
                                         </div>
                                     </div>
                                 </div>

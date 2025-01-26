@@ -64,6 +64,7 @@
 <script src="{% static 'chat/js/chart.js' %}"></script>
 <script>
     let chatLoaded = false;
+
     document.getElementById("toggleChat").addEventListener("click", toggleChat)
     document.getElementById("closeChat").addEventListener("click", toggleChat)
     function toggleChat() {
@@ -140,6 +141,9 @@
             }
         });
     }
-
+    let is_continue_conversation = {{ continue_conversation }}
+    if (is_continue_conversation === 1) {
+        document.getElementById("toggleChat").click()
+    }
 </script>
 {% endblock %}
