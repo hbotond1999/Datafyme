@@ -16,7 +16,7 @@ def create_chart_data(chart: Chart):
         else:
             if chart.type == ChartTypes.PIE.value:
                 chart_data = PieChart.create_chart_data(chart, data)
-            elif  chart.type == ChartTypes.BAR.value:
+            elif chart.type == ChartTypes.BAR.value:
                 chart_data = BarChart.create_chart_data(chart, data)
             elif chart.type == ChartTypes.LINE.value:
                 chart_data = LineChart.create_chart_data(chart, data)

@@ -19,9 +19,8 @@ class TestChartDescription(unittest.TestCase):
     def setUp(self):
         load_dotenv()
         self.chart_id = 6
-        with open("C:\\Users\\Lenovo\\Desktop\\report-assistant\\chart_img_most_viewed_movies.png", "rb") as image_file:
-            self.encoded_img = base64.b64encode(image_file.read())
+        self.chart_url = "C:\\Users\\Lenovo\\Desktop\\report-assistant\\chart_img_most_viewed_movies.png"
 
     def test_create_description(self):
-        result = create_description(chart_id=self.chart_id, chart_png=self.encoded_img)
+        result = create_description(chart_id=self.chart_id, chart_url=self.chart_url)
         print(result)
