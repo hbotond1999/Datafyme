@@ -6,6 +6,8 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from db_configurator.models import DatabaseSource
 from reporter_agent.models import Chart
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
+from reporter_agent.reporter.subgraph.visualisation_agent.chart_description.chart_description_agent import \
+    create_description
 from reporter_agent.utils.chart_data import create_chart_data
 
 
@@ -50,3 +52,12 @@ def edit_chart(request):
         return JsonResponse({'message': 'Chart updated successfully'})
     else:
         return HttpResponseNotAllowed(['POST'])
+
+
+@login_required
+def generate_description(request):
+    chart_id = request.GET.get('chart_id')
+    chart_url = request.GET.get('chart_url')
+    result = create_description(chart_id, chart_url)
+
+    return JsonResponse(data={"description": result.description})
