@@ -23,3 +23,13 @@ def create_chart_data(chart: Chart):
     except ExecuteQueryError as e:
         logging.error(f"Error to get chart data {chart.id} " + e.message)
         raise ExecuteQueryError(e)
+
+
+def create_chart_meta_data(chart: Chart):
+    database_manager = DatabaseManager(chart.data_source)
+    try:
+        data = database_manager.execute_sql(chart.sql_query, "list")
+        return data
+    except ExecuteQueryError as e:
+        logging.error(f"Error to get chart data {chart.id} " + e.message)
+        raise ExecuteQueryError(e)
