@@ -30,5 +30,6 @@
 ### I18N
 `django-admin makemessages -l en`
 `django-admin makemessages -l hu`
+`django-admin compilemessages`
 
 Majd a http://localhost:8000/en/rosetta/ szerkeszük meg az új szövegek fordítását

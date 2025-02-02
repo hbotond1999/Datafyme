@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.db.models import OuterRef, Subquery
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
-import uuid
 
 from chat.forms import MessageForm
 from chat.models import Conversation, Message, MessageType
@@ -11,6 +11,7 @@ from chat.utils.message import save_message_from_reporter
 from reporter_agent.reporter.graph import create_reporter_graph
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
+from reporter_agent.task import generate_title
 
 
 @login_required
@@ -30,7 +31,11 @@ def chat_view(request):
                 datasource = form.cleaned_data['database_source']
                 request.session["database_source_id"] = datasource.id
                 messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
+
+                if len(messages) == 0:
+                    generate_title.enqueue(conversation_id, user_message)
                 chat_hist = [msg.type + ": " + (msg.message if msg.message else "") for msg in messages]
+
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
                 reporter_graph = create_reporter_graph()
                 final_state: GraphState = reporter_graph.invoke(
@@ -70,7 +75,9 @@ def chat_view(request):
         form = MessageForm(user=request.user, database_source_id=request.session.get("database_source_id", None))
 
     messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
-    return render(request, 'chat/chat.html', {'form': form, 'messages': messages, 'conversation_id': conversation_id})
+    continue_conversation_ = request.session['continue_conversation']
+    request.session['continue_conversation'] = 0
+    return render(request, 'chat/chat.html', {'form': form, 'messages': messages, 'conversation_id': conversation_id, 'continue_conversation': continue_conversation_})
 
 @login_required
 def clear_chat(request):
@@ -81,25 +88,45 @@ def clear_chat(request):
 
 @login_required
 def chat_history(request):
-    # Get all conversations ordered by the most recent first
-    conversations = Message.objects.values('conversation_id').distinct().order_by('-timestamp')
-    history = []
-    for conversation in conversations:
-        messages = Message.objects.filter(conversation_id=conversation['conversation_id']).order_by('timestamp')
-        history.append({
-            'conversation_id': conversation['conversation_id'],
-            'messages': messages
-        })
+    """
+    View to display the chat history, showing all conversations ordered by the most recent timestamp.
+    """
+    # Get distinct conversation IDs ordered by the most recent timestamp
+    recent_conversations = (
+        Message.objects
+        .filter(conversation_id=OuterRef('id'))
+        .order_by('-timestamp')
+    )
+
+    conversations = (
+        Conversation.objects
+        .annotate(latest_message_time=Subquery(recent_conversations.values('timestamp')[:1]))
+        .order_by('-latest_message_time')
+    )
+
+    history = [
+        {
+            'title': conversation.title,
+            'conversation_id': conversation.id,
+            'messages': Message.objects.filter(conversation_id=conversation.id).order_by('timestamp')
+        }
+        for conversation in conversations
+    ]
+
     return render(request, 'chat/chat_history.html', {'history': history})
 
 # New view to reset the conversation ID (without deleting from the DB)
 @login_required
 def clear_chat(request):
     if request.method == 'POST':
-        conversation = Conversation(user=request.user)
-        conversation.save()
-        request.session['conversation_id'] = conversation.id
+        if 'conversation_id' in request.session:
+            messages = Message.objects.filter(conversation_id=request.session['conversation_id'], conversation__user=request.user)
+            if messages and len(messages) > 0:
+                conversation = Conversation(user=request.user)
+                conversation.save()
+                request.session['conversation_id'] = conversation.id
         return JsonResponse({'status': 'success'})
+
     return JsonResponse({'status': 'failed'}, status=400)
 
 @login_required
@@ -109,3 +136,9 @@ def trial(request):
 @login_required
 def trial_simple(request):
     return render(request, 'chat/trial_simple.html')
+
+@login_required()
+def continue_conversation(request, conversation_id):
+    request.session['conversation_id'] = conversation_id
+    request.session['continue_conversation'] = 1
+    return redirect('chat:chat')

@@ -124,3 +124,16 @@ def refine_empty_result_sql_agent(database_source):
     )
 
     return agent_executor
+
+
+def generate_title_agent():
+
+    prompt_str = """
+    Generate a title for the conversation based on the first message from the user. Formulate the title in the language in which you received the message.
+    
+    First message: {first_message}
+    """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["first_message"])
+
+    return prompt | get_llm_model() | StrOutputParser()
