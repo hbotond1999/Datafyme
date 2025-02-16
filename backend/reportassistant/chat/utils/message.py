@@ -15,7 +15,7 @@ def save_message_from_reporter(state: GraphState, data_source: DatabaseSource, c
             chart = Chart(
                 data_source=data_source,
                 title=state["representation_data"].chart_title if state["representation_data"].type == RepType.CHART else None,
-                description="description",
+                description=None,
                 type=state["representation_data"].chart_type.value if state["representation_data"].type == RepType.CHART else RepType.TABLE.value,
                 sql_query=state["sql_query"],
                 meta_data=state["representation_data"].data if state["representation_data"].type == RepType.CHART else None

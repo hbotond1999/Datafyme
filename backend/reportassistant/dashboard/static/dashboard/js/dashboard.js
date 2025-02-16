@@ -238,14 +238,16 @@ class DashboardHelper {
     }
 
     createGirdContent(slot, getChartUrl) {
-
         const slotContainer = document.createElement("div");
-        const chartHelper = new ChartHelper(getChartUrl.replace('0', slot.chart_id), this.chartUpdateUrl, slotContainer, slot.chart_id, false, false, false);
         slotContainer.className = "slot-container";
         slotContainer.dataset.slotId = slot.id;
 
         const slotHeader = document.createElement("div");
         slotHeader.className = "slot-header";
+
+        const infoIcon = document.createElement("i");
+        infoIcon.className = "fas fa-info-circle slot-info";
+        infoIcon.style.marginRight = "8px"; // Kisebb térköz a title előtt
 
         const slotTitle = document.createElement("h5");
         slotTitle.textContent = slot.title ? slot.title : '';
@@ -268,11 +270,13 @@ class DashboardHelper {
                 }
 
                 input.classList.remove("is-invalid");
-                errorMessage.textContent = ""
+                errorMessage.textContent = "";
                 slotTitle.textContent = input.value;
                 slot.title = input.value;
 
-                chartHelper.updateChartTitle(input.value).then().catch((error) => {alert('An error occurred while updating the chart title: ' + error.message)});
+                chartHelper.updateChartTitle(input.value)
+                    .catch((error) => { alert('An error occurred while updating the chart title: ' + error.message); });
+
                 input.replaceWith(slotTitle);
             });
 
@@ -292,10 +296,31 @@ class DashboardHelper {
         trashIcon.addEventListener("click", () => this.deleteDashboardSlot(slot.id));
         trashIconContainer.appendChild(trashIcon);
 
+        slotHeader.appendChild(infoIcon);
         slotHeader.appendChild(slotTitle);
         slotHeader.appendChild(trashIconContainer);
         slotContainer.appendChild(slotHeader);
-        chartHelper.init()
+
+        const chartHelper = new ChartHelper(
+            getChartUrl.replace('0', slot.chart_id),
+            this.chartUpdateUrl,
+            '',
+            (description) => {
+                if (description) {
+                    infoIcon.setAttribute("title", description);
+                    infoIcon.style.display = "inline";
+                } else {
+                    infoIcon.style.display = "none";
+                }
+            },
+            slotContainer,
+            slot.chart_id,
+            false,
+            false,
+            false
+        );
+
+        chartHelper.init();
         return slotContainer;
     }
 
