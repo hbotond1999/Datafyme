@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseNotAllowed
 
 from db_configurator.models import DatabaseSource
@@ -29,14 +30,9 @@ def get_chart(request, chart_id: int):
     if request.method == 'GET':
         chart = Chart.objects.get(id=chart_id)
         chart_data = create_chart_data(chart)
-        return JsonResponse(data={"chart_data": chart_data, "type": chart.type}, safe=False, status=200)
+        return JsonResponse(data={"chart_data": chart_data, "type": chart.type, "description": chart.description}, safe=False, status=200)
     else:
         return HttpResponseNotAllowed(['GET'])
-
-
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse, HttpResponseNotAllowed
-
 
 @login_required
 def edit_chart(request):

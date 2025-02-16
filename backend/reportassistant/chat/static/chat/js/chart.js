@@ -1,5 +1,14 @@
 class ChartHelper {
-    constructor(url, chartUpdateUrl = '', parentContainer, chartId, draggable = false, scrollToInit = false, init = true) {
+    constructor(url,
+                chartUpdateUrl = '',
+                generate_description_url = '',
+                generateDescriptionCallback,
+                parentContainer,
+                chartId,
+                draggable = false,
+                scrollToInit = false,
+                init = true
+              ) {
         this.parent = parentContainer;
         this.url = url;
         this.chartId = chartId;
@@ -7,7 +16,8 @@ class ChartHelper {
         this.chartUpdateUrl = chartUpdateUrl
         this.draggable = draggable
         this.scrollToInit = scrollToInit
-
+        this.generate_description_url = generate_description_url
+        this.generateDescriptionCallback = generateDescriptionCallback
         if (init) {
             this.init()
         }
@@ -42,6 +52,15 @@ class ChartHelper {
         if (this.scrollToInit) {
             canvas.scrollIntoView({behavior: "smooth", block: "end"})
         }
+        console.log(charData)
+        console.log("url", this.generate_description_url)
+        if (this.generate_description_url) {
+            this.getDescription(canvas)
+        } else if (this.generateDescriptionCallback != null){
+            this.generateDescriptionCallback(charData.description)
+        }
+
+
     }
 
     createChart(canvas, charData) {
@@ -113,7 +132,6 @@ class ChartHelper {
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 this.renderChart(data);
             })
             .catch(error => {
@@ -166,5 +184,39 @@ class ChartHelper {
             console.error("Error while updating chart title:", error);
             return false;
         }
+    }
+
+   getDescription(canvas) {
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                console.error("Canvas-to-blob conversion failed.");
+                return;
+            }
+
+            const formData = new FormData();
+                formData.append("chart_id", this.chartId);
+                formData.append("chart_img_file", blob, "chart.png");
+
+                fetch(this.generate_description_url, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken":Cookies.get('csrftoken'),
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.generateDescriptionCallback(data.description);
+                    console.log("Generated Description:", data.description);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+            }, "image/png");
     }
 }
