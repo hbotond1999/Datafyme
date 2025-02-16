@@ -56,8 +56,13 @@ def edit_chart(request):
 
 @login_required
 def generate_description(request):
-    chart_id = request.GET.get('chart_id')
-    chart_url = request.GET.get('chart_url')
-    result = create_description(chart_id, chart_url)
+    if request.method == 'POST':
 
-    return JsonResponse(data={"description": result.description})
+        chart_id = request.POST["chart_id"]
+        chart_img_file = request.FILES["chart_img_file"]
+
+        result = create_description(chart_id, chart_img_file)
+
+        return JsonResponse(data={"description": result.description})
+    else:
+        return HttpResponseNotAllowed(['POST'])
