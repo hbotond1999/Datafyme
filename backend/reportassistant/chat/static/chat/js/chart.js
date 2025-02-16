@@ -25,7 +25,7 @@ class ChartHelper {
 
     renderChart(data) {
         if (data.type === "TABLE") {
-            this.renderTable(data.chart_data);
+            this.renderTable(data.chart_data, data.description);
         } else {
             this.renderCanvasChart(data);
         }
@@ -68,7 +68,7 @@ class ChartHelper {
         const chart = new Chart(ctx, charData.chart_data);
     }
 
-    renderTable(tableData) {
+    renderTable(tableData, description) {
 
         const table = document.createElement('table');
         table.classList.add('table', 'table-striped'); // Bootstrap classes
@@ -103,8 +103,15 @@ class ChartHelper {
         } else {
             this.parent.append(table)
         }
+
         if (this.scrollToInit) {
             table.scrollIntoView({behavior: "smooth"})
+        }
+
+        if (this.generate_description_url) {
+            this.getDescription()
+        } else if (this.generateDescriptionCallback != null){
+            this.generateDescriptionCallback(description)
         }
     }
 
@@ -187,36 +194,44 @@ class ChartHelper {
     }
 
    getDescription(canvas) {
-        canvas.toBlob((blob) => {
-            if (!blob) {
-                console.error("Canvas-to-blob conversion failed.");
-                return;
-            }
+        const formData = new FormData();
+        formData.append("chart_id", this.chartId);
 
-            const formData = new FormData();
-                formData.append("chart_id", this.chartId);
+        if (canvas) {
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    console.error("Canvas-to-blob conversion failed.");
+                    this.sendDescriptionRequest(formData);
+                    return;
+                }
                 formData.append("chart_img_file", blob, "chart.png");
-
-                fetch(this.generate_description_url, {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken":Cookies.get('csrftoken'),
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    this.generateDescriptionCallback(data.description);
-                    console.log("Generated Description:", data.description);
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                });
+                this.sendDescriptionRequest(formData);
             }, "image/png");
+        } else {
+            this.sendDescriptionRequest(formData);
+        }
+    }
+
+    sendDescriptionRequest(formData) {
+        fetch(this.generate_description_url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": Cookies.get('csrftoken'),
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            this.generateDescriptionCallback(data.description);
+            console.log("Generated Description:", data.description);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
     }
 }

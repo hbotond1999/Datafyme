@@ -55,7 +55,7 @@ def generate_description(request):
     if request.method == 'POST':
 
         chart_id = request.POST["chart_id"]
-        chart_img_file = request.FILES["chart_img_file"]
+        chart_img_file = request.FILES.get("chart_img_file", None)
 
         result = create_description(chart_id, chart_img_file)
 
