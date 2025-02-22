@@ -41,6 +41,11 @@
                 {% if message.chart %}
                      <div class="custom-chart" data-id="{{ message.chart.id }}"></div>
                 {% endif %}
+                {% if message.chart.description %}
+                 <div class="message reply-message">
+                     <strong>{% translate 'System' %}:</strong> {{ message.chart.description }}
+                 </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
@@ -74,7 +79,8 @@
 
             if (chatContainer.style.display === 'block' && chatLoaded === false) {
                 document.querySelectorAll('.custom-chart').forEach(function(element) {
-                    new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', element, element.dataset.id, true)
+                    const chatHelper = new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', '', null, element, element.dataset.id, true)
+                    chatHelper
                 });
                 chatLoaded = true
             }
@@ -109,16 +115,28 @@
                 messagesContainer.append(message);
             }
             if (data.chart_id) {
-                new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id), '', messagesContainer, data.chart_id, true, true);
+                new ChartHelper(
+                    '{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id),
+                    '',
+                    '{% url "reporter_agent:generate_description" %}',
+                    (description) => {
+                        const message = createElementFromString('<div class="message reply-message"><strong>{% trans 'System' %}:</strong> ' +description+ '</div>');
+                        messagesContainer.append(message);
+                        sendButton.disabled = false;
+                        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    },
+                    messagesContainer,
+                    data.chart_id,
+                    true,
+                    true,
+                );
             }
         })
         .catch(error => {
             console.error('Hiba történt:', error);
-        })
-        .finally(() => {
             sendButton.disabled = false;
             sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
-        });
+        })
 
         return false;
     }

@@ -1,6 +1,8 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse, HttpResponseNotAllowed
 from django.utils.translation import get_language
 
 from db_configurator.models import DatabaseSource
@@ -29,14 +31,9 @@ def get_chart(request, chart_id: int):
     if request.method == 'GET':
         chart = Chart.objects.get(id=chart_id)
         chart_data = create_chart_data(chart)
-        return JsonResponse(data={"chart_data": chart_data, "type": chart.type}, safe=False, status=200)
+        return JsonResponse(data={"chart_data": chart_data, "type": chart.type, "description": chart.description}, safe=False, status=200)
     else:
         return HttpResponseNotAllowed(['GET'])
-
-
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse, HttpResponseNotAllowed
-
 
 @login_required
 def edit_chart(request):
@@ -59,7 +56,8 @@ def generate_description(request):
     if request.method == 'POST':
 
         chart_id = request.POST["chart_id"]
-        chart_img_file = request.FILES["chart_img_file"]
+        chart_img_file = request.FILES.get("chart_img_file", None)
+
         result = create_description(chart_id, chart_img_file, get_language())
 
         return JsonResponse(data={"description": result.description})
