@@ -83,7 +83,7 @@ def chat_view(request):
         form = MessageForm(user=request.user, database_source_id=request.session.get("database_source_id", None))
 
     messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
-    continue_conversation_ = request.session['continue_conversation']
+    continue_conversation_ = request.session.get('continue_conversation')
     request.session['continue_conversation'] = 0
     return render(request, 'chat/chat.html', {'form': form, 'messages': messages, 'conversation_id': conversation_id, 'continue_conversation': continue_conversation_})
 
