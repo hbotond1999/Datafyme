@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.utils.translation import get_language
 
 from chat.forms import MessageForm
 from chat.models import Conversation, Message, MessageType
@@ -33,8 +34,14 @@ def chat_view(request):
                 messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
 
                 if len(messages) == 0:
-                    generate_title.enqueue(conversation_id, user_message)
-                chat_hist = [msg.type + ": " + (msg.message if msg.message else "") for msg in messages]
+                    generate_title.enqueue(conversation_id, user_message, get_language())
+
+                chat_hist = []
+                for msg in messages:
+                    if msg.chart:
+                        chat_hist.append(msg.type + " : \nChart type: " + msg.chart.type + " description: " + msg.chart.description)
+                    if msg.message:
+                        chat_hist.append(msg.type + " : " + msg.message)
 
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
                 reporter_graph = create_reporter_graph()
@@ -44,7 +51,8 @@ def chat_view(request):
                         "chat_history": chat_hist,
                         "question": user_message,
                         "refine_sql_recursive_limit": 3,
-                        "refine_empty_result_recursive_limit": 3
+                        "refine_empty_result_recursive_limit": 3,
+                        "language": get_language()
                      }
                 )
                 message = save_message_from_reporter(final_state, datasource, conversation_id)
@@ -75,7 +83,7 @@ def chat_view(request):
         form = MessageForm(user=request.user, database_source_id=request.session.get("database_source_id", None))
 
     messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
-    continue_conversation_ = request.session['continue_conversation']
+    continue_conversation_ = request.session.get('continue_conversation')
     request.session['continue_conversation'] = 0
     return render(request, 'chat/chat.html', {'form': form, 'messages': messages, 'conversation_id': conversation_id, 'continue_conversation': continue_conversation_})
 

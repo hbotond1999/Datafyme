@@ -79,6 +79,6 @@ def refine_empty_result_sql_query_node(state: GraphState):
 
 
 def create_visualization_node(state: GraphState):
-    result = create_visu_graph().invoke({"question": state["question"], "input_data": state["sql_query_result"]})
+    result = create_visu_graph().invoke({"question": state["question"], "input_data": state["sql_query_result"], "language": state["language"]})
 
     return {"representation_data": result["final_data"]}

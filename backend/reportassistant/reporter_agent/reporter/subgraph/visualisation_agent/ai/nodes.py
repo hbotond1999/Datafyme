@@ -43,7 +43,7 @@ def populate_chart_data(state: GraphState):
     """
     agent = create_chart_def_agent(CHART_RESPONSE_MAPPING[state["chart_type"]])
     preview_data = get_first_ten_records(data=state["input_data"])
-    result = agent.invoke({"preview_data": json.dumps(preview_data), "chart_type": state["chart_type"],  'question': state["question"]})
+    result = agent.invoke({"preview_data": json.dumps(preview_data), "chart_type": state["chart_type"],  'question': state["question"], 'language': state["language"]})
     return {"chart_column_data": result}
 
 
@@ -61,7 +61,7 @@ def create_final_data(state: GraphState):
     """
     rep_type = RepType[state["representation_type"]]
     if rep_type == RepType.TEXT:
-        response = create_summarize_agent().invoke({"data": state["input_data"], "question": state["question"]}).content
+        response = create_summarize_agent().invoke({"data": state["input_data"], "question": state["question"], "language": state["language"]}).content
         return {
             "final_data": FinalData(type=rep_type, chart_type= None, data=response, chart_title=None)
         }

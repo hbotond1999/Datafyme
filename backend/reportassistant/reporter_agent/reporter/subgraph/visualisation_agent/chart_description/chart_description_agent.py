@@ -6,12 +6,12 @@ from reporter_agent.reporter.subgraph.visualisation_agent.chart_description.agen
 from reporter_agent.utils.chart_data import create_chart_meta_data
 
 
-def create_description(chart_id, chart_url):
+def create_description(chart_id, chart_url, lang):
     chart = Chart.objects.get(id=chart_id)
     chart_data = create_chart_meta_data(chart)
     chart_df = pd.DataFrame.from_dict(chart_data)
     content = [
-        {"type": "text", "text": "Your task is to provide a description of the following figure."},
+        {"type": "text", "text": "Your task is to provide a description of the following figure in this language: " + lang + "."},
     ]
 
     if chart_url:

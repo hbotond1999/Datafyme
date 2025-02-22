@@ -3,6 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseNotAllowed
+from django.utils.translation import get_language
 
 from db_configurator.models import DatabaseSource
 from reporter_agent.models import Chart
@@ -57,7 +58,7 @@ def generate_description(request):
         chart_id = request.POST["chart_id"]
         chart_img_file = request.FILES.get("chart_img_file", None)
 
-        result = create_description(chart_id, chart_img_file)
+        result = create_description(chart_id, chart_img_file, get_language())
 
         return JsonResponse(data={"description": result.description})
     else:

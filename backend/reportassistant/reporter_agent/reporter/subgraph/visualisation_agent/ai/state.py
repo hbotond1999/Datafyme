@@ -20,4 +20,5 @@ class GraphState(TypedDict):
     chart_column_data: Chart
     input_data: Dict[str, List[Any]] # input
     question: str # input
+    language: str
     final_data: FinalData # output

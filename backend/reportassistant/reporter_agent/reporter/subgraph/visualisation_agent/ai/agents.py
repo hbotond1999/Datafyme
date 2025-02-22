@@ -69,23 +69,23 @@ def create_chart_def_agent(structured_output):
     
      USER question: {question}
     
-     Your task is to assist in creating the visualization. To do this, label each axis of the chart with the column names according to the provided structure.
+     Your task is to assist in creating the visualization. To do this, label each axis of the chart with the column names according to the provided structure. The title must be in this language {language}
       """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["preview_data", "chart_type", "question"])
+    prompt = PromptTemplate(template=prompt_str, input_variables=["preview_data", "chart_type", "question", "language"])
 
     return prompt | get_llm_model().with_structured_output(structured_output)
 
 
 def create_summarize_agent():
     prompt_str = """
-   You are a helpful assistant, and your task is to summarize the following data in a response.
+   You are a helpful assistant, and your task is to summarize the following data in a response. You must response the following language: {language}
    
    User's question:  {question}
    
    USER question: {data}
    """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["data", "question"])
+    prompt = PromptTemplate(template=prompt_str, input_variables=["data", "question", "language"])
 
     return prompt | get_llm_model()
