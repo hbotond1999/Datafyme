@@ -34,7 +34,13 @@ def chat_view(request):
 
                 if len(messages) == 0:
                     generate_title.enqueue(conversation_id, user_message)
-                chat_hist = [msg.type + ": " + (msg.message if msg.message else "") for msg in messages]
+
+                chat_hist = []
+                for msg in messages:
+                    if msg.chart:
+                        chat_hist.append(msg.type + " : \nChart type: " + msg.chart.type + " description: " + msg.chart.description)
+                    if msg.message:
+                        chat_hist.append(msg.type + " : " + msg.message)
 
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
                 reporter_graph = create_reporter_graph()
