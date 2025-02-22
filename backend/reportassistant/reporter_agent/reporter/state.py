@@ -18,4 +18,5 @@ class GraphState(TypedDict):
     representation_data: FinalData  # output
     refine_sql_recursive_limit: int  # input
     refine_empty_result_recursive_limit: int  # input
+    language: str
 

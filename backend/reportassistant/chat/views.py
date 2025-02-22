@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.utils.translation import get_language
 
 from chat.forms import MessageForm
 from chat.models import Conversation, Message, MessageType
@@ -33,7 +34,7 @@ def chat_view(request):
                 messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
 
                 if len(messages) == 0:
-                    generate_title.enqueue(conversation_id, user_message)
+                    generate_title.enqueue(conversation_id, user_message, get_language())
 
                 chat_hist = []
                 for msg in messages:
@@ -50,7 +51,8 @@ def chat_view(request):
                         "chat_history": chat_hist,
                         "question": user_message,
                         "refine_sql_recursive_limit": 3,
-                        "refine_empty_result_recursive_limit": 3
+                        "refine_empty_result_recursive_limit": 3,
+                        "language": get_language()
                      }
                 )
                 message = save_message_from_reporter(final_state, datasource, conversation_id)
