@@ -113,6 +113,7 @@
                 message.scrollIntoView({behavior: "smooth", block: "end"})
                 sendButton.disabled = true;
                 messagesContainer.append(message);
+                resetLoading(sendButton);
             }
             if (data.chart_id) {
                 new ChartHelper(
@@ -122,8 +123,7 @@
                     (description) => {
                         const message = createElementFromString('<div class="message reply-message"><strong>{% trans 'System' %}:</strong> ' +description+ '</div>');
                         messagesContainer.append(message);
-                        sendButton.disabled = false;
-                        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                        resetLoading(sendButton)
                     },
                     messagesContainer,
                     data.chart_id,
@@ -134,11 +134,15 @@
         })
         .catch(error => {
             console.error('Hiba történt:', error);
-            sendButton.disabled = false;
-            sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            resetLoading(sendButton)
         })
 
         return false;
+    }
+
+    function resetLoading(sendButton) {
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
 
 
@@ -163,5 +167,6 @@
     if (is_continue_conversation === 1) {
         document.getElementById("toggleChat").click()
     }
+
 </script>
 {% endblock %}

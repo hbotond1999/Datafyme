@@ -169,12 +169,12 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "INFO",
+            "level": os.getenv("LOG_LEVEL", "INFO"),
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
         "file": {
-            "level": "INFO",
+            "level": os.getenv("LOG_LEVEL", "INFO"),
             "class": "logging.FileHandler",
             "filename": "django_app.log",
             "formatter": "verbose",
@@ -191,6 +191,11 @@ LOGGING = {
             "level": os.getenv("LOG_LEVEL", "INFO"),
             "propagate": False,
         },
+        "reportassistant.default": {
+            "handlers": ["console", "file"],
+            "level": os.getenv("LOG_LEVEL", "INFO"),
+            "propagate": False,
+        }
     },
 }
 

@@ -1,5 +1,7 @@
 import json
 
+from common.custom_logging import log
+from reporter_agent.reporter.agents import logger
 from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData, RepType
 from reporter_agent.reporter.subgraph.visualisation_agent.ai.agents import create_representation_agent, create_chart_selector_agent, \
     create_chart_def_agent, create_summarize_agent
@@ -8,6 +10,7 @@ from reporter_agent.reporter.subgraph.visualisation_agent.ai.utils import get_fi
 from reporter_agent.reporter.subgraph.visualisation_agent.chart import CHART_RESPONSE_MAPPING, ChartTypes
 
 
+@log(my_logger=logger)
 def decide_representation(state: GraphState):
     """
     Args:
@@ -23,6 +26,7 @@ def decide_representation(state: GraphState):
     return {"representation_type": result.content}
 
 
+@log(my_logger=logger)
 def decide_chart_type(state: GraphState):
     """
     Args:
@@ -36,6 +40,7 @@ def decide_chart_type(state: GraphState):
     return {"chart_type": result.content}
 
 
+@log(my_logger=logger)
 def populate_chart_data(state: GraphState):
     """
     Args:
@@ -47,6 +52,7 @@ def populate_chart_data(state: GraphState):
     return {"chart_column_data": result}
 
 
+@log(my_logger=logger)
 def create_final_data(state: GraphState):
     """
     Creates the final data based on the state provided.
