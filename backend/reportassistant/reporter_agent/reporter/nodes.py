@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime
 
+from common.custom_logging import log
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from reporter_agent.reporter.agents import create_history_summarizer, refine_sql_agent, refine_empty_result_sql_agent
@@ -14,7 +15,7 @@ from reporter_agent.reporter.subgraph.visualisation_agent.ai.graph import create
 
 logger = logging.getLogger('reportassistant.custom')
 
-
+@log(my_logger=logger)
 def summarize_history_node(state: GraphState):
     new_question = create_history_summarizer().invoke(
         {"chat_history": state["chat_history"], "question": state["question"]}
@@ -22,6 +23,7 @@ def summarize_history_node(state: GraphState):
     return {"question": new_question}
 
 
+@log(my_logger=logger)
 def create_sql_query_node(state: GraphState):
     result = create_sql_agent_graph().invoke({"message": state["question"],
                                               "database_source": state["database_source"],
@@ -31,6 +33,7 @@ def create_sql_query_node(state: GraphState):
             "table_final_ddls": result["table_final_ddls"]}
 
 
+@log(my_logger=logger)
 def run_sql_query_node(state: GraphState):
     db_manager = DatabaseManager(state["database_source"])
     try:
@@ -40,6 +43,7 @@ def run_sql_query_node(state: GraphState):
         return {"error_message": {"message": e.message, "original_exception": e.original_exception}}
 
 
+@log(my_logger=logger)
 def refine_sql_query_node(state: GraphState):
     refine_sql_recursive_limit = state["refine_sql_recursive_limit"] - 1
     logger.info(f"Actual REFINE SQL RECURSIVE LIMIT value: {state["refine_sql_recursive_limit"]}")
@@ -60,6 +64,7 @@ def refine_sql_query_node(state: GraphState):
                                        "question or try a different source.")
 
 
+@log(my_logger=logger)
 def refine_empty_result_sql_query_node(state: GraphState):
     refine_empty_result_recursive_limit = state["refine_empty_result_recursive_limit"] - 1
     logger.info(f"Current EMPTY RESULT REFINE RECURSIVE LIMIT value: {refine_empty_result_recursive_limit}")
@@ -78,6 +83,7 @@ def refine_empty_result_sql_query_node(state: GraphState):
                                        "question or try a different source.")
 
 
+@log(my_logger=logger)
 def create_visualization_node(state: GraphState):
     result = create_visu_graph().invoke({"question": state["question"], "input_data": state["sql_query_result"], "language": state["language"]})
 
