@@ -57,7 +57,7 @@ class VectorLoader:
         data = []
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        table_docs = loop.run_until_complete(self.create_docs())
+        table_docs: List[TableDocumentation] = loop.run_until_complete(self.create_docs())
         loop.close()
         for table_doc in table_docs:
             data.append(TableDocument(
@@ -84,5 +84,16 @@ class VectorLoader:
                     schema_name=table_doc.schema_name,
                     database_id = self.data_source.id)
                 )
+
+            table_structure = f"""
+            Table name: {table_doc.schema_name}.{table_doc.table_name}
+            Columns: \n{"\n".join([f"""
+                        - Name: {col.name}
+                        - type: {col.type}
+                        - description: {col.description}
+                         """  for col in table_doc.columns])}
+            """
+            data.append(table_structure)
+
         delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=self.data_source.id)
         insert_docs_to_collection(data, COLLECTION_NAME)

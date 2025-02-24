@@ -74,7 +74,7 @@ class PostgresHelper:
 
                 # Fetch and return results if the query is a SELECT
                 if cursor.description:
-                    results: List[Any] = cursor.fetchall()
+                    results: List[Any] = cursor.fetchall() # fetchmany(10)   cursor.rowcount
                     return results
         except (Exception, psycopg2.DatabaseError) as error:
             logger.error(f"Error executing query in {self.dbname}: {error} - {query}")
