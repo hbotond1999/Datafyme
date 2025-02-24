@@ -15,6 +15,7 @@ class TableSchema:
     name: str
     schema: str
     columns: List[Column]
+    ddl: str
 
     def to_dict(self):
         return dataclasses.asdict(self)

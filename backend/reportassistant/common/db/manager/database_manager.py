@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseManager(DatabaseManagerAbc):
+
     def __init__(self, db_source: DatabaseSource):
         super().__init__(db_source)
         self.db_source = db_source
@@ -63,3 +64,9 @@ class DatabaseManager(DatabaseManagerAbc):
 
     def check_connection(self) -> bool:
         return self.handler.check_connection()
+
+    def get_table_ddl(self, table_name: str) -> str:
+        return self.handler.get_table_ddl(table_name)
+
+    def get_tables_ddls(self) -> List[TableSchema]:
+        return self.handler.get_tables_ddls()

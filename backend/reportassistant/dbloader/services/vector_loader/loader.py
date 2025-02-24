@@ -2,6 +2,7 @@ import asyncio
 from typing import List
 
 from langchain.chains.base import Chain
+from peft.utils.merge_utils import prune
 
 from common.db.manager.types import TableSchema
 from common.vectordb.db import COLLECTION_NAME
@@ -25,10 +26,11 @@ class VectorLoader:
         self.documentation_agent = create_doc_agent()
         self.data_source = data_source
 
-    async def create_doc(self, table_schema):
-        table_doc: TableDocumentation = await self.documentation_agent.ainvoke({"table_schema": table_schema.to_dict()})
+    async def create_doc(self, table_schema: TableSchema):
+        table_doc: TableDocumentation = await self.documentation_agent.ainvoke({"table_schema": table_schema.ddl})
         table_doc.table_name = table_schema.name
         table_doc.schema_name = table_schema.schema
+        print(table_doc)
         table_doc.database_name = self.data_source.name
         return table_doc
 
@@ -86,14 +88,17 @@ class VectorLoader:
                 )
 
             table_structure = f"""
-            Table name: {table_doc.schema_name}.{table_doc.table_name}
-            Columns: \n{"\n".join([f"""
-                        - Name: {col.name}
-                        - type: {col.type}
-                        - description: {col.description}
-                         """  for col in table_doc.columns])}
-            """
-            data.append(table_structure)
+Table: {table_doc.schema_name}.{table_doc.table_name}
+Columns:
+{"".join([f"- **{col.name}** ({col.type})\n  {col.description.strip()}\n" for col in table_doc.columns])}
+"""
+            data.append(TableDocument(
+                    text=table_structure,
+                    table_name=table_doc.table_name,
+                    database_name=table_doc.database_name,
+                    schema_name=table_doc.schema_name,
+                    database_id = self.data_source.id))
+            print(table_structure)
 
         delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=self.data_source.id)
         insert_docs_to_collection(data, COLLECTION_NAME)
