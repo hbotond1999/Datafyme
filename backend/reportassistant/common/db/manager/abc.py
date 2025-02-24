@@ -38,9 +38,5 @@ class DatabaseManagerAbc(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_table_ddl(self, table_name: str) -> TableSchema:
-        pass
-
-    @abc.abstractmethod
-    def get_tables_ddls(self) -> List[TableSchema]:
+    def get_table_ddl(self, table_name: str) -> str:
         pass

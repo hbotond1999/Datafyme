@@ -67,6 +67,3 @@ class DatabaseManager(DatabaseManagerAbc):
 
     def get_table_ddl(self, table_name: str) -> str:
         return self.handler.get_table_ddl(table_name)
-
-    def get_tables_ddls(self) -> List[TableSchema]:
-        return self.handler.get_tables_ddls()

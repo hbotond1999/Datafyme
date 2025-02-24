@@ -28,7 +28,7 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
         )
 
 
-    def get_table_ddl(self, table_name) -> TableSchema:
+    def get_table_ddl(self, table_name) -> str:
         try:
             schema, table = table_name.split('.')
             result = self.db_manager.execute_query(f"""
@@ -76,23 +76,12 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
 
             if result and isinstance(result, list) and len(result) > 0:
                 print(result)
-                return TableSchema(name=table_name, schema=schema, columns=[], ddl=result[0]["ddl"])
+                return result[0]["ddl"]
             else:
                 raise Exception("Table not exists: " + table_name)
         except Exception as e:
             logger.error(f"An error occurred while fetching DDL for table {table_name}: {e}")
             raise e
-
-    @log()
-    def get_tables_ddls(self) -> List[TableSchema]:
-        table_names = self.get_table_names_with_schema()
-        table_list = []
-
-        for table_name in table_names:
-            table = self.get_table_ddl(table_name)
-            table_list.append(table)
-
-        return table_list
 
     def get_table_schema(self, table_name: str) -> TableSchema:
         try:
@@ -122,7 +111,7 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
                     ) for row in result
                 ]
 
-                return TableSchema(name=table, schema=schema, columns=columns)
+                return TableSchema(name=table, schema=schema, columns=columns, ddl=self.get_table_ddl(table_name))
             else:
                 logger.warning(f"No columns found for table {table_name}")
                 raise Exception(f"No columns found for table {table_name}")

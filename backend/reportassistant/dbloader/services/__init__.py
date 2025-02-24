@@ -17,7 +17,7 @@ class DBLoader:
         self.create_relation_graph()
 
     def vector_loader(self):
-        tables_schemas = self.extractor.get_tables_ddls()
+        tables_schemas = self.extractor.get_tables_schemas()
         try:
             VectorLoader(tables_schemas, self.datasource).load()
         except Exception as e:
