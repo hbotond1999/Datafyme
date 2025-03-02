@@ -18,10 +18,7 @@ class DBLoader:
 
     def vector_loader(self):
         tables_schemas = self.extractor.get_tables_schemas()
-        try:
-            VectorLoader(tables_schemas, self.datasource).load()
-        except Exception as e:
-            return str(e)
+        VectorLoader(tables_schemas, self.datasource).load()
 
     def create_relation_graph(self):
 
@@ -73,10 +70,5 @@ class DBLoader:
                                                table_pair["foreign_table_schema"],
                                                table_pair["foreign_table_name"],
                                                table_pair["foreign_column_name"])
-
-            return
-
-        except:
-            return "Graph creation failed"
         finally:
             neo4j_instance.close()

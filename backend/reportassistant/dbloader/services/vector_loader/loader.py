@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import List
 
 from langchain.chains.base import Chain
@@ -63,12 +64,14 @@ class VectorLoader:
         table_docs: List[TableDocumentation] = loop.run_until_complete(self.create_docs())
         loop.close()
         for table_doc in table_docs:
-            TableDocumentationModel(
+            doc_instance = TableDocumentationModel(
                 database_source=self.data_source,
                 table_name=table_doc.table_name,
                 schema_name=table_doc.schema_name,
-                documentation={"columns_descriptions": table_doc.columns, "table_description": table_doc.table_description, "raw_ddl": table_doc.raw_ddl}
-            ).save()
+                documentation=table_doc.model_dump(include={"table_description", "columns", "raw_ddl"})
+            )
+            doc_instance.full_clean()
+            doc_instance.save()
 
             data.append(TableDocument(
                 text=table_doc.table_description,
