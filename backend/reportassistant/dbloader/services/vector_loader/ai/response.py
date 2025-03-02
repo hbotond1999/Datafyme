@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 
 class TableColDocumentation(BaseModel):
@@ -18,7 +18,7 @@ class TableColDocumentation(BaseModel):
     """
     name: str = Field(description="Name of the column")
     type: str = Field(description="Type of the column")
-    description: str = Field(description="Detailed description and purpose of the column")
+    description: str = Field(description="Provide a detailed description of the column's purpose, including its role in the table and relationships with other columns (e.g., primary key, foreign key")
 
 class TableDocumentation(BaseModel):
     """
@@ -41,3 +41,4 @@ class TableDocumentation(BaseModel):
     columns: List[TableColDocumentation]
     use_cases: List[str] = Field(description="Potential use cases for the table")
     common_queries: List[str] = Field(description="Common business queries, questions for the table")
+    raw_ddl: str

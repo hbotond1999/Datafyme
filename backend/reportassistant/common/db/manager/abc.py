@@ -36,3 +36,7 @@ class DatabaseManagerAbc(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def check_connection(self) -> bool:
         pass
+
+    @abc.abstractmethod
+    def get_table_ddl(self, table_name: str) -> str:
+        pass

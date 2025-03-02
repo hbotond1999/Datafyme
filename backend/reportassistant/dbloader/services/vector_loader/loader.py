@@ -2,8 +2,10 @@ import asyncio
 from typing import List
 
 from langchain.chains.base import Chain
+from peft.utils.merge_utils import prune
 
 from common.db.manager.types import TableSchema
+from db_configurator.models import TableDocumentation as TableDocumentationModel
 from common.vectordb.db import COLLECTION_NAME
 from common.vectordb.db.schema import TableDocument
 from common.vectordb.db.utils import insert_docs_to_collection, delete_docs_from_collection
@@ -25,11 +27,12 @@ class VectorLoader:
         self.documentation_agent = create_doc_agent()
         self.data_source = data_source
 
-    async def create_doc(self, table_schema):
-        table_doc: TableDocumentation = await self.documentation_agent.ainvoke({"table_schema": table_schema.to_dict()})
+    async def create_doc(self, table_schema: TableSchema):
+        table_doc: TableDocumentation = await self.documentation_agent.ainvoke({"table_schema": table_schema.ddl})
         table_doc.table_name = table_schema.name
         table_doc.schema_name = table_schema.schema
         table_doc.database_name = self.data_source.name
+        table_doc.raw_ddl = table_schema.ddl
         return table_doc
 
 
@@ -57,9 +60,16 @@ class VectorLoader:
         data = []
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        table_docs = loop.run_until_complete(self.create_docs())
+        table_docs: List[TableDocumentation] = loop.run_until_complete(self.create_docs())
         loop.close()
         for table_doc in table_docs:
+            TableDocumentationModel(
+                database_source=self.data_source,
+                table_name=table_doc.table_name,
+                schema_name=table_doc.schema_name,
+                documentation={"columns_descriptions": table_doc.columns, "table_description": table_doc.table_description, "raw_ddl": table_doc.raw_ddl}
+            ).save()
+
             data.append(TableDocument(
                 text=table_doc.table_description,
                 table_name=table_doc.table_name,
@@ -84,5 +94,18 @@ class VectorLoader:
                     schema_name=table_doc.schema_name,
                     database_id = self.data_source.id)
                 )
+
+            table_structure = f"""
+Table: {table_doc.schema_name}.{table_doc.table_name}
+Columns:
+{"".join([f"- **{col.name}** ({col.type})\n  {col.description.strip()}\n" for col in table_doc.columns])}
+"""
+            data.append(TableDocument(
+                    text=table_structure,
+                    table_name=table_doc.table_name,
+                    database_name=table_doc.database_name,
+                    schema_name=table_doc.schema_name,
+                    database_id=self.data_source.id))
+
         delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=self.data_source.id)
         insert_docs_to_collection(data, COLLECTION_NAME)

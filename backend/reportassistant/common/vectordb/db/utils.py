@@ -22,7 +22,7 @@ def insert_docs_to_collection(table_docs: List[TableDocument], collection_name: 
     try:
         Collection(collection_name).insert(convert_to_milvus_data(table_docs))
     except Exception as e:
-        logger.error(f"Error during insertion of docs to {collection_name}")
+        logger.error(f"Error during insertion of docs to {collection_name} " + str(e))
         raise e
 
 
