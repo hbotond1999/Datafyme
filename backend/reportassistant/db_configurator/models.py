@@ -29,3 +29,19 @@ class DatabaseSource(models.Model):
 
     class Meta:
         unique_together = ('host', 'port', 'name')
+
+class TableDocumentation(models.Model):
+    database_source = models.ForeignKey(DatabaseSource, on_delete=models.CASCADE)
+    schema_name = models.CharField(max_length=255)
+    table_name = models.CharField(max_length=255)
+    documentation = models.JSONField()
+
+    class Meta:
+        unique_together = ('database_source', 'schema_name', 'table_name')
+
+    def to_dict(self):
+        return {
+            "schema_name": self.schema_name,
+            "table_name": self.table_name,
+            "documentation": self.documentation
+        }

@@ -4,6 +4,9 @@ from decimal import Decimal
 from typing import List, Dict, AnyStr, Any, Literal
 
 import pandas as pd
+from numpy.f2py.auxfuncs import throw_error
+
+from common.custom_logging import log
 from common.db.manager.handlers.utils.postgres_helper import PostgresHelper
 from db_configurator.models import DatabaseSource
 from common.db.manager.abc import DatabaseManagerAbc
@@ -23,6 +26,61 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             host=db_source.host,
             port=db_source.port
         )
+
+
+    def get_table_ddl(self, table_name) -> str:
+        try:
+            schema, table = table_name.split('.')
+            result = self.db_manager.execute_query(f"""
+                WITH table_info AS (
+              SELECT c.oid, c.relname, n.nspname
+              FROM pg_class c
+              JOIN pg_namespace n ON c.relnamespace = n.oid
+              WHERE c.relname = '{table}'  
+                AND n.nspname = '{schema}' 
+            ),
+            cols AS (
+              SELECT a.attrelid,
+                     string_agg(
+                       '    ' || quote_ident(a.attname) || ' ' || pg_catalog.format_type(a.atttypid, a.atttypmod)
+                       || CASE WHEN a.attnotnull THEN ' NOT NULL' ELSE '' END
+                       || CASE WHEN a.atthasdef THEN ' DEFAULT ' || pg_get_expr(ad.adbin, ad.adrelid) ELSE '' END,
+                       E',\n' ORDER BY a.attnum
+                     ) AS col_defs
+              FROM pg_attribute a
+              LEFT JOIN pg_attrdef ad
+                ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum
+              WHERE a.attrelid = (SELECT oid FROM table_info)
+                AND a.attnum > 0
+                AND NOT a.attisdropped
+              GROUP BY a.attrelid
+            ),
+            cons AS (
+              SELECT con.conrelid,
+                     string_agg(
+                       '    CONSTRAINT ' || quote_ident(con.conname) || ' ' || pg_get_constraintdef(con.oid),
+                       E',\n' ORDER BY con.conname
+                     ) AS con_defs
+              FROM pg_constraint con
+              WHERE con.conrelid = (SELECT oid FROM table_info)
+              GROUP BY con.conrelid
+            )
+            SELECT 'CREATE TABLE ' || quote_ident(t.nspname) || '.' || quote_ident(t.relname) || E' (\n' ||
+                   COALESCE(c.col_defs, '') ||
+                   CASE WHEN con.con_defs IS NOT NULL THEN E',\n' || con.con_defs ELSE '' END ||
+                   E'\n);' AS ddl
+            FROM table_info t
+            LEFT JOIN cols c ON t.oid = c.attrelid
+            LEFT JOIN cons con ON t.oid = con.conrelid;
+            """)
+
+            if result and isinstance(result, list) and len(result) > 0:
+                return result[0]["ddl"]
+            else:
+                raise Exception("Table not exists: " + table_name)
+        except Exception as e:
+            logger.error(f"An error occurred while fetching DDL for table {table_name}: {e}")
+            raise e
 
     def get_table_schema(self, table_name: str) -> TableSchema:
         try:
@@ -52,7 +110,7 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
                     ) for row in result
                 ]
 
-                return TableSchema(name=table, schema=schema, columns=columns)
+                return TableSchema(name=table, schema=schema, columns=columns, ddl=self.get_table_ddl(table_name))
             else:
                 logger.warning(f"No columns found for table {table_name}")
                 raise Exception(f"No columns found for table {table_name}")
