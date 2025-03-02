@@ -3,9 +3,9 @@ import json
 from datetime import datetime
 import logging
 
-from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
+from db_configurator.models import TableDocumentation
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent, refine_user_question_agent
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_ddls
 
@@ -43,10 +43,10 @@ def get_ddls(state: GraphState):
     Returns:
         dict: A dictionary containing the matching_tables
     """
-    extractor = DatabaseManager(state["database_source"])
-    tables_schemas = extractor.get_tables_schemas()
-    matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["matching_tables"]]
-    json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
+    matching_tables = [(temp["schema"], temp["table_name"]) for temp in state["matching_tables"]]
+    json_data = [TableDocumentation.objects.get(database_source=state["database_source"], schema_name=schema,
+                                                table_name=table).to_dict()
+                 for schema, table in matching_tables]
     return {"matching_table_ddls": json_data}
 
 
@@ -70,7 +70,7 @@ def refine_user_question(state: GraphState):
 
 
 def relation_graph(state: GraphState):
-    filtered_tables = [(table["schema"], table["name"]) for table in state['filtered_table_ddls']]
+    filtered_tables = [(table["schema_name"], table["table_name"]) for table in state['filtered_table_ddls']]
     neo4j_instance = Neo4JInstance()
 
     tables_all = []
@@ -91,10 +91,10 @@ def relation_graph(state: GraphState):
 
 
 def get_final_ddls(state: GraphState):
-    extractor = DatabaseManager(state["database_source"])
-    tables_schemas = extractor.get_tables_schemas()
-    matching_tables = [f'{temp["schema"]}.{temp["table_name"]}' for temp in state["tables_all"]]
-    json_data = [table.to_dict() for table in tables_schemas if f'{table.schema}.{table.name}' in matching_tables]
+    matching_tables = [(temp["schema"], temp["table_name"]) for temp in state["tables_all"]]
+    json_data = [TableDocumentation.objects.get(database_source=state["database_source"], schema_name=schema,
+                                                table_name=table).to_dict()
+                 for schema, table in matching_tables]
     return {"table_final_ddls": json_data}
 
 

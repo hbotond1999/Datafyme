@@ -38,3 +38,10 @@ class TableDocumentation(models.Model):
 
     class Meta:
         unique_together = ('database_source', 'schema_name', 'table_name')
+
+    def to_dict(self):
+        return {
+            "schema_name": self.schema_name,
+            "table_name": self.table_name,
+            "documentation": self.documentation
+        }
