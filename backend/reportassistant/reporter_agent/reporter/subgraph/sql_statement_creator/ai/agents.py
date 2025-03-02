@@ -1,7 +1,8 @@
 from langchain_core.prompts import PromptTemplate
 
 from common.ai.model import get_llm_model
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import SQLCommand, NewQuestion
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import SQLCommand, NewQuestion, IsRelevant, \
+    BasicChat
 
 
 def sql_agent():
@@ -37,3 +38,28 @@ def refine_user_question_agent():
     prompt = PromptTemplate(template=prompt_str, input_variables=["message", "systemtime"])
 
     return prompt | get_llm_model().with_structured_output(NewQuestion)
+
+
+def filter_relevant_question():
+    prompt_str = """
+    Your task is to decide whether the message sent by the user is a data analysis question that is intended to query 
+    information from a database or just a general chat message, greeting, etc.
+    User question: {message}. 
+    """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["message"])
+
+    return prompt | get_llm_model().with_structured_output(IsRelevant)
+
+
+def basic_chat():
+    prompt_str = """
+    System: Your are a helpful data analyst, whose task is to answer analytical questions based on the selected 
+    data source.
+    Data source: {database}.
+    User message: {message}.
+    """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["message", "database"])
+
+    return prompt | get_llm_model().with_structured_output(BasicChat)
