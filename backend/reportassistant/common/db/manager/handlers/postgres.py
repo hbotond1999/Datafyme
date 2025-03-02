@@ -75,7 +75,6 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             """)
 
             if result and isinstance(result, list) and len(result) > 0:
-                print(result)
                 return result[0]["ddl"]
             else:
                 raise Exception("Table not exists: " + table_name)

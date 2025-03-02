@@ -41,3 +41,4 @@ class TableDocumentation(BaseModel):
     columns: List[TableColDocumentation]
     use_cases: List[str] = Field(description="Potential use cases for the table")
     common_queries: List[str] = Field(description="Common business queries, questions for the table")
+    raw_ddl: str
