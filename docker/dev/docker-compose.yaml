@@ -128,7 +128,7 @@ services:
       - django-db
       - neo4j
     deploy:
-      replicas: 4
+      replicas: 2
     networks:
       - "docker_network"
 

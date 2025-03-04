@@ -30,9 +30,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 CSRF_COOKIE_SECURE=True
 SESSION_COOKIE_SECURE=True
 
-DEBUG = True if int(os.getenv('DEBUG')) == 1 else False
+DEBUG = int(os.getenv('DEBUG')) == 1
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "backend"]
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
 
 
 # Application definition
