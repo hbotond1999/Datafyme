@@ -79,3 +79,5 @@ LICENSE*
 # Temp files
 .DS_Store
 thumbs.db
+
+.log

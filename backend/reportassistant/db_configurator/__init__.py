@@ -5,4 +5,4 @@ def preload_model():
     BgeM3EmbeddingsModel().get_model().encode_documents(["hello"])
     return
 
-preload_model()
+# preload_model()

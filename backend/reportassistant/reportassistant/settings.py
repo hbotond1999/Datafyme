@@ -14,6 +14,8 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+from decouple import config, Csv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -32,9 +34,14 @@ SESSION_COOKIE_SECURE=True
 
 DEBUG = int(os.getenv('DEBUG')) == 1
 
-ALLOWED_HOSTS = ["127.0.0.1", "backend"]
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+CSRF_TRUSTED_ORIGINS =config('CSRF_TRUSTED_ORIGINS', cast=Csv())
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_ROOT =  os.path.join(BASE_DIR, 'staticfiles')
 
 # Application definition
 
