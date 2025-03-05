@@ -150,6 +150,8 @@ services:
       - django-db
       - neo4j
       - backend
+    volumes:
+      - ./backend/huggingface:/root/.cache/huggingface/
     networks:
       - "docker_network"
 
