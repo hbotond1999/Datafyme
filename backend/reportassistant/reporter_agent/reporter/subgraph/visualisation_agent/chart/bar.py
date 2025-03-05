@@ -10,13 +10,13 @@ from reporter_agent.reporter.subgraph.visualisation_agent.chart.utils import axi
 class BarChart(BaseModel, Chart):
     category_column_name: str = Field(description="This axis displays the categories or groups being compared. Each bar corresponds to one category, such as different products, countries")
     values_column_name: str = Field(description="This axis represents the numerical values associated with each category. The height (or length, in a horizontal bar chart) of each bar shows the value of that category, such as revenue, population, or any other quantitative metric.")
-    date_format: Optional[str] = Field(description='The date format to use, to show values of the x_axis_column in the chart. It should be Python compatible.', default=None)
+    date_or_date_time_format: Optional[str] = Field(description='The date or date time format to use, to show values of the x_axis_column in the chart. It should be Python strftime method compatible.', default=None)
 
     def create_meta_data(self):
         return {
             "x_axis": self.category_column_name,
             "y_axis": self.values_column_name,
-            "date_format": self.date_format
+            "date_format": self.date_or_date_time_format
         }
 
     @classmethod

@@ -163,3 +163,5 @@ cython_debug/
 backend/.idea
 *.env
 data/
+.idea
+docker/dev/backend/huggingface/

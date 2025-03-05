@@ -1,41 +1,43 @@
-# Create stage for Poetry installation
-FROM python:3.12-slim as poetry-base
+FROM python:3.12-slim as deps
 
-# Install required system dependencies for venv
-RUN apt-get update && apt-get install -y \
-    python3-venv \
+RUN pip install --no-cache-dir poetry==1.8.3
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    libffi-dev \
+    libpq-dev \
+    python3-dev \
+    build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Creating a virtual environment just for poetry and install it with pip
-RUN python3 -m venv /opt/poetry-venv \
-    && /opt/poetry-venv/bin/pip install -U pip setuptools \
-    && /opt/poetry-venv/bin/pip install poetry==1.8.3
+WORKDIR /app
 
-# Create a new stage from the base python image
-FROM python:3.12-slim as reoport-assistant
 
-# Copy Poetry to app image
-COPY --from=poetry-base /opt/poetry-venv /opt/poetry-venv
+COPY pyproject.toml poetry.lock ./
 
-# Add Poetry to PATH
-ENV PATH="${PATH}:/opt/poetry-venv/bin"
+
+RUN poetry config virtualenvs.create false \
+    && poetry lock --no-update \
+    && poetry install --no-interaction --no-root
+
+
+FROM python:3.12-slim
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-# Copy Dependencies
-COPY pyproject.toml ./
 
-RUN poetry lock
+COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=deps /usr/local/bin /usr/local/bin
 
-RUN poetry check
-# Install Dependencies
-RUN poetry install --no-interaction --no-cache --without dev
+COPY . .
 
-# Copy Application
-COPY . /app
+WORKDIR /app/reportassistant
 
-WORKDIR reportassistant
 
-#RUN poetry run python manage.py collectstatic --noinput
+EXPOSE 8000

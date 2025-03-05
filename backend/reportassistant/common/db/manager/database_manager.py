@@ -10,7 +10,7 @@ from common.db.manager.abc import DatabaseManagerAbc
 from common.db.manager.handlers import HANDLER
 from common.db.manager.types import TableSchema, Relation, TablePreview
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("reportassistant.default")
 
 
 class DatabaseManager(DatabaseManagerAbc):

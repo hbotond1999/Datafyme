@@ -6,7 +6,7 @@ from pymilvus import connections, utility
 
 from common.vectordb.db.schema import create_collection
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("reportassistant.default")
 
 load_dotenv()
 

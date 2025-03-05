@@ -4,7 +4,7 @@ from typing import Optional, List, Any
 
 from psycopg2.extras import RealDictCursor
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("reportassistant.default")
 
 
 class PostgresHelper:
