@@ -12,13 +12,13 @@ class StackedBarChart(BaseModel, Chart):
     x_axis_column_name: str = Field( description="This x axis displays the categories or groups being compared. Each bar corresponds to one category, such as different products, countries.")
     y_value_column_name: str = Field(description="This represents the values that are being measured and visualized on the y-axis.")
     category_column_name: str = Field( description="This column defines the categories that break down the bars into segments, representing different parts of each total value.")
-    date_format: Optional[str] = Field( description='The date format to use, to show values of the x_axis_column in the chart. It should be Python strftime method compatible.', default=None)
+    date_or_date_time_format: Optional[str] = Field( description='The date or date time format to use, to show values of the x_axis_column in the chart. It should be Python strftime method compatible.', default=None)
     def create_meta_data(self):
         return {
             "x_axis": self.x_axis_column_name,
             "y_axis": self.y_value_column_name,
             "category_column_name": self.category_column_name,
-            "date_format": self.date_format
+            "date_format": self.date_or_date_time_format
         }
 
     @classmethod

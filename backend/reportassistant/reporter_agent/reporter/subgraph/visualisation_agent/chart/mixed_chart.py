@@ -14,7 +14,7 @@ class Dataset(BaseModel):
 class MixedChart(BaseModel, Chart):
     datasets: List[Dataset] = Field(description="The list of datasets, that show on chart")
     labels_column_name: str = Field(description='The column name to show in the chart.')
-    date_format: Optional[str] = Field(description='The date format to use, to show values of the x_axis_column in the chart. It should be Python strftime method compatible.', default=None)
+    date_or_date_time_format: Optional[str] = Field(description='The date or date time format to use, to show values of the x_axis_column in the chart. It should be Python strftime method compatible.', default=None)
 
     def create_meta_data(self) -> Dict[str, str]:
         return self.model_dump()
@@ -24,7 +24,7 @@ class MixedChart(BaseModel, Chart):
     def create_chart_data(cls, chart, data):
         datasets = [{"type": dataset["type"], "data": data[dataset["data_column_name"]], "label": dataset["data_column_name"]} for dataset in chart.meta_data["metadata"]["datasets"]]
         labels_raw = data[chart.meta_data["metadata"]["labels_column_name"]]
-        date_format = chart.meta_data["metadata"]["date_format"]
+        date_format = chart.meta_data["metadata"]["date_or_date_time_format"]
         if date_format:
             labels = axis_date_str_converter(labels_raw, date_format)
         else:

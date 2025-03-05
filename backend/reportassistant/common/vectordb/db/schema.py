@@ -6,7 +6,7 @@ from pymilvus import FieldSchema, DataType, CollectionSchema, MilvusClient, Coll
 
 from common.vectordb.embeddings import BgeM3EmbeddingsModel
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("reportassistant.default")
 
 def create_collection(collection_name: str):
     """

@@ -12,7 +12,7 @@ from db_configurator.models import DatabaseSource
 from common.db.manager.abc import DatabaseManagerAbc
 from common.db.manager.types import TableSchema, Column, Relation, TablePreview
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("reportassistant.default")
 
 
 class PostgresDatabaseManager(DatabaseManagerAbc):

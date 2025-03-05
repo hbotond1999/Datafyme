@@ -10,7 +10,7 @@ from reporter_agent.reporter.subgraph.visualisation_agent.chart.utils import axi
 class LineChart(BaseModel, Chart):
     x_axis_column_name: str = Field(description='Represents the independent variable, often time (e.g., days, months, years).')
     y_axis_column_name: str = Field(description='Shows the dependent variable, the value being measured (e.g., temperature, revenue, or population).')
-    date_format: Optional[str] = Field(description='The date format to use, to show values of the x_axis_column in the chart. It should be Python compatible.', default=None)
+    date_format: Optional[str] = Field(description='The date or date time format to use, to show values of the x_axis_column in the chart. It should be Python compatible.', default=None)
 
     def create_meta_data(self):
         return {
