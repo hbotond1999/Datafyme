@@ -37,7 +37,6 @@ DEBUG = int(os.getenv('DEBUG')) == 1
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 CSRF_TRUSTED_ORIGINS =config('CSRF_TRUSTED_ORIGINS', cast=Csv())
 
-STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
