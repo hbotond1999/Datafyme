@@ -16,6 +16,7 @@ from reporter_agent.reporter.utils import save_graph_png
 
 logger = logging.getLogger('reportassistant.custom')
 
+
 @log(my_logger=logger)
 def summarize_history_node(state: GraphState):
     new_question = create_history_summarizer().invoke(

@@ -1,4 +1,3 @@
-import asyncio
 import json
 from datetime import datetime
 import logging
@@ -8,7 +7,7 @@ from common.vectordb.db.utils import hybrid_search
 from db_configurator.models import TableDocumentation
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent, refine_user_question_agent, \
     filter_relevant_question, basic_chat
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_ddls
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_all_ddl
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import IsRelevant, BasicChat
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
@@ -76,7 +75,18 @@ def get_ddls(state: GraphState):
 
 
 def reranker(state: GraphState):
-    filtered_ddls = asyncio.run(grade_ddls(state))
+    """
+    Args:
+        state (GraphState): A dictionary-like object containing the current state of the graph.
+
+    Returns:
+        dict: A dictionary containing the filtered_table_ddls derived from the result of the ddl grader agent.
+    """
+    logger.info("Running reranker node: we examine the relevance of the tables using an agent.")
+    results = grade_all_ddl().invoke({'message': state["message"], 'ddls': state["matching_table_ddls"]})
+    filtered_ddls = [ddl for relevance, ddl in zip(results, state["matching_table_ddls"]) if relevance]
+
+    logger.info(f"Filtered tables: {[(ddl['schema_name'], ddl['table_name']) for ddl in filtered_ddls]}")
     return {"filtered_table_ddls": filtered_ddls}
 
 

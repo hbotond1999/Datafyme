@@ -1,4 +1,8 @@
+from typing import List, Dict, Any
+
 from pydantic import BaseModel, Field
+
+from db_configurator.models import TableDocumentation
 
 
 class SQLCommand(BaseModel):
@@ -39,3 +43,13 @@ class IsRelevant(BaseModel):
 class BasicChat(BaseModel):
 
     answer: str = Field(description="The answer for the user message")
+
+
+class DDLGrade(BaseModel):
+    grade: bool = Field(description="The retrieved table documentation is relevant for the user question")
+    ddl: List[Dict[str, Any]] = Field(description="The retrieved table documentation")
+
+
+class GradedDDLs(BaseModel):
+    grades: List[bool] = Field(description="The grades of the retrieved table documentations")
+    # grades: List[DDLGrade] = Field(description="The grades of the retrieved table documentations")
