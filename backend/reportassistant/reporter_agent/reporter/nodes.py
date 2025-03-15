@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from datetime import datetime
 
 from common.custom_logging import log
@@ -11,7 +12,7 @@ from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
 from reporter_agent.reporter.subgraph.visualisation_agent.ai.graph import create_graph as create_visu_graph
-
+from reporter_agent.reporter.utils import save_graph_png
 
 logger = logging.getLogger('reportassistant.custom')
 
@@ -25,9 +26,12 @@ def summarize_history_node(state: GraphState):
 
 @log(my_logger=logger)
 def create_sql_query_node(state: GraphState):
-    result = create_sql_agent_graph().invoke({"message": state["question"],
-                                              "database_source": state["database_source"],
-                                              "refine_recursive_limit": 3})
+    sql_agent_graph = create_sql_agent_graph()
+    # save graph image:
+    if int(os.getenv('DEBUG')) == 1:
+        save_graph_png(sql_agent_graph, name='sql_agent_graph')
+    result = sql_agent_graph.invoke({"message": state["question"], "database_source": state["database_source"],
+                                     "refine_recursive_limit": 3})
 
     return {"sql_query": result["sql_query"], "sql_query_description": result["query_description"],
             "table_final_ddls": result["table_final_ddls"]}
@@ -85,6 +89,10 @@ def refine_empty_result_sql_query_node(state: GraphState):
 
 @log(my_logger=logger)
 def create_visualization_node(state: GraphState):
-    result = create_visu_graph().invoke({"question": state["question"], "input_data": state["sql_query_result"], "language": state["language"]})
+    visu_graph = create_visu_graph()
+    # save graph image:
+    if int(os.getenv('DEBUG')) == 1:
+        save_graph_png(visu_graph, name='visu_graph')
+    result = visu_graph.invoke({"question": state["question"], "input_data": state["sql_query_result"], "language": state["language"]})
 
     return {"representation_data": result["final_data"]}

@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
@@ -12,6 +13,7 @@ from chat.utils.message import save_message_from_reporter
 from reporter_agent.reporter.graph import create_reporter_graph
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
+from reporter_agent.reporter.utils import save_graph_png
 from reporter_agent.task import generate_title
 
 
@@ -45,6 +47,9 @@ def chat_view(request):
 
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
                 reporter_graph = create_reporter_graph()
+                # save graph image:
+                if int(os.getenv('DEBUG')) == 1:
+                    save_graph_png(reporter_graph, name='reporter_graph')
                 final_state: GraphState = reporter_graph.invoke(
                     {
                         "database_source": datasource,
