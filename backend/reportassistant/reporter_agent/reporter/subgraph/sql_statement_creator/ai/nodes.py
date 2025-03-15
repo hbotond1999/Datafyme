@@ -18,14 +18,21 @@ logger = logging.getLogger('reportassistant.custom')
 
 
 def filter_basic_chat(state: GraphState):
+    """
+    Args:
+        state (GraphState): A dictionary-like object containing the current state of the graph.
 
+    Returns:
+        dict: A dictionary containing the 'message' which is the original user input.
+    """
+    logger.info("Running filter_basic_chat node: checking if the message is relevant for a reporting tasks.")
     result: IsRelevant = filter_relevant_question().invoke({'message': state["message"]})
 
     if result.is_relevant:
-        logger.info(f"Relevant message")
+        logger.info(f"Relevant message for a reporting tasks")
         return {'message': state["message"]}
     else:
-        logger.info(f"User message is not relevant")
+        logger.info(f"User message is not relevant for a reporting tasks")
         answer: BasicChat = basic_chat().invoke({'message': state["message"],
                                                  'database': state["database_source"].name})
         raise RefineLimitExceededError(answer.answer)
@@ -34,11 +41,12 @@ def filter_basic_chat(state: GraphState):
 def hybrid_search_node(state: GraphState):
     """
     Args:
-        state (GraphState):
+        state (GraphState): A dictionary-like object containing the current state of the graph.
 
     Returns:
-        dict: A dictionary containing the matching_tables
+        dict: A dictionary containing the matching_tables derived from the result of the hybrid search.
     """
+    logger.info("Running hybrid_search_node: selecting matching table descriptions for the user message with hybrid search.")
     collection_name = "TablesDocs"
     similar_docs = hybrid_search(state["message"], collection_name, database_id=state["database_source"].id, limit=15)
     tables = []
@@ -54,11 +62,12 @@ def hybrid_search_node(state: GraphState):
 def get_ddls(state: GraphState):
     """
     Args:
-        state (GraphState):
+        state (GraphState): A dictionary-like object containing the current state of the graph.
 
     Returns:
-        dict: A dictionary containing the matching_tables
+        dict: A dictionary containing the matching_table_ddls filtered from the django database.
     """
+    logger.info("Running get_ddls node: selecting matching table ddls from django database.")
     matching_tables = [(temp["schema"], temp["table_name"]) for temp in state["matching_tables"]]
     json_data = [TableDocumentation.objects.get(database_source=state["database_source"], schema_name=schema,
                                                 table_name=table).to_dict()
@@ -72,12 +81,22 @@ def reranker(state: GraphState):
 
 
 def refine_user_question(state: GraphState):
+    """
+    Args:
+        state (GraphState): A dictionary-like object containing the current state of the graph.
+
+    Returns:
+        dict: A dictionary containing the refined user message derived from the result of the refine user question
+         agent.
+    """
+    logger.info("Running refine_user_question node: refining the incoming user message.")
     refine_recursive_limit = state["refine_recursive_limit"] - 1
     logger.info(f"Actual REFINE RECURSIVE LIMIT value: {refine_recursive_limit}")
 
     if refine_recursive_limit >= 0:
         result = refine_user_question_agent().invoke({'message': state["message"],
                                                       'systemtime': datetime.now().isoformat()})
+        logger.info(f"The refined user message: {result.message}")
         return {"message": result.message, "refine_recursive_limit": refine_recursive_limit}
     else:
         logger.error(f"Refine user message recursive limit exceeded")
@@ -86,6 +105,14 @@ def refine_user_question(state: GraphState):
 
 
 def relation_graph(state: GraphState):
+    """
+    Args:
+        state (GraphState): A dictionary-like object containing the current state of the graph.
+
+    Returns:
+        dict: A dictionary containing all the relevant tables derived from the relations of the neo4j graph database.
+    """
+    logger.info("Running relation_graph node: selecting all the related tables from neo4j graph database.")
     filtered_tables = [(table["schema_name"], table["table_name"]) for table in state['filtered_table_ddls']]
     neo4j_instance = Neo4JInstance()
 
@@ -107,6 +134,14 @@ def relation_graph(state: GraphState):
 
 
 def get_final_ddls(state: GraphState):
+    """
+    Args:
+        state (GraphState): A dictionary-like object containing the current state of the graph.
+
+    Returns:
+        dict: A dictionary containing the 'table_final_ddls' derived from the django database.
+    """
+    logger.info("Running get_final_ddls node: selecting table ddls from django database for the final table set.")
     matching_tables = [(temp["schema"], temp["table_name"]) for temp in state["tables_all"]]
     json_data = [TableDocumentation.objects.get(database_source=state["database_source"], schema_name=schema,
                                                 table_name=table).to_dict()
@@ -124,6 +159,7 @@ def create_query(state: GraphState):
         dict: A dictionary containing the 'result_query' derived from the result of invoking
               the sql agent.
     """
+    logger.info("Running create_query node: creating sql query for the user question.")
     result = sql_agent().invoke({'ddls': json.dumps(state["table_final_ddls"]),
                                  'message': state["message"],
                                  'database': state["database_source"].type,
