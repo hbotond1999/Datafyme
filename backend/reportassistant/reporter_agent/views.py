@@ -1,7 +1,7 @@
 import json
 
 import anthropic
-import google.ai.generativelanguage_v1alpha
+from django.utils.translation import gettext_lazy as _
 import requests
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
@@ -250,11 +250,11 @@ def test_google_with_langchain(api_key, model_name, test_message):
 
         return {
             'success': True,
-            'message': 'API kulcs érvényes és működőképes.',
+            'message': _('API kulcs érvényes és működőképes.'),
             'models': get_google_models(api_key)
         }
     except Exception as e:
-        return {'success': False, 'message': f'API kulcs teszt sikertelen: {str(e)}'}
+        return {'success': False, 'message': _('API kulcs teszt sikertelen') + f': {str(e)}'}
 
 
 def get_openai_models(api_key):

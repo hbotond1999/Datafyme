@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-15 17:54+0100\n"
-"PO-Revision-Date: 2025-03-15 18:01+0000\n"
+"POT-Creation-Date: 2025-03-15 18:17+0100\n"
+"PO-Revision-Date: 2025-03-15 18:18+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -380,6 +380,14 @@ msgstr "Invalid API key or network error"
 #: .\reporter_agent\templates\reporter_agent\model_form.html:175
 msgid "Validate API key first"
 msgstr "Validate API key first"
+
+#: .\reporter_agent\views.py:253
+msgid "API kulcs érvényes és működőképes."
+msgstr "API key is valid!"
+
+#: .\reporter_agent\views.py:257
+msgid "API kulcs teszt sikertelen"
+msgstr "API key is not valid!"
 
 #~ msgid "Establish a New Connection"
 #~ msgstr "Establish a new connection"
