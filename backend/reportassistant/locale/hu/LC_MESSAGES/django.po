@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-26 16:37+0100\n"
-"PO-Revision-Date: 2025-01-26 16:38+0000\n"
+"POT-Creation-Date: 2025-03-15 17:54+0100\n"
+"PO-Revision-Date: 2025-03-15 17:59+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -35,12 +35,13 @@ msgstr "AI"
 msgid "HUMAN"
 msgstr "Ember"
 
-#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:89
+#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:95
 #: .\chat\templates\chat\chat_history.html:32
 msgid "You"
 msgstr "Te"
 
-#: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:106
+#: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:46
+#: .\chat\templates\chat\chat.html:112 .\chat\templates\chat\chat.html:124
 #: .\chat\templates\chat\chat_history.html:34
 msgid "System"
 msgstr "Rendszer"
@@ -49,16 +50,15 @@ msgstr "Rendszer"
 msgid "Chat History"
 msgstr "Chat történet"
 
-#: .\chat\templates\chat\chat_history.html:42
-#| msgid "Start New Conversation"
+#: .\chat\templates\chat\chat_history.html:44
 msgid "Continue Conversation"
 msgstr "Beszélgetés folytatása"
 
-#: .\chat\templates\chat\chat_history.html:49
+#: .\chat\templates\chat\chat_history.html:51
 msgid "No chat history available."
 msgstr "No chat history available."
 
-#: .\chat\templates\chat\chat_history.html:53
+#: .\chat\templates\chat\chat_history.html:55
 msgid "Start New Conversation"
 msgstr "Új beszélgetés kezdése"
 
@@ -75,11 +75,12 @@ msgid "required"
 msgstr "Kötelező"
 
 #: .\dashboard\templates\add_dashboard.html:21
-#: .\db_configurator\templates\db_configurator\add-database-form.html:60
+#: .\db_configurator\templates\db_configurator\database-form.html:61
 msgid "Close"
 msgstr "Bezárás"
 
 #: .\dashboard\templates\add_dashboard.html:22
+#: .\reporter_agent\templates\reporter_agent\model_form.html:69
 msgid "Save"
 msgstr "Mentés"
 
@@ -91,99 +92,93 @@ msgstr "Az adatbázis betöltése sikeres"
 msgid "ERROR_TO_LOAD_DATABASE"
 msgstr "Váratlan hiba történ a betöltés során"
 
-#: .\db_configurator\templates\db_configurator\add-database-form.html:7
-msgid "Establish a New Connection"
-msgstr "Új kapcsolat felvétele"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:18
-msgid "Select a type"
-msgstr "Válasszon típust"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:25
-msgid "Database name"
-msgstr "Adatbázis neve"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:29
-#: .\db_configurator\templates\db_configurator\connections-table.html:11
-msgid "Display name"
-msgstr "Megjelenítendő név"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:33
-msgid "Username"
-msgstr "Felhasználónév"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:37
-msgid "Password"
-msgstr "Jelszó"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:46
-#: .\db_configurator\templates\db_configurator\connections-table.html:13
-msgid "Host"
-msgstr "Host"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:50
-#: .\db_configurator\templates\db_configurator\connections-table.html:14
-msgid "Port"
-msgstr "Port"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:61
-msgid "Save Connection"
-msgstr "Kapcsolat mentése"
-
-#: .\db_configurator\templates\db_configurator\connections-table.html:4
+#: .\db_configurator\templates\db_configurator\connections-table.html:5
 msgid "Add new database"
 msgstr "Új adatbázis felvétele"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:10
+#: .\db_configurator\templates\db_configurator\connections-table.html:12
 msgid "Name"
 msgstr "Név"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:12
+#: .\db_configurator\templates\db_configurator\connections-table.html:13
+#: .\db_configurator\templates\db_configurator\database-form.html:30
+msgid "Display name"
+msgstr "Megjelenítendő név"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:14
 msgid "Type"
 msgstr "Típus"
 
 #: .\db_configurator\templates\db_configurator\connections-table.html:15
+#: .\db_configurator\templates\db_configurator\database-form.html:34
+msgid "Username"
+msgstr "Felhasználónév"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:16
+#: .\db_configurator\templates\db_configurator\database-form.html:47
+msgid "Host"
+msgstr "Host"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:17
+#: .\db_configurator\templates\db_configurator\database-form.html:51
+msgid "Port"
+msgstr "Port"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:18
 msgid "Access group"
 msgstr "Hozzáférő csoport"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:16
+#: .\db_configurator\templates\db_configurator\connections-table.html:19
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:23
+#: .\reporter_agent\templates\reporter_agent\model-list.html:30
 msgid "Status"
 msgstr "Státusz"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:17
+#: .\db_configurator\templates\db_configurator\connections-table.html:20
+#: .\reporter_agent\templates\reporter_agent\model-list.html:31
 msgid "Actions"
 msgstr "Műveletek"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:31
+#: .\db_configurator\templates\db_configurator\connections-table.html:35
 msgid "Paused"
 msgstr "Felfügesztett"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:33
+#: .\db_configurator\templates\db_configurator\connections-table.html:37
 msgid "LOADING"
 msgstr "Feldolgozás"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:35
+#: .\db_configurator\templates\db_configurator\connections-table.html:39
 msgid "READY"
 msgstr "Kész"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:37
+#: .\db_configurator\templates\db_configurator\connections-table.html:41
 #: .\home\models.py:13
 msgid "ERROR"
 msgstr "Hiba"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:45
-msgid "Resume"
-msgstr "Folytatás"
+#: .\db_configurator\templates\db_configurator\database-form.html:7
+#, fuzzy
+#| msgid "Save Connection"
+msgid "Connection"
+msgstr "Kapcsolat mentése"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:47
-msgid "Pause"
-msgstr "Felfügeszt"
+#: .\db_configurator\templates\db_configurator\database-form.html:19
+msgid "Select a type"
+msgstr "Válasszon típust"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:53
-msgid "Delete"
-msgstr "Törlés"
+#: .\db_configurator\templates\db_configurator\database-form.html:26
+msgid "Database name"
+msgstr "Adatbázis neve"
 
-#: .\db_configurator\views.py:61
+#: .\db_configurator\templates\db_configurator\database-form.html:38
+msgid "Password"
+msgstr "Jelszó"
+
+#: .\db_configurator\templates\db_configurator\database-form.html:62
+msgid "Save Connection"
+msgstr "Kapcsolat mentése"
+
+#: .\db_configurator\views.py:72
 msgid "Could not connect to database"
 msgstr "Nem lehet csatlakozni az adatbázishoz"
 
@@ -203,29 +198,193 @@ msgstr "Veszély"
 msgid "CRITICAL"
 msgstr "Hiba"
 
-#: .\home\templates\base_generic.html:28
+#: .\home\templates\base_generic.html:29
 msgid "Start Chat"
 msgstr "Chat kezdése"
 
-#: .\home\templates\base_generic.html:31
+#: .\home\templates\base_generic.html:32
 msgid "Chat history"
 msgstr "Chat történet"
 
-#: .\home\templates\base_generic.html:35
+#: .\home\templates\base_generic.html:36
 msgid "DB connections"
 msgstr "Adatbázis kapcsolatok"
 
-#: .\home\templates\base_generic.html:74
+#: .\home\templates\base_generic.html:41
+msgid "LLM models"
+msgstr "LLM modellek"
+
+#: .\home\templates\base_generic.html:80
 msgid "Logout"
 msgstr "Kilépés"
 
-#: .\reportassistant\settings.py:139
+#: .\reportassistant\settings.py:146
 msgid "English"
 msgstr "Angol"
 
-#: .\reportassistant\settings.py:140
+#: .\reportassistant\settings.py:147
 msgid "Hungarian"
 msgstr "Magyar"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:10
+#, fuzzy
+#| msgid "Delete"
+msgid "Delete model"
+msgstr "Törlés"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:13
+#, fuzzy
+#| msgid "Delete"
+msgid "Delete confirm"
+msgstr "Törlés"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:19
+#: .\reporter_agent\templates\reporter_agent\model-list.html:29
+#: .\reporter_agent\templates\reporter_agent\model_form.html:35
+msgid "API Key"
+msgstr "API kulcs"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:25
+#: .\reporter_agent\templates\reporter_agent\model-list.html:44
+#, fuzzy
+#| msgid "Actions"
+msgid "Active"
+msgstr "Műveletek"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:27
+#: .\reporter_agent\templates\reporter_agent\model-list.html:46
+msgid "Inactive"
+msgstr "Inaktív"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:36
+msgid ""
+"Warning: This is an active model. After deletion, there will be no active "
+"GenAI model until you set up a new one."
+msgstr ""
+"Figyelmeztetés: Ez egy aktív modell. Törlése után nem lesz aktív LLM modell,"
+" amíg nem állít be egy újat."
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:44
+msgid "Cancel"
+msgstr "Mégsem"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:47
+msgid "Confirm Deletion"
+msgstr "Törlés megerősítése"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:7
+msgid "GenAI Models"
+msgstr "LLM modellek"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:9
+msgid "New model"
+msgstr "Új modell"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:27
+#: .\reporter_agent\templates\reporter_agent\model_form.html:23
+msgid "Provider"
+msgstr "Szolgáltató"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:28
+#: .\reporter_agent\templates\reporter_agent\model_form.html:48
+msgid "Model name"
+msgstr "Modell neve"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:52
+msgid "Edit"
+msgstr "Szekesztés"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:55
+msgid "Delete"
+msgstr "Törlés"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:66
+msgid ""
+"No GenAI models added yet. Click the \"New model\" button to create a new "
+"model."
+msgstr ""
+"Nincs még LLM modell hozzáadva. Kattintson az \"Új modell\" gombra egy új "
+"modell létrehozásához"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:12
+msgid "Create New GenAI Model"
+msgstr "Új LLM Modell Létrehozása"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:14
+msgid "Edit GenAI Model"
+msgstr "LLM Modell Szerkesztése"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:25
+#, fuzzy
+#| msgid "Select a type"
+msgid "Select a provider"
+msgstr "Válasszon típust"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:37
+msgid "Provider API key to fetch models"
+msgstr "A szolgáltató API kulcsa a modellek lekérdezéséhez"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:42
+#: .\reporter_agent\templates\reporter_agent\model_form.html:160
+msgid "Fetch models"
+msgstr "Modellek lekérdezése"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:53
+msgid "Fetch models first"
+msgstr "Először kérdezze le a modelleket"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:60
+msgid "Active model"
+msgstr "Aktív modell"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:61
+msgid ""
+"Only one model can be active. If checked, all other models will be made "
+"inactive."
+msgstr ""
+"Csak egy modell lehet aktív. Ha bejelöli, az összes többi modell inaktív "
+"lesz."
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:66
+msgid "Back"
+msgstr "Vissza"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:95
+msgid "Please select a provider!"
+msgstr "Kérjük, válasszon szolgáltatót!"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:100
+msgid "Please enter an API key!"
+msgstr "Kérjük, adja meg az API kulcsot!"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:104
+msgid "Validating API key with \\"
+msgstr "API kulcs validálása, \"Hello World\" teszttel..."
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:107
+msgid "Validating..."
+msgstr "Validálás..."
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:122
+msgid "Error testing API key"
+msgstr "Hiba a API kulcs tesztelésekor"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:152
+msgid "Invalid API key or network error"
+msgstr "Érvénytelen API kulcs vagy hálózati hiba"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:175
+msgid "Validate API key first"
+msgstr "Először validálja az API kulcsot"
+
+#~ msgid "Establish a New Connection"
+#~ msgstr "Új kapcsolat felvétele"
+
+#~ msgid "Resume"
+#~ msgstr "Folytatás"
+
+#~ msgid "Pause"
+#~ msgstr "Felfügeszt"
 
 #~ msgid "Running"
 #~ msgstr "Futó"

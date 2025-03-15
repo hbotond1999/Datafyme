@@ -1,4 +1,5 @@
 {% extends 'base_generic.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-4">
@@ -8,9 +9,9 @@
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">
                         {% if action == 'create' %}
-                            Új GenAI Modell Létrehozása
+                            {% trans 'Create New GenAI Model' %}
                         {% else %}
-                            GenAI Modell Szerkesztése
+                            {% trans 'Edit GenAI Model' %}
                         {% endif %}
                     </h3>
                 </div>
@@ -19,9 +20,9 @@
                         {% csrf_token %}
 
                         <div class="mb-3">
-                            <label for="provider" class="form-label">Szolgáltató</label>
+                            <label for="provider" class="form-label">{% trans 'Provider' %}</label>
                             <select class="form-select" id="provider" name="provider" required>
-                                <option value="" selected disabled>Válasszon szolgáltatót</option>
+                                <option value="" selected disabled>{% trans 'Select a provider' %}</option>
                                 {% for key, value in providers.items %}
                                     <option value="{{ key }}" {% if model and model.provider == key %}selected{% endif %}>
                                         {{ value }}
@@ -31,41 +32,41 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="api_key" class="form-label">API Kulcs</label>
+                            <label for="api_key" class="form-label">{% trans 'API Key' %}</label>
                             <input type="password" class="form-control" id="api_key" name="api_key" value="{{ model.api_key|default:'' }}" required>
-                            <small class="form-text text-muted">A szolgáltató API kulcsa a modellek lekérdezéséhez</small>
+                            <small class="form-text text-muted">{% trans 'Provider API key to fetch models' %}</small>
                         </div>
 
                         <div class="mb-3">
                             <button type="button" id="fetch-models" class="btn btn-outline-primary">
-                                <i class="bi bi-cloud-download"></i> Modellek lekérdezése
+                                <i class="bi bi-cloud-download"></i> {% trans 'Fetch models' %}
                             </button>
                             <div id="fetch-status" class="mt-2"></div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="name" class="form-label">Modell neve</label>
+                            <label for="name" class="form-label">{% trans 'Model name' %}</label>
                             <select class="form-select" id="name" name="name" required {% if not model %}disabled{% endif %}>
                                 {% if model %}
                                     <option value="{{ model.name }}" selected>{{ model.name }}</option>
                                 {% else %}
-                                    <option value="" selected disabled>Először kérdezze le a modelleket</option>
+                                    <option value="" selected disabled>{% trans 'Fetch models first' %}</option>
                                 {% endif %}
                             </select>
                         </div>
 
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="active" name="active" {% if model and model.active %}checked{% endif %}>
-                            <label class="form-check-label" for="active">Aktív modell</label>
-                            <small class="form-text text-muted d-block">Csak egy modell lehet aktív. Ha bejelöli, az összes többi modell inaktív lesz.</small>
+                            <label class="form-check-label" for="active">{% trans 'Active model' %}</label>
+                            <small class="form-text text-muted d-block">{% trans 'Only one model can be active. If checked, all other models will be made inactive.' %}</small>
                         </div>
 
                         <div class="d-flex justify-content-between">
                             <a href="{% url 'reporter_agent:genai_model_list' %}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Vissza
+                                <i class="bi bi-arrow-left"></i> {% trans 'Back' %}
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Mentés
+                                <i class="bi bi-save"></i> {% trans 'Save' %}
                             </button>
                         </div>
                     </form>
@@ -91,19 +92,19 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchStatus.innerHTML = '';
 
         if (!provider) {
-            showStatus('Kérjük, válasszon szolgáltatót!', 'danger');
+            showStatus('{% trans "Please select a provider!" %}', 'danger');
             return false;
         }
 
         if (!apiKey) {
-            showStatus('Kérjük, adja meg az API kulcsot!', 'danger');
+            showStatus('{% trans "Please enter an API key!" %}', 'danger');
             return false;
         }
 
-        showStatus('API kulcs validálása "Hello World" teszttel...', 'info');
+        showStatus('{% trans "Validating API key with \"Hello World\" test..." %}', 'info');
 
         fetchModelsBtn.disabled = true;
-        fetchModelsBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Validálás...';
+        fetchModelsBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {% trans "Validating..." %}';
 
         fetch('{% url "reporter_agent:test_api_key" %}', {
             method: 'POST',
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Hiba a API kulcs tesztelésekor');
+                throw new Error('{% trans "Error testing API key" %}');
             }
             return response.json();
         })
@@ -148,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            nameSelect.innerHTML = '<option value="" selected disabled>Érvénytelen API kulcs vagy hálózati hiba</option>';
+            nameSelect.innerHTML = '<option value="" selected disabled>{% trans "Invalid API key or network error" %}</option>';
             nameSelect.disabled = true;
             showStatus('❌ ' + error.message, 'danger');
             return false;
@@ -156,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .finally(() => {
             // Re-enable the fetch button
             fetchModelsBtn.disabled = false;
-            fetchModelsBtn.innerHTML = '<i class="bi bi-cloud-download"></i> Modellek lekérdezése';
+            fetchModelsBtn.innerHTML = '<i class="bi bi-cloud-download"></i> {% trans "Fetch models" %}';
         });
     }
 
@@ -171,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     providerSelect.addEventListener('change', function() {
-        nameSelect.innerHTML = '<option value="" selected disabled>Először validálja az API kulcsot</option>';
+        nameSelect.innerHTML = '<option value="" selected disabled>{% trans "Validate API key first" %}</option>';
         nameSelect.disabled = true;
         fetchStatus.innerHTML = '';
 
