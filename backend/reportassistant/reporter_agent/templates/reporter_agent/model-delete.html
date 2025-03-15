@@ -1,0 +1,56 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Modell törlése</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Biztosan törölni szeretné a következő GenAI modellt?</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ model.provider }} - {{ model.name }}</h5>
+                            <p class="card-text">
+                                <strong>API Kulcs:</strong> 
+                                <span class="text-muted">{{ model.api_key|slice:":5" }}...{{ model.api_key|slice:"-5:" }}</span>
+                            </p>
+                            <p class="card-text">
+                                <strong>Állapot:</strong>
+                                {% if model.active %}
+                                    <span class="badge bg-success">Aktív</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inaktív</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if model.active %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            Figyelmeztetés: Ez egy aktív modell. Törlése után nem lesz aktív GenAI modell, 
+                            amíg nem állít be egy újat.
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'reporter_agent:genai_model_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Mégsem
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Törlés megerősítése
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

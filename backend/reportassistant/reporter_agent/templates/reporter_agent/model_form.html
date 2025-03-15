@@ -1,0 +1,196 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        {% if action == 'create' %}
+                            Új GenAI Modell Létrehozása
+                        {% else %}
+                            GenAI Modell Szerkesztése
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="genai-model-form">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="provider" class="form-label">Szolgáltató</label>
+                            <select class="form-select" id="provider" name="provider" required>
+                                <option value="" selected disabled>Válasszon szolgáltatót</option>
+                                {% for key, value in providers.items %}
+                                    <option value="{{ key }}" {% if model and model.provider == key %}selected{% endif %}>
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="api_key" class="form-label">API Kulcs</label>
+                            <input type="password" class="form-control" id="api_key" name="api_key" value="{{ model.api_key|default:'' }}" required>
+                            <small class="form-text text-muted">A szolgáltató API kulcsa a modellek lekérdezéséhez</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="button" id="fetch-models" class="btn btn-outline-primary">
+                                <i class="bi bi-cloud-download"></i> Modellek lekérdezése
+                            </button>
+                            <div id="fetch-status" class="mt-2"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Modell neve</label>
+                            <select class="form-select" id="name" name="name" required {% if not model %}disabled{% endif %}>
+                                {% if model %}
+                                    <option value="{{ model.name }}" selected>{{ model.name }}</option>
+                                {% else %}
+                                    <option value="" selected disabled>Először kérdezze le a modelleket</option>
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="active" name="active" {% if model and model.active %}checked{% endif %}>
+                            <label class="form-check-label" for="active">Aktív modell</label>
+                            <small class="form-text text-muted d-block">Csak egy modell lehet aktív. Ha bejelöli, az összes többi modell inaktív lesz.</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'reporter_agent:genai_model_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Vissza
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Mentés
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fetchModelsBtn = document.getElementById('fetch-models');
+    const providerSelect = document.getElementById('provider');
+    const apiKeyInput = document.getElementById('api_key');
+    const nameSelect = document.getElementById('name');
+    const fetchStatus = document.getElementById('fetch-status');
+
+    function validateAndFetchModels() {
+        const provider = providerSelect.value;
+        const apiKey = apiKeyInput.value;
+
+        fetchStatus.innerHTML = '';
+
+        if (!provider) {
+            showStatus('Kérjük, válasszon szolgáltatót!', 'danger');
+            return false;
+        }
+
+        if (!apiKey) {
+            showStatus('Kérjük, adja meg az API kulcsot!', 'danger');
+            return false;
+        }
+
+        showStatus('API kulcs validálása "Hello World" teszttel...', 'info');
+
+        fetchModelsBtn.disabled = true;
+        fetchModelsBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Validálás...';
+
+        fetch('{% url "reporter_agent:test_api_key" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': Cookies.get('csrftoken')
+            },
+            body: JSON.stringify({
+                provider: provider,
+                api_key: apiKey
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Hiba a API kulcs tesztelésekor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+            nameSelect.innerHTML = '';
+            nameSelect.disabled = false;
+
+            data.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                nameSelect.appendChild(option);
+            });
+
+            {% if model %}
+            const existingOption = Array.from(nameSelect.options).find(option => option.value === "{{ model.name }}");
+            if (existingOption) {
+                existingOption.selected = true;
+            }
+            {% endif %}
+
+            showStatus('✓ ' + data.message, 'success');
+            return true;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            nameSelect.innerHTML = '<option value="" selected disabled>Érvénytelen API kulcs vagy hálózati hiba</option>';
+            nameSelect.disabled = true;
+            showStatus('❌ ' + error.message, 'danger');
+            return false;
+        })
+        .finally(() => {
+            // Re-enable the fetch button
+            fetchModelsBtn.disabled = false;
+            fetchModelsBtn.innerHTML = '<i class="bi bi-cloud-download"></i> Modellek lekérdezése';
+        });
+    }
+
+
+    fetchModelsBtn.addEventListener('click', validateAndFetchModels);
+
+    apiKeyInput.addEventListener('blur', function() {
+        if (apiKeyInput.value && providerSelect.value) {
+            validateAndFetchModels();
+        }
+    });
+
+
+    providerSelect.addEventListener('change', function() {
+        nameSelect.innerHTML = '<option value="" selected disabled>Először validálja az API kulcsot</option>';
+        nameSelect.disabled = true;
+        fetchStatus.innerHTML = '';
+
+
+        if (apiKeyInput.value) {
+            setTimeout(validateAndFetchModels, 100);
+        }
+    });
+
+    {% if model and model.api_key %}
+    setTimeout(function() {
+        validateAndFetchModels();
+    }, 300);
+    {% endif %}
+
+    function showStatus(message, type) {
+        fetchStatus.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}
