@@ -4,7 +4,7 @@
          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
              <div class="modal-content">
                  <div class="modal-header">
-                    <h5 class="modal-title">{% trans "Establish a New Connection" %}</h5>
+                    <h5 class="modal-title">{% trans "Connection" %}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                  <div class="modal-body">
@@ -12,6 +12,7 @@
                         <div class="col-md-12">
                         <form id="databaseForm" method="POST" novalidate >
                         {% csrf_token %}
+                            <input type="number" hidden="hidden" id="db_id" name="id">
                         <div class="mb-3">
                             <label for="id_type" class="form-label">Database Type</label>
                             <select class="form-select" id="id_type" name="type">
@@ -53,7 +54,7 @@
 {#                        <button type="submit" class="btn btn-primary w-100">Save Connection</button>#}
                         </form>
                         </div>
-
+                     <div id="save_form_errors"></div>
                     </div>
                  </div>
                      <div class="modal-footer">
@@ -69,6 +70,16 @@
     </div>
 
 <script>
+
+    document.getElementById('addDatabaseModal').addEventListener('show.bs.modal', () => {
+        resetErrorMessage();
+        const form = document.getElementById('databaseForm');
+        form.reset();
+        form.removeAttribute('data-database-id');
+        form.querySelectorAll(".error-message").forEach(el => el.remove());
+        form.querySelectorAll(".is-invalid").forEach(el => el.classList.remove("is-invalid"));
+    });
+    const errorContainer = document.getElementById("save_form_errors");
     const submitButton = document.getElementById("submitButton");
     const dbLoaderSpinner = document.getElementById('db-loader-spinner');
 
@@ -76,21 +87,22 @@
     submitButton.style.display = 'block';
 
     submitButton.addEventListener('click', () => {
+        resetErrorMessage()
         const form = document.getElementById("databaseForm");
         const formData = new FormData(form);
 
         submitButton.style.display = 'none';
         dbLoaderSpinner.style.display = 'block';
 
-        // Töröljük az előző hibajelzéseket
+        // Clear previous error messages
         document.querySelectorAll(".error-message").forEach(el => el.remove());
         document.querySelectorAll(".is-invalid").forEach(el => el.classList.remove("is-invalid"));
 
-        fetch("{% url 'db_configurator:add_connection' %}", {
+        fetch("{% url 'db_configurator:connection' %}", {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken') // Django CSRF token
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
             }
         })
         .then(response => {
@@ -107,8 +119,31 @@
             } else {
                 const errors = JSON.parse(data.errors);
 
-                // Hibák megjelenítése
                 for (const [field, errorList] of Object.entries(errors)) {
+                    console.log(field, errorList)
+                    if (field === "__all__") {
+
+                        errorContainer.innerHTML = "";
+
+                        const alertDiv = document.createElement("div");
+                        alertDiv.style.wordBreak = "break-all";
+                        alertDiv.style.overflowWrap = "break-word";
+                        alertDiv.className = "alert alert-danger alert-dismissible fade show";
+                        alertDiv.role = "alert";
+
+                        alertDiv.textContent = errorList.map(error => error.message).join(", ");
+
+                        const dismissButton = document.createElement("button");
+                        dismissButton.type = "button";
+                        dismissButton.className = "btn-close";
+                        dismissButton.setAttribute("data-bs-dismiss", "alert");
+                        dismissButton.setAttribute("aria-label", "Close");
+                        alertDiv.appendChild(dismissButton);
+
+                        errorContainer.appendChild(alertDiv);
+                        errorContainer.style.display = "block";
+                        continue;
+                    }
                     const inputElement = form.querySelector(`[name="${field}"]`);
                     if (inputElement) {
                         inputElement.classList.add("is-invalid");
@@ -120,16 +155,15 @@
                     }
                 }
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An unexpected error occurred.');
-        })
-        .finally(() => {
-            dbLoaderSpinner.style.display = 'none';
-            submitButton.style.display = 'block';
-        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        dbLoaderSpinner.style.display = 'none';
+        submitButton.style.display = 'block';
     });
+});
     const passWordField = document.getElementById("id_password")
 
     document.getElementById("togglePassword").addEventListener('click', () => {
@@ -139,4 +173,10 @@
            passWordField.type = "password";
           }
     })
+
+    function resetErrorMessage() {
+        while (errorContainer.firstChild) {
+            errorContainer.removeChild(errorContainer.firstChild);
+        }
+    }
 </script>

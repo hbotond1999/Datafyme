@@ -1,8 +1,10 @@
+{% load static %}
 {% load i18n %}
-<div class="container mt-4">
+<div class="container mt-12">
 {% if perms.db_configurator.add_databasesource %}
         <button id="openAddDatabaseModal" class="btn btn-primary w-25 mb-2" data-bs-toggle="modal" data-bs-target="#addDatabaseModal">{% trans 'Add new database' %}</button>
 {% endif %}
+<script src="{% static 'db_connector/js/db_configurator.js' %}"></script>
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead>
@@ -10,6 +12,7 @@
                         <th>{% trans 'Name' %}</th>
                          <th>{% trans 'Display name' %}</th>
                         <th>{% trans 'Type' %}</th>
+                        <th>{% trans 'Username' %}</th>
                         <th>{% trans 'Host' %}</th>
                         <th>{% trans 'Port' %}</th>
                         <th>{% trans 'Access group' %}</th>
@@ -20,12 +23,13 @@
                 <tbody>
                     {% for database in databases %}
                     <tr>
-                        <td>{{ database.name }}</td>
-                        <td>{{ database.display_name }}</td>
-                        <td>{{ database.type }}</td>
-                        <td>{{ database.host }}</td>
-                        <td>{{ database.port }}</td>
-                      <td>{{ database.group.name }}</td>
+                        <td data-db-name="{{ database.id }}">{{ database.name }}</td>
+                        <td data-display-name="{{ database.id }}">{{ database.display_name }}</td>
+                        <td data-db-type="{{ database.id }}">{{ database.type }}</td>
+                        <td data-db-user="{{ database.id }}">{{ database.username }}</td>
+                        <td data-db-host="{{ database.id }}">{{ database.host }}</td>
+                        <td data-db-port="{{ database.id }}">{{ database.port }}</td>
+                      <td data-db-group="{{ database.id }}">{{ database.group.name }}</td>
                         <td>
                             {% if database.status == 'PAUSED'  %}
                                 <span class="badge bg-warning">{% trans 'Paused' %}</span>
@@ -40,17 +44,18 @@
                         <td>
                             <div class="btn-group" role="group">
                                 {% if perms.db_configurator.change_databasesource and database.status != 'LOADING' and database.status != 'ERROR'%}
+                                    <button type="button" class="btn btn-primary" onclick="populateDatabaseFormForEdit({{ database.id }})"> <i class="fas fa-edit"></i></button>
                                     <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
                                         {% if database.status == 'PAUSED' %}
-                                            <i class="fas fa-play"></i> {% trans 'Resume' %}
+                                            <i class="fas fa-play"></i>
                                         {% else %}
-                                            <i class="fas fa-pause"></i>  {% trans 'Pause' %}
+                                            <i class="fas fa-pause"></i>
                                         {% endif %}
                                     </a>
                                {% endif %}
                                 {% if perms.db_configurator.delete_databasesource and database.status != 'LOADING'%}
                                     <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> {% trans 'Delete' %}
+                                        <i class="fas fa-trash"></i>
                                     </a>
                                 {% endif %}
 
