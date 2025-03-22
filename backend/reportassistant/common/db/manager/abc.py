@@ -30,7 +30,7 @@ class DatabaseManagerAbc(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
+    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list', row_num: int = None):
         pass
 
     @abc.abstractmethod

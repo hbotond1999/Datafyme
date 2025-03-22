@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-15 18:17+0100\n"
-"PO-Revision-Date: 2025-03-15 18:18+0000\n"
+"POT-Creation-Date: 2025-03-22 17:18+0100\n"
+"PO-Revision-Date: 2025-03-22 17:47+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -35,16 +35,21 @@ msgstr "AI"
 msgid "HUMAN"
 msgstr "Ember"
 
-#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:95
+#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:94
 #: .\chat\templates\chat\chat_history.html:32
 msgid "You"
 msgstr "Te"
 
 #: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:46
-#: .\chat\templates\chat\chat.html:112 .\chat\templates\chat\chat.html:124
+#: .\chat\templates\chat\chat.html:111 .\chat\templates\chat\chat.html:123
 #: .\chat\templates\chat\chat_history.html:34
 msgid "System"
 msgstr "Rendszer"
+
+#: .\chat\templates\chat\chat.html:82
+#: .\chat\templates\chat\chat_history.html:64
+msgid "download"
+msgstr "A táblázat csak előnézet, teljes letöltése"
 
 #: .\chat\templates\chat\chat_history.html:11
 msgid "Chat History"
@@ -377,11 +382,11 @@ msgstr "Érvénytelen API kulcs vagy hálózati hiba"
 msgid "Validate API key first"
 msgstr "Először validálja az API kulcsot"
 
-#: .\reporter_agent\views.py:253
+#: .\reporter_agent\views.py:284
 msgid "API kulcs érvényes és működőképes."
 msgstr "API kulcs érvényes és működőképes."
 
-#: .\reporter_agent\views.py:257
+#: .\reporter_agent\views.py:288
 msgid "API kulcs teszt sikertelen"
 msgstr "API kulcs teszt sikertelen"
 

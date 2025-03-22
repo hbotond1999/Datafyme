@@ -239,9 +239,9 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             raise e
 
 
-    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list'):
+    def execute_sql(self, sql: str, response_format: Literal["dict", "list", "series", "split", "tight", "index"] = 'list', row_num: int = None):
         try:
-            result = self.db_manager.execute_query(sql)
+            result = self.db_manager.execute_query(sql, row_num=row_num)
             if result and isinstance(result, list):
                 result_df = pd.DataFrame(result)
                 if response_format == "list":

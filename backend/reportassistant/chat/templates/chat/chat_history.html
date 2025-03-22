@@ -61,7 +61,7 @@
 <script src="{% static 'chat/js/chart.js' %}"></script>
 <script>
     document.querySelectorAll('.custom-chart').forEach(function(element) {
-        new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', '', null, element, element.dataset.id, false);
+        new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', '', null, element, element.dataset.id, false, false, false, '{% url "reporter_agent:download_chart" 0 %}'.replace('0', element.dataset.id) , '{% trans 'download' %}');
     });
 </script>
 {% endblock %}

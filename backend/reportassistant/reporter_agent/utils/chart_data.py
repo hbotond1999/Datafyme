@@ -10,10 +10,12 @@ from reporter_agent.reporter.subgraph.visualisation_agent.chart import ChartType
 def create_chart_data(chart: Chart):
     database_manager = DatabaseManager(chart.data_source)
     try:
-        data = database_manager.execute_sql(chart.sql_query, "list")
+
         if chart.type == "TABLE":
+            data = database_manager.execute_sql(chart.sql_query, "list", row_num=20)
             return data
         else:
+            data = database_manager.execute_sql(chart.sql_query, "list")
             chart_class = CHART_RESPONSE_MAPPING.get(chart.type, None)
 
             if chart_class is None:

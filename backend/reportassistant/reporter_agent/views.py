@@ -10,7 +10,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.utils.translation import get_language
 from langchain_google_genai import ChatGoogleGenerativeAI
-
+import pandas as pd
+from django.http import HttpResponse
+import io
+from datetime import datetime
+import re
+from common.db.manager.database_manager import DatabaseManager
 from db_configurator.models import DatabaseSource
 from reporter_agent.models import Chart, GenAIModel, GenAIModelTypes
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
@@ -69,6 +74,38 @@ def generate_description(request):
         return JsonResponse(data={"description": result.description})
     else:
         return HttpResponseNotAllowed(['POST'])
+
+
+@login_required(login_url='/login')
+def download_chart(request, chart_id):
+
+
+    chart = get_object_or_404(Chart, id=chart_id)
+
+    data = DatabaseManager(db_source=chart.data_source).execute_sql(chart.sql_query, response_format="list")
+    df = pd.DataFrame(data)
+
+    buffer = io.BytesIO()
+    df.to_excel(buffer, sheet_name='Chart Data', index=False, engine='xlsxwriter')
+
+    buffer.seek(0)
+
+    if hasattr(chart, 'title') and chart.title:
+        sanitized_title = re.sub(r'[\\/*?:"<>|]', '', chart.title)
+        sanitized_title = sanitized_title.replace(' ', '_')
+        filename = f"{sanitized_title if sanitized_title else 'table'}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    else:
+        filename = f"chart_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response
+
+
 
 
 @permission_required("reporter_agent.add_genaimodel")

@@ -76,7 +76,7 @@ def create_final_data(state: GraphState):
             "final_data": FinalData(
                 type=rep_type,
                 chart_type=ChartTypes(state["chart_type"]),
-                data={"metadata": state["chart_column_data"].create_meta_data(), "data": state["input_data"]},
+                data={"metadata": state["chart_column_data"].create_meta_data()},
                 chart_title=state["chart_column_data"].title)
         }
     else:
