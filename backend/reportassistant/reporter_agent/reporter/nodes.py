@@ -37,7 +37,7 @@ def create_sql_query_node(state: GraphState):
 def run_sql_query_node(state: GraphState):
     db_manager = DatabaseManager(state["database_source"])
     try:
-        data = db_manager.execute_sql(state["sql_query"], response_format="list")
+        data = db_manager.execute_sql(state["sql_query"], response_format="list", row_num=100)
         return {"sql_query_result": data, "error_message": None}
     except ExecuteQueryError as e:
         return {"error_message": {"message": e.message, "original_exception": e.original_exception}}

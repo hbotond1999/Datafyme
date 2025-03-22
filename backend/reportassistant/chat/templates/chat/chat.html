@@ -79,8 +79,20 @@
 
             if (chatContainer.style.display === 'block' && chatLoaded === false) {
                 document.querySelectorAll('.custom-chart').forEach(function(element) {
-                    const chatHelper = new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', '', null, element, element.dataset.id, true)
-                    chatHelper
+                    const chatHelper = new ChartHelper(
+                        '{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id),
+                        '',
+                        '',
+                        null,
+                        element,
+                        element.dataset.id,
+                        true,
+                        false,
+                        true,
+                         '{% url "reporter_agent:download_chart" 0 %}'.replace('0', element.dataset.id) ,
+                        '{% trans 'download' %}'
+                    )
+
                 });
                 chatLoaded = true
             }
@@ -129,6 +141,9 @@
                     data.chart_id,
                     true,
                     true,
+                    true,
+                     '{% url "reporter_agent:download_chart" 0 %}'.replace('0', data.chart_id) ,
+                    '{% trans 'download' %}'
                 );
             }
         })

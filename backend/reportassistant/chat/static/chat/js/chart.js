@@ -7,7 +7,9 @@ class ChartHelper {
                 chartId,
                 draggable = false,
                 scrollToInit = false,
-                init = true
+                init = true,
+                download_url = "",
+                download_text = null
               ) {
         this.parent = parentContainer;
         this.url = url;
@@ -18,6 +20,8 @@ class ChartHelper {
         this.scrollToInit = scrollToInit
         this.generate_description_url = generate_description_url
         this.generateDescriptionCallback = generateDescriptionCallback
+        this.download_url = download_url;
+        this.download_text =download_text
         if (init) {
             this.init()
         }
@@ -69,51 +73,74 @@ class ChartHelper {
     }
 
     renderTable(tableData, description) {
+    const container = document.createElement("div");
 
-        const table = document.createElement('table');
-        table.classList.add('table', 'table-striped'); // Bootstrap classes
+    const tableWrapper = document.createElement("div");
+    tableWrapper.style.overflowX = "auto";
+    tableWrapper.style.overflowY = "auto";
+    tableWrapper.style.maxHeight = "400px";
 
-        const thead = table.createTHead();
-        const headerRow = thead.insertRow();
-        const headers = Object.keys(tableData);
+    const table = document.createElement('table');
+    table.classList.add('table', 'table-striped');
 
-        headers.forEach(headerText => {
-            const th = document.createElement('th');
-            th.textContent = headerText.replace('_', ' '); // Replace underscores with spaces for display
-            headerRow.appendChild(th);
+    const thead = table.createTHead();
+    const headerRow = thead.insertRow();
+    const headers = Object.keys(tableData);
+
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText.replace('_', ' ');
+        headerRow.appendChild(th);
+    });
+
+    const tbody = table.createTBody();
+
+    const numRows = tableData[headers[0]].length;
+
+    for (let i = 0; i < numRows; i++) {
+        const row = tbody.insertRow();
+        headers.forEach(header => {
+            const cell = row.insertCell();
+            cell.textContent = tableData[header][i];
         });
-
-        const tbody = table.createTBody();
-
-        // Assuming all arrays in tableData have the same length
-        const numRows = tableData[headers[0]].length;
-
-        for (let i = 0; i < numRows; i++) {
-            const row = tbody.insertRow();
-            headers.forEach(header => {
-                const cell = row.insertCell();
-                cell.textContent = tableData[header][i];
-            });
-        }
-        if (this.draggable) {
-            const contEl = this.createDraggableContainer()
-            contEl.append(table)
-            this.parent.appendChild(contEl);
-             setupDragIn()
-        } else {
-            this.parent.append(table)
-        }
-
-        if (this.scrollToInit) {
-            table.scrollIntoView({behavior: "smooth"})
-        }
-
-        if (this.generate_description_url) {
-            this.getDescription()
-        } else if (this.generateDescriptionCallback != null){
-            this.generateDescriptionCallback(description)
-        }
     }
+
+    tableWrapper.appendChild(table);
+    container.appendChild(tableWrapper);
+
+    if (this.download_url) {
+        const linkContainer =  document.createElement("div");
+        linkContainer.style.paddingBottom = "10px";
+        const downloadButton = document.createElement('a');
+        downloadButton.classList.add('link-opacity-75');
+        downloadButton.textContent = this.download_text;
+        downloadButton.href = this.download_url;
+
+        downloadButton.setAttribute('role', 'button');
+        downloadButton.target = '_blank';
+        linkContainer.appendChild(downloadButton)
+        container.appendChild(linkContainer);
+    }
+
+    if (this.draggable) {
+        const contEl = this.createDraggableContainer();
+        contEl.append(container);
+        this.parent.appendChild(contEl);
+        setupDragIn();
+    } else {
+        this.parent.append(container);
+    }
+
+    if (this.scrollToInit) {
+        tableWrapper.scrollIntoView({behavior: "smooth"});
+    }
+
+    if (this.generate_description_url) {
+        this.getDescription();
+    } else if (this.generateDescriptionCallback != null){
+        this.generateDescriptionCallback(description);
+    }
+}
 
     createDraggableContainer() {
         const contEl = document.createElement("div");
