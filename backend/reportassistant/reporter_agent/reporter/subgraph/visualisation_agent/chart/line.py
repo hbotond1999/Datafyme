@@ -3,9 +3,7 @@ from typing import Optional
 from pptx.chart.data import CategoryChartData
 from pptx.dml.color import RGBColor
 from pydantic import BaseModel, Field
-from pptx.enum.chart import XL_CHART_TYPE, XL_TICK_LABEL_POSITION, XL_LEGEND_POSITION, XL_MARKER_STYLE, XL_AXIS_CROSSES
-from pptx.util import Pt
-
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION, XL_MARKER_STYLE
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
 
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.utils import axis_date_str_converter
