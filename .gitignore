@@ -165,3 +165,4 @@ backend/.idea
 data/
 .idea
 docker/dev/backend/huggingface/
+*.png
