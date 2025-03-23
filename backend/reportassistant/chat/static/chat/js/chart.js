@@ -59,7 +59,7 @@ class ChartHelper {
         console.log(charData)
         console.log("url", this.generate_description_url)
         if (this.generate_description_url) {
-            setTimeout(() => {this.getDescription(canvas)}, 200)
+            setTimeout(() => {this.getDescription(canvas)}, 300)
         } else if (this.generateDescriptionCallback != null){
             this.generateDescriptionCallback(charData.description)
         }
