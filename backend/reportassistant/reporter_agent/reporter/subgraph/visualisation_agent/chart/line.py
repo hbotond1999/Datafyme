@@ -59,7 +59,6 @@ class LineChart(BaseModel, Chart):
             }
         }
 
-
     @classmethod
     def create_pptx_chart(cls, chart_metadata, data, slide, x, y, cx, cy):
         """
@@ -104,25 +103,6 @@ class LineChart(BaseModel, Chart):
         else:
             pptx_chart.chart_title.text_frame.text = f"{y_axis} over {x_axis}"
 
-        category_axis = pptx_chart.category_axis
-        category_axis.has_major_gridlines = False
-
-        category_axis.tick_label_position = XL_TICK_LABEL_POSITION.LOW
-
-        if len(categories) > 10:
-            category_axis.tick_labels.font.size = Pt(8)
-            category_axis.tick_labels.offset = 100
-            category_axis.tick_labels.rotation = -45
-
-        # Format value (y) axis
-        value_axis = pptx_chart.value_axis
-        value_axis.has_major_gridlines = True
-        value_axis.has_minor_gridlines = False
-        value_axis.has_title = True
-        value_axis.axis_title.text_frame.text = y_axis
-
-        value_axis.crosses = XL_AXIS_CROSSES.MINIMUM
-
         # Set up legend
         pptx_chart.has_legend = True
         pptx_chart.legend.position = XL_LEGEND_POSITION.BOTTOM
@@ -131,7 +111,6 @@ class LineChart(BaseModel, Chart):
         # Apply smooth line styling
         plot = pptx_chart.plots[0]
         series = plot.series[0]
-        series.smooth = True
 
         series.format.line.color.rgb = RGBColor(65, 105, 225)
         series.marker.style = XL_MARKER_STYLE.CIRCLE
