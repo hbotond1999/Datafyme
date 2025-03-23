@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional, Literal
 
+import pandas as pd
 from pydantic import BaseModel, Field
 
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
@@ -45,3 +46,6 @@ class MixedChart(BaseModel, Chart):
                 }
             }
         }
+
+    def create_pptx_chart(cls, chart_metadata, data: pd.DataFrame, slide, x, y, cx, cy):
+        return None
