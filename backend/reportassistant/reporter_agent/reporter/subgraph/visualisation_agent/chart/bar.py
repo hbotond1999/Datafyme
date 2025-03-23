@@ -99,7 +99,7 @@ class BarChart(BaseModel, Chart):
         ).chart
 
         pptx_chart.has_title = True
-        if hasattr(chart_metadata, 'title') and chart_metadata.title:
+        if chart_metadata.title:
             pptx_chart.chart_title.text_frame.text = chart_metadata.title
         else:
             pptx_chart.chart_title.text_frame.text = f"{y_axis} by {x_axis}"

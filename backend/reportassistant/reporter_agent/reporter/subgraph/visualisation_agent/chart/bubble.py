@@ -91,7 +91,10 @@ class BubbleChart(BaseModel, Chart):
         ).chart
 
         pptx_chart.has_title = True
-        pptx_chart.chart_title.text_frame.text = f"{y_axis} vs {x_axis} (Size: {size})"
+        if chart_metadata.title:
+            pptx_chart.chart_title.text_frame.text = chart_metadata.title
+        else:
+            pptx_chart.chart_title.text_frame.text = f"{y_axis} by {x_axis}"
 
         value_axis = pptx_chart.value_axis
         value_axis.has_major_gridlines = True

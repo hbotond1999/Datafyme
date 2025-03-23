@@ -103,12 +103,10 @@ class LineChart(BaseModel, Chart):
         else:
             pptx_chart.chart_title.text_frame.text = f"{y_axis} over {x_axis}"
 
-        # Set up legend
         pptx_chart.has_legend = True
         pptx_chart.legend.position = XL_LEGEND_POSITION.BOTTOM
         pptx_chart.legend.include_in_layout = False
 
-        # Apply smooth line styling
         plot = pptx_chart.plots[0]
         series = plot.series[0]
 
