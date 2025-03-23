@@ -7,7 +7,7 @@ from common.vectordb.db import COLLECTION_NAME
 from common.vectordb.db.schema import TableDocument, convert_to_milvus_data
 from common.vectordb.embeddings import BgeM3EmbeddingsModel
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("reportassistant.default")
 
 def insert_docs_to_collection(table_docs: List[TableDocument], collection_name: str = COLLECTION_NAME):
     """

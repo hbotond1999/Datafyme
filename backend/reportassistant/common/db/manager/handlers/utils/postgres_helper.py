@@ -4,7 +4,7 @@ from typing import Optional, List, Any
 
 from psycopg2.extras import RealDictCursor
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("reportassistant.default")
 
 
 class PostgresHelper:
@@ -53,11 +53,12 @@ class PostgresHelper:
             finally:
                 self.connection = None
 
-    def execute_query(self, query: str) -> Optional[List[Any]]:
+    def execute_query(self, query: str, row_num=None) -> Optional[List[Any]]:
         """
         Execute an SQL query and return results if applicable.
 
         :param query: SQL query string to be executed.
+        :param row_num: How many rows to return. If provided, the query will be limited to this number of rows.
         :return: List of rows (if SELECT query) or None.
         """
         try:
@@ -66,13 +67,19 @@ class PostgresHelper:
             if self.connection is None:
                 raise ConnectionError("Failed to establish database connection.")
 
-            # Execute the SQL query
+            if row_num is not None:
+                if query.strip().upper().startswith("SELECT"):
+                    cleaned_query = query.strip()
+                    if cleaned_query.endswith(';'):
+                        cleaned_query = cleaned_query[:-1]
+
+                    query = f"SELECT * FROM ({cleaned_query}) AS subquery LIMIT {row_num};"
+
             with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
                 cursor.execute(query)
                 self.connection.commit()
                 logger.info("Query executed successfully.")
 
-                # Fetch and return results if the query is a SELECT
                 if cursor.description:
                     results: List[Any] = cursor.fetchall() # fetchmany(10)   cursor.rowcount
                     return results
@@ -80,7 +87,6 @@ class PostgresHelper:
             logger.error(f"Error executing query in {self.dbname}: {error} - {query}")
             raise
         finally:
-            # Ensure that the connection is closed after execution
             self._disconnect()
 
     def check_connection(self) -> bool:

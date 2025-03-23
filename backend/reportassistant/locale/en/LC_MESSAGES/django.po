@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-26 16:37+0100\n"
-"PO-Revision-Date: 2025-01-26 16:37+0000\n"
+"POT-Creation-Date: 2025-03-22 17:18+0100\n"
+"PO-Revision-Date: 2025-03-22 17:47+0000\n"
 "Last-Translator:   <>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -35,15 +35,22 @@ msgstr "AI"
 msgid "HUMAN"
 msgstr "Human"
 
-#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:89
+#: .\chat\templates\chat\chat.html:30 .\chat\templates\chat\chat.html:94
 #: .\chat\templates\chat\chat_history.html:32
 msgid "You"
 msgstr "You"
 
-#: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:106
+#: .\chat\templates\chat\chat.html:36 .\chat\templates\chat\chat.html:46
+#: .\chat\templates\chat\chat.html:111 .\chat\templates\chat\chat.html:123
 #: .\chat\templates\chat\chat_history.html:34
 msgid "System"
 msgstr "System"
+
+#: .\chat\templates\chat\chat.html:82
+#: .\chat\templates\chat\chat_history.html:64
+msgid "download"
+msgstr ""
+"The table is just a preview, to download the full data content click here"
 
 #: .\chat\templates\chat\chat_history.html:11
 #, fuzzy
@@ -51,16 +58,15 @@ msgstr "System"
 msgid "Chat History"
 msgstr "Chat history"
 
-#: .\chat\templates\chat\chat_history.html:42
-#| msgid "Save Connection"
+#: .\chat\templates\chat\chat_history.html:44
 msgid "Continue Conversation"
 msgstr "Continue Conversation"
 
-#: .\chat\templates\chat\chat_history.html:49
+#: .\chat\templates\chat\chat_history.html:51
 msgid "No chat history available."
 msgstr "No chat history available."
 
-#: .\chat\templates\chat\chat_history.html:53
+#: .\chat\templates\chat\chat_history.html:55
 #, fuzzy
 #| msgid "Save Connection"
 msgid "Start New Conversation"
@@ -79,11 +85,12 @@ msgid "required"
 msgstr "required"
 
 #: .\dashboard\templates\add_dashboard.html:21
-#: .\db_configurator\templates\db_configurator\add-database-form.html:60
+#: .\db_configurator\templates\db_configurator\database-form.html:61
 msgid "Close"
 msgstr "Close"
 
 #: .\dashboard\templates\add_dashboard.html:22
+#: .\reporter_agent\templates\reporter_agent\model_form.html:69
 msgid "Save"
 msgstr "Save"
 
@@ -95,99 +102,93 @@ msgstr "Database loaded successfully"
 msgid "ERROR_TO_LOAD_DATABASE"
 msgstr "Something went wrong to load database"
 
-#: .\db_configurator\templates\db_configurator\add-database-form.html:7
-msgid "Establish a New Connection"
-msgstr "Establish a new connection"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:18
-msgid "Select a type"
-msgstr "Select a type"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:25
-msgid "Database name"
-msgstr "Database name"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:29
-#: .\db_configurator\templates\db_configurator\connections-table.html:11
-msgid "Display name"
-msgstr "Display name"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:33
-msgid "Username"
-msgstr "Username"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:37
-msgid "Password"
-msgstr "Password"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:46
-#: .\db_configurator\templates\db_configurator\connections-table.html:13
-msgid "Host"
-msgstr "Host"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:50
-#: .\db_configurator\templates\db_configurator\connections-table.html:14
-msgid "Port"
-msgstr "Port"
-
-#: .\db_configurator\templates\db_configurator\add-database-form.html:61
-msgid "Save Connection"
-msgstr "Save Connection"
-
-#: .\db_configurator\templates\db_configurator\connections-table.html:4
+#: .\db_configurator\templates\db_configurator\connections-table.html:5
 msgid "Add new database"
 msgstr "Add new database"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:10
+#: .\db_configurator\templates\db_configurator\connections-table.html:12
 msgid "Name"
 msgstr "Name"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:12
+#: .\db_configurator\templates\db_configurator\connections-table.html:13
+#: .\db_configurator\templates\db_configurator\database-form.html:30
+msgid "Display name"
+msgstr "Display name"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:14
 msgid "Type"
 msgstr "Type"
 
 #: .\db_configurator\templates\db_configurator\connections-table.html:15
+#: .\db_configurator\templates\db_configurator\database-form.html:34
+msgid "Username"
+msgstr "Username"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:16
+#: .\db_configurator\templates\db_configurator\database-form.html:47
+msgid "Host"
+msgstr "Host"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:17
+#: .\db_configurator\templates\db_configurator\database-form.html:51
+msgid "Port"
+msgstr "Port"
+
+#: .\db_configurator\templates\db_configurator\connections-table.html:18
 msgid "Access group"
 msgstr "Access group"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:16
+#: .\db_configurator\templates\db_configurator\connections-table.html:19
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:23
+#: .\reporter_agent\templates\reporter_agent\model-list.html:30
 msgid "Status"
 msgstr "Status"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:17
+#: .\db_configurator\templates\db_configurator\connections-table.html:20
+#: .\reporter_agent\templates\reporter_agent\model-list.html:31
 msgid "Actions"
 msgstr "Actions"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:31
+#: .\db_configurator\templates\db_configurator\connections-table.html:35
 msgid "Paused"
 msgstr "Paused"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:33
+#: .\db_configurator\templates\db_configurator\connections-table.html:37
 msgid "LOADING"
 msgstr "Loading"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:35
+#: .\db_configurator\templates\db_configurator\connections-table.html:39
 msgid "READY"
 msgstr "Ready"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:37
+#: .\db_configurator\templates\db_configurator\connections-table.html:41
 #: .\home\models.py:13
 msgid "ERROR"
 msgstr "Error"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:45
-msgid "Resume"
-msgstr "Resume"
+#: .\db_configurator\templates\db_configurator\database-form.html:7
+#, fuzzy
+#| msgid "Save Connection"
+msgid "Connection"
+msgstr "Save Connection"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:47
-msgid "Pause"
-msgstr "Pause"
+#: .\db_configurator\templates\db_configurator\database-form.html:19
+msgid "Select a type"
+msgstr "Select a type"
 
-#: .\db_configurator\templates\db_configurator\connections-table.html:53
-msgid "Delete"
-msgstr "Delete"
+#: .\db_configurator\templates\db_configurator\database-form.html:26
+msgid "Database name"
+msgstr "Database name"
 
-#: .\db_configurator\views.py:61
+#: .\db_configurator\templates\db_configurator\database-form.html:38
+msgid "Password"
+msgstr "Password"
+
+#: .\db_configurator\templates\db_configurator\database-form.html:62
+msgid "Save Connection"
+msgstr "Save Connection"
+
+#: .\db_configurator\views.py:72
 msgid "Could not connect to database"
 msgstr "Could not connect to database"
 
@@ -207,29 +208,201 @@ msgstr "Warning"
 msgid "CRITICAL"
 msgstr "Critical"
 
-#: .\home\templates\base_generic.html:28
+#: .\home\templates\base_generic.html:29
 msgid "Start Chat"
 msgstr "Start Chat"
 
-#: .\home\templates\base_generic.html:31
+#: .\home\templates\base_generic.html:32
 msgid "Chat history"
 msgstr "Chat history"
 
-#: .\home\templates\base_generic.html:35
+#: .\home\templates\base_generic.html:36
 msgid "DB connections"
 msgstr "DB connections"
 
-#: .\home\templates\base_generic.html:74
+#: .\home\templates\base_generic.html:41
+msgid "LLM models"
+msgstr "LLM models"
+
+#: .\home\templates\base_generic.html:80
 msgid "Logout"
 msgstr "Logout"
 
-#: .\reportassistant\settings.py:139
+#: .\reportassistant\settings.py:146
 msgid "English"
 msgstr "English"
 
-#: .\reportassistant\settings.py:140
+#: .\reportassistant\settings.py:147
 msgid "Hungarian"
 msgstr "Hungarian"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:10
+#, fuzzy
+#| msgid "Delete"
+msgid "Delete model"
+msgstr "Delete"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:13
+#, fuzzy
+#| msgid "Delete"
+msgid "Delete confirm"
+msgstr "Delete"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:19
+#: .\reporter_agent\templates\reporter_agent\model-list.html:29
+#: .\reporter_agent\templates\reporter_agent\model_form.html:35
+msgid "API Key"
+msgstr "API Key"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:25
+#: .\reporter_agent\templates\reporter_agent\model-list.html:44
+#, fuzzy
+#| msgid "Actions"
+msgid "Active"
+msgstr "Actions"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:27
+#: .\reporter_agent\templates\reporter_agent\model-list.html:46
+msgid "Inactive"
+msgstr "Inactive"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:36
+msgid ""
+"Warning: This is an active model. After deletion, there will be no active "
+"GenAI model until you set up a new one."
+msgstr ""
+"Warning: This is an active model. After deletion, there will be no active "
+"GenAI model until you set up a new one."
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:44
+msgid "Cancel"
+msgstr "Cancel"
+
+#: .\reporter_agent\templates\reporter_agent\model-delete.html:47
+msgid "Confirm Deletion"
+msgstr "Confirm Deletion"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:7
+msgid "GenAI Models"
+msgstr "LLM Models"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:9
+msgid "New model"
+msgstr "New model"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:27
+#: .\reporter_agent\templates\reporter_agent\model_form.html:23
+msgid "Provider"
+msgstr "Provider"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:28
+#: .\reporter_agent\templates\reporter_agent\model_form.html:48
+msgid "Model name"
+msgstr "Model name"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:52
+msgid "Edit"
+msgstr "Edit"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:55
+msgid "Delete"
+msgstr "Delete"
+
+#: .\reporter_agent\templates\reporter_agent\model-list.html:66
+msgid ""
+"No GenAI models added yet. Click the \"New model\" button to create a new "
+"model."
+msgstr ""
+"No LLM models added yet. Click the \"New model\" button to create a new "
+"model."
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:12
+msgid "Create New GenAI Model"
+msgstr "Create New LLM Model"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:14
+msgid "Edit GenAI Model"
+msgstr "Edit LLM Model"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:25
+#, fuzzy
+#| msgid "Select a type"
+msgid "Select a provider"
+msgstr "Select a type"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:37
+msgid "Provider API key to fetch models"
+msgstr "Provider API key to fetch models"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:42
+#: .\reporter_agent\templates\reporter_agent\model_form.html:160
+msgid "Fetch models"
+msgstr "Fetch models"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:53
+msgid "Fetch models first"
+msgstr "Fetch models first"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:60
+msgid "Active model"
+msgstr "Active model"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:61
+msgid ""
+"Only one model can be active. If checked, all other models will be made "
+"inactive."
+msgstr ""
+"Only one model can be active. If checked, all other models will be made "
+"inactive."
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:66
+msgid "Back"
+msgstr "Back"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:95
+msgid "Please select a provider!"
+msgstr "Please select a provider!"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:100
+msgid "Please enter an API key!"
+msgstr "Please enter an API key!"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:104
+msgid "Validating API key with \\"
+msgstr "Validating API key with \"Hello World\" test..."
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:107
+msgid "Validating..."
+msgstr "Validating..."
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:122
+msgid "Error testing API key"
+msgstr "Error testing API key"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:152
+msgid "Invalid API key or network error"
+msgstr "Invalid API key or network error"
+
+#: .\reporter_agent\templates\reporter_agent\model_form.html:175
+msgid "Validate API key first"
+msgstr "Validate API key first"
+
+#: .\reporter_agent\views.py:284
+msgid "API kulcs érvényes és működőképes."
+msgstr "API key is valid!"
+
+#: .\reporter_agent\views.py:288
+msgid "API kulcs teszt sikertelen"
+msgstr "API key is not valid!"
+
+#~ msgid "Establish a New Connection"
+#~ msgstr "Establish a new connection"
+
+#~ msgid "Resume"
+#~ msgstr "Resume"
+
+#~ msgid "Pause"
+#~ msgstr "Pause"
 
 #~ msgid "Running"
 #~ msgstr "Running"

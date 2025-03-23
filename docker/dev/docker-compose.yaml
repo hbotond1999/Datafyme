@@ -9,6 +9,8 @@ services:
       volumes:
         - ./mockdb/datasets:/docker-entrypoint-initdb.d
         - ./mockdb/data:/var/lib/postgresql/data
+      networks:
+        - "docker_network"
 
   neo4j:
       image: neo4j:5.24
@@ -28,6 +30,8 @@ services:
           interval: 15s
           timeout: 30s
           retries: 10
+      networks:
+        - "docker_network"
 
   # Vektor db
   etcd:
@@ -46,6 +50,8 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    networks:
+      - "docker_network"
 
   minio:
     container_name: milvus-minio
@@ -64,6 +70,8 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    networks:
+      - "docker_network"
 
   standalone:
     container_name: milvus-standalone
@@ -89,6 +97,8 @@ services:
     depends_on:
       - "etcd"
       - "minio"
+    networks:
+      - "docker_network"
 # vektor db end
 
   django-db:
@@ -96,20 +106,73 @@ services:
     restart: always
     env_file:
       - ./database/.env
+    networks:
+      - "docker_network"
     ports:
       - "5434:5432"
     volumes:
       - ./database/data:/var/lib/postgresql/data
 
-# nem végleges még, inkább localban indítsd el a python manage.py runserver
+
   backend:
     image: report_assistant/backend
     restart: always
     build:
       context: ../../backend
       dockerfile: Dockerfile
-    command: poetry run gunicorn reportassistant.wsgi:application -w 4 --bind 0.0.0.0:8000
+    command:  bash -c "python /app/reportassistant/manage.py collectstatic --noinput && 
+                python /app/reportassistant/manage.py migrate && 
+                poetry run uvicorn reportassistant.asgi:application --host 0.0.0.0 --port 8000"
     env_file:
       - ./backend/.env
+    depends_on:
+      - standalone
+      - django-db
+      - neo4j
+    volumes:
+      - static_files:/app/reportassistant/staticfiles
+      - ./backend/huggingface:/root/.cache/huggingface/
+    deploy:
+      replicas: 2
+    networks:
+      - "docker_network"
+
+  worker:
+    image: report_assistant/backend
+    restart: always
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: python /app/reportassistant/manage.py db_worker
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - standalone
+      - django-db
+      - neo4j
+      - backend
+    volumes:
+      - ./backend/huggingface:/root/.cache/huggingface/
+    networks:
+      - "docker_network"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    volumes:
+      - ./certs/:/etc/nginx/certs
+      - static_files:/app/reportassistant/staticfiles
     ports:
       - "8000:8000"
+    networks:
+      - "docker_network"
+
+networks:
+  docker_network:
+    driver: bridge
+
+
+
+volumes:
+  static_files:

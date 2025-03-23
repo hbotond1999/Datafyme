@@ -14,6 +14,8 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+from decouple import config, Csv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,10 +32,15 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 CSRF_COOKIE_SECURE=True
 SESSION_COOKIE_SECURE=True
 
-DEBUG = True if int(os.getenv('DEBUG')) == 1 else False
+DEBUG = int(os.getenv('DEBUG')) == 1
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+CSRF_TRUSTED_ORIGINS =config('CSRF_TRUSTED_ORIGINS', cast=Csv())
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_ROOT =  os.path.join(BASE_DIR, 'staticfiles')
 
 # Application definition
 

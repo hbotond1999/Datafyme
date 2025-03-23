@@ -15,3 +15,12 @@ class Chart(models.Model):
     sql_query = models.TextField()
     meta_data = models.JSONField(null=True, blank=True)
     chart_img_url = models.TextField(null=True)
+
+
+GenAIModelTypes = {"openai": "Openai", "claude": "Claude", "google": "google"}
+class GenAIModel(models.Model):
+    provider = models.CharField(max_length=100)
+    name = models.CharField(max_length=200)
+    host = models.CharField(max_length=200, null=True)
+    active = models.BooleanField(default=False)
+    api_key = models.TextField()

@@ -1,8 +1,12 @@
+import json
+from random import random
+
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
+from langchain.smith.evaluation.name_generation import random_name
 
 from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
@@ -24,10 +28,13 @@ def manage_connections(request):
     })
 
 @permission_required("db_configurator.add_databasesource")
-def add_connection(request):
+def connection(request):
     if request.method == 'POST':
-        form = DatabaseSourceForm(request.POST)
+        db_source = None
+        if request.POST.get('id'):
+            db_source = DatabaseSource.objects.get(pk=request.POST.get('id'))
 
+        form = DatabaseSourceForm(request.POST, instance=db_source)
         if not form.is_valid():
             return JsonResponse({"success": False, "errors": form.errors.as_json()})
 
@@ -41,12 +48,16 @@ def add_connection(request):
         )
         success = DatabaseManager(database_source).check_connection()
         if success:
+            if request.POST.get('id'):
+                form.save()
+                return JsonResponse({"success": True})
+
             group_name = "database_source_group_" + form.cleaned_data["name"] + "_" + form.cleaned_data["type"]
             existing_groups = Group.objects.filter(name__startswith=group_name)
 
             if existing_groups.exists():
-                count = existing_groups.count()
-                unique_name = f"{group_name}_{count + 1}"
+                latest_group = existing_groups.order_by('-id').first()
+                unique_name = f"{group_name}_{latest_group.id + 1}"
             else:
                 unique_name = group_name
             new_group = Group.objects.create(name=unique_name)

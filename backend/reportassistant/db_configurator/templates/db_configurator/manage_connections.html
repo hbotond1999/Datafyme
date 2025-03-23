@@ -3,7 +3,7 @@
 
 {% block content %}
      {% if perms.db_configurator.view_databasesource %}
-         {% include 'db_configurator/add-database-form.html' %}
+         {% include 'db_configurator/database-form.html' %}
      {% endif %}
 
     {% include 'db_configurator/connections-table.html' %}
