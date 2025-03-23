@@ -12,3 +12,7 @@ class RefinedSQLCommand(BaseModel):
     """
     sql_query: str = Field(description="The text of the refined SQL query")
     query_description: str = Field(description="The refined SQL query description")
+
+
+class IsSQLNeeded(BaseModel):
+    is_sql_needed: bool = Field(description="Is it necessary to run a new sql query or not?")

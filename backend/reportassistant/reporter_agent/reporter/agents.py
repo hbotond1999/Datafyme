@@ -7,7 +7,7 @@ from langchain_core.tools import tool
 
 from common.ai.model import get_llm_model
 from common.db.manager.database_manager import DatabaseManager
-from reporter_agent.reporter.response import RefinedSQLCommand
+from reporter_agent.reporter.response import RefinedSQLCommand, IsSQLNeeded
 
 logger = logging.getLogger('reportassistant.custom')
 
@@ -33,6 +33,20 @@ def create_history_summarizer():
     )
 
     return contextualize_q_prompt | get_llm_model() | StrOutputParser()
+
+
+def task_router():
+    prompt_str = """You are a task assigning agent whose job is to decide whether the answer to the user's question can 
+    be generated from the data from the chat history or whether a new database query is required. If all the necessary 
+    data for the answer is not available, a new SQL query is required to generate the data.
+    User question: {question}.
+    Chat history with previously used tables: {chat_history}.
+    
+    """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["question", "chat_history"])
+
+    return prompt | get_llm_model().with_structured_output(IsSQLNeeded)
 
 
 def refine_sql_agent():

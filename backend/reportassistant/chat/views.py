@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime
 
@@ -15,6 +16,9 @@ from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
 from reporter_agent.reporter.utils import save_graph_png
 from reporter_agent.task import generate_title
+
+
+logger = logging.getLogger('reportassistant.custom')
 
 
 @login_required
@@ -41,10 +45,11 @@ def chat_view(request):
                 chat_hist = []
                 for msg in messages:
                     if msg.chart:
-                        chat_hist.append(msg.type + " : \nChart type: " + msg.chart.type + " description: " + msg.chart.description)
+                        chat_hist.append(msg.type + " : \nChart type: " + msg.chart.type + " description: " + str(msg.chart.description) + " sql_query: " + msg.chart.sql_query)
                     if msg.message:
                         chat_hist.append(msg.type + " : " + msg.message)
 
+                logger.info(f"Chat history: {chat_hist}")
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
                 reporter_graph = create_reporter_graph()
                 # save graph image:

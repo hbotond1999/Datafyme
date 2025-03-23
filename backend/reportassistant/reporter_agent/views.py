@@ -2,6 +2,7 @@ import json
 from uuid import uuid4
 
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.utils.translation import get_language
@@ -60,6 +61,11 @@ def generate_description(request):
         fs = FileSystemStorage(location="files")
         file = fs.save(str(uuid4()) + ".png", chart_img_file)
         url = fs.path(file)
+
+        chart = Chart.objects.get(id=chart_id)
+        chart.chart_img_url = url
+        chart.save(update_fields=["chart_img_url"])
+
         result = create_description(chart_id, url, get_language())
         return JsonResponse(data={"description": result.description})
     else:

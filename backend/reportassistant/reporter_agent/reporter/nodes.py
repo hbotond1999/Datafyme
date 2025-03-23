@@ -6,7 +6,8 @@ from datetime import datetime
 from common.custom_logging import log
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
-from reporter_agent.reporter.agents import create_history_summarizer, refine_sql_agent, refine_empty_result_sql_agent
+from reporter_agent.reporter.agents import create_history_summarizer, refine_sql_agent, refine_empty_result_sql_agent, \
+    task_router
 from reporter_agent.reporter.response import RefinedSQLCommand
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
@@ -22,7 +23,14 @@ def summarize_history_node(state: GraphState):
     new_question = create_history_summarizer().invoke(
         {"chat_history": state["chat_history"], "question": state["question"]}
     )
+
     return {"question": new_question}
+
+
+@log(my_logger=logger)
+def task_router_node(state: GraphState):
+    is_sql_needed = task_router().invoke({"question": state["question"], "chat_history": state["chat_history"]})
+    pass
 
 
 @log(my_logger=logger)
@@ -31,6 +39,7 @@ def create_sql_query_node(state: GraphState):
     # save graph image:
     if int(os.getenv('DEBUG')) == 1:
         save_graph_png(sql_agent_graph, name='sql_agent_graph')
+    logger.info(f"message: {state["question"]}")
     result = sql_agent_graph.invoke({"message": state["question"], "database_source": state["database_source"],
                                      "refine_recursive_limit": 3})
 
