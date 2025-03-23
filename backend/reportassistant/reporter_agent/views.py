@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -54,12 +55,12 @@ def edit_chart(request):
 @login_required
 def generate_description(request):
     if request.method == 'POST':
-
         chart_id = request.POST["chart_id"]
         chart_img_file = request.FILES.get("chart_img_file", None)
-
-        result = create_description(chart_id, chart_img_file, get_language())
-
+        fs = FileSystemStorage(location="files")
+        file = fs.save(str(uuid4()) + ".png", chart_img_file)
+        url = fs.path(file)
+        result = create_description(chart_id, url, get_language())
         return JsonResponse(data={"description": result.description})
     else:
         return HttpResponseNotAllowed(['POST'])
