@@ -1,6 +1,7 @@
 import logging
 
 import pandas as pd
+from pptx.dml.color import RGBColor
 
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
@@ -72,7 +73,7 @@ def create_pptx_chart(chart: Chart, slide, x, y, cx, cy):
             for i, column_name in enumerate(data.columns):
                 table.cell(0, i).text = str(column_name)
                 table.cell(0, i).fill.solid()
-                table.cell(0, i).fill.fore_color.rgb = (200, 200, 200)
+                table.cell(0, i).fill.fore_color.rgb = RGBColor(200, 200, 200)
                 table.cell(0, i).text_frame.paragraphs[0].font.bold = True
 
             for row_idx, row in enumerate(data.itertuples(index=False)):

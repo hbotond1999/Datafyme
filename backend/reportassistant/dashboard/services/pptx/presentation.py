@@ -28,14 +28,15 @@ def create_presentation(dashboard: Dashboard):
     for slot in dashboard_slots:
         slide_layout = prs.slide_layouts[5]
         slide = prs.slides.add_slide(slide_layout)
+        if slot.chart.title:
+            title_shape = slide.shapes.add_textbox(
+                Inches(0.5), Inches(0.5), Inches(12), Inches(1)
+            )
 
-        title_shape = slide.shapes.add_textbox(
-            Inches(0.5), Inches(0.5), Inches(12), Inches(1)
-        )
-        title_frame = title_shape.text_frame
-        title_frame.text = f"{slot.chart.title}"
-        title_frame.paragraphs[0].font.bold = True
-        title_frame.paragraphs[0].font.size = Pt(24)
+            title_frame = title_shape.text_frame
+            title_frame.text = f"{slot.chart.title}"
+            title_frame.paragraphs[0].font.bold = True
+            title_frame.paragraphs[0].font.size = Pt(24)
 
         if slot.chart.description:
             notes_slide = slide.notes_slide
