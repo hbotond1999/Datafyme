@@ -1,6 +1,8 @@
 import json
+from uuid import uuid4
 
 import anthropic
+from django.core.files.storage import FileSystemStorage
 from django.utils.translation import gettext_lazy as _
 import requests
 from django.contrib import messages
@@ -65,12 +67,12 @@ def edit_chart(request):
 @login_required
 def generate_description(request):
     if request.method == 'POST':
-
         chart_id = request.POST["chart_id"]
         chart_img_file = request.FILES.get("chart_img_file", None)
-
-        result = create_description(chart_id, chart_img_file, get_language())
-
+        fs = FileSystemStorage(location="files")
+        file = fs.save(str(uuid4()) + ".png", chart_img_file)
+        url = fs.path(file)
+        result = create_description(chart_id, url, get_language())
         return JsonResponse(data={"description": result.description})
     else:
         return HttpResponseNotAllowed(['POST'])
@@ -104,8 +106,6 @@ def download_chart(request, chart_id):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
     return response
-
-
 
 
 @permission_required("reporter_agent.add_genaimodel")

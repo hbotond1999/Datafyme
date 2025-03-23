@@ -22,5 +22,5 @@ class TestChartDescription(unittest.TestCase):
         self.chart_url = "C:\\Users\\Lenovo\\Desktop\\report-assistant\\chart_img_most_viewed_movies.png"
 
     def test_create_description(self):
-        result = create_description(chart_id=self.chart_id, chart_url=self.chart_url)
+        result = create_description(chart_id=self.chart_id, chart_path=self.chart_url, lang="hu")
         print(result)
