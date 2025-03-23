@@ -28,6 +28,7 @@ python-decouple = "3.8"
 langchain-anthropic = "0.3.10"
 langchain-google-genai = "2.1.0"
 xlsxwriter = "^3.2.2"
+python-pptx = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 

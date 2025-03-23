@@ -1,6 +1,10 @@
 from typing import Optional
 
+from pptx.chart.data import CategoryChartData
+from pptx.dml.color import RGBColor
 from pydantic import BaseModel, Field
+from pptx.enum.chart import XL_CHART_TYPE, XL_TICK_LABEL_POSITION, XL_LEGEND_POSITION, XL_MARKER_STYLE, XL_AXIS_CROSSES
+from pptx.util import Pt
 
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
 
@@ -54,3 +58,83 @@ class LineChart(BaseModel, Chart):
                 }
             }
         }
+
+
+    @classmethod
+    def create_pptx_chart(cls, chart_metadata, data, slide, x, y, cx, cy):
+        """
+        Creates a line chart object that can be directly added to a PowerPoint slide.
+
+        Args:
+            chart_metadata: The chart object containing metadata
+            data: The DataFrame containing the data to be plotted
+            slide: The PowerPoint slide to add the chart to
+            x: The x-coordinate for the chart position
+            y: The y-coordinate for the chart position
+            cx: The width of the chart
+            cy: The height of the chart
+
+        Returns:
+            Chart: A PowerPoint chart object that has been added to the slide
+        """
+
+        x_axis = chart_metadata.meta_data["metadata"]["x_axis"]
+        y_axis = chart_metadata.meta_data["metadata"]["y_axis"]
+        date_format = chart_metadata.meta_data["metadata"].get("date_format")
+
+        chart_data = CategoryChartData()
+
+        if not date_format:
+            categories = data[x_axis].tolist()
+        else:
+            categories = axis_date_str_converter(dates=data[x_axis], date_format=date_format)
+
+        chart_data.categories = categories
+        chart_data.add_series(y_axis, data[y_axis].tolist())
+
+        pptx_chart = slide.shapes.add_chart(
+            XL_CHART_TYPE.LINE,
+            x, y, cx, cy,
+            chart_data
+        ).chart
+
+        pptx_chart.has_title = True
+        if hasattr(chart_metadata, 'title') and chart_metadata.title:
+            pptx_chart.chart_title.text_frame.text = chart_metadata.title
+        else:
+            pptx_chart.chart_title.text_frame.text = f"{y_axis} over {x_axis}"
+
+        category_axis = pptx_chart.category_axis
+        category_axis.has_major_gridlines = False
+
+        category_axis.tick_label_position = XL_TICK_LABEL_POSITION.LOW
+
+        if len(categories) > 10:
+            category_axis.tick_labels.font.size = Pt(8)
+            category_axis.tick_labels.offset = 100
+            category_axis.tick_labels.rotation = -45
+
+        # Format value (y) axis
+        value_axis = pptx_chart.value_axis
+        value_axis.has_major_gridlines = True
+        value_axis.has_minor_gridlines = False
+        value_axis.has_title = True
+        value_axis.axis_title.text_frame.text = y_axis
+
+        value_axis.crosses = XL_AXIS_CROSSES.MINIMUM
+
+        # Set up legend
+        pptx_chart.has_legend = True
+        pptx_chart.legend.position = XL_LEGEND_POSITION.BOTTOM
+        pptx_chart.legend.include_in_layout = False
+
+        # Apply smooth line styling
+        plot = pptx_chart.plots[0]
+        series = plot.series[0]
+        series.smooth = True
+
+        series.format.line.color.rgb = RGBColor(65, 105, 225)
+        series.marker.style = XL_MARKER_STYLE.CIRCLE
+        series.marker.size = 5
+
+        return pptx_chart
