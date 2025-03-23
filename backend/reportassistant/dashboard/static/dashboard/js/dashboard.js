@@ -10,7 +10,8 @@ class DashboardHelper {
                 deleteDashboardUrl,
                 addDashboardSlotUrl,
                 getChartUrl,
-                chartUpdateUrl
+                chartUpdateUrl,
+                exportPptUrl
     ) {
         GridStack.renderCB = (el, w)=> {
             el.appendChild(this.createGirdContent(w.data, getChartUrl))
@@ -28,6 +29,7 @@ class DashboardHelper {
         this.deleteDashboardUrl = deleteDashboardUrl
         this.addDashboardSlotUrl = addDashboardSlotUrl
         this.chartUpdateUrl = chartUpdateUrl
+        this.exportPptUrl = exportPptUrl
 
     }
 
@@ -373,7 +375,55 @@ class DashboardHelper {
     .catch(error => {
         console.error("Error deleting slot:", error);
     });
-}
+    }
+
+    exportDashboardToPptx(exportButton) {
+        const dashboardId = document.getElementById("existingDashboards").value
+        if (!dashboardId) {
+            return
+        }
+
+        const originalContent = exportButton.innerHTML;
+        exportButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        exportButton.disabled = true;
+
+        fetch(this.exportPptUrl.replace('0', dashboardId), {
+            method: 'GET',
+            headers: {
+            'Accept': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'X-CSRFToken':  Cookies.get('csrftoken'),
+
+            },
+        }).then(response => {
+            if (!response.ok) {
+              throw new Error(`Export failed: ${response.status} ${response.statusText}`);
+            }
+            return response.blob();
+          })
+          .then(blob => {
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+
+            const dashboardTitle = document.getElementById('dashboard-title')?.textContent || 'dashboard';
+            const filename = `${dashboardTitle.toLowerCase().replace(/\s+/g, '-')}-export.pptx`;
+
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+
+            setTimeout(() => {
+              window.URL.revokeObjectURL(downloadUrl);
+              document.body.removeChild(a);
+            }, 100);
+          })
+          .catch(error => {
+            console.error('Dashboard export failed:', error);
+          }).finally(() => {
+              exportButton.innerHTML = originalContent;
+              exportButton.disabled = false;
+          });
+    }
 }
 
 function setupDragIn() {
