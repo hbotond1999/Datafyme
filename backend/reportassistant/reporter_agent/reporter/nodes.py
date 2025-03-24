@@ -29,8 +29,9 @@ def summarize_history_node(state: GraphState):
 
 @log(my_logger=logger)
 def task_router_node(state: GraphState):
-    is_sql_needed = task_router().invoke({"question": state["question"], "chat_history": state["chat_history"]})
-    pass
+    is_sql_needed = task_router(question=state["question"], chat_data=state["chat_history"])
+    logger.info(f"SQL is needed? {is_sql_needed}")
+    return {"is_sql_needed": is_sql_needed}
 
 
 @log(my_logger=logger)

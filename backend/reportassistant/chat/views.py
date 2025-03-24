@@ -49,7 +49,35 @@ def chat_view(request):
                     if msg.message:
                         chat_hist.append(msg.type + " : " + msg.message)
 
-                logger.info(f"Chat history: {chat_hist}")
+                chat_hist2 = []
+                q_and_a = {}
+
+                for msg in messages:
+                    if msg.type == "HUMAN":
+                        if q_and_a:
+                            chat_hist2.append(q_and_a)
+                            q_and_a = {}
+
+                        q_and_a["HUMAN"] = msg.message
+
+                    elif msg.type == "AI":
+                        if not q_and_a:
+                            q_and_a["HUMAN"] = "MISSING_QUESTION"
+
+                        if msg.chart:
+                            q_and_a[
+                                "AI"] = f"{msg.message} Chart type: {msg.chart.type}; Chart description: {msg.chart.description}; Chart sql_query: {msg.chart.sql_query}"
+                            q_and_a["image"] = msg.chart.chart_img_url
+                        else:
+                            q_and_a["AI"] = msg.message
+
+                        chat_hist2.append(q_and_a)
+                        q_and_a = {}
+
+                if q_and_a:
+                    chat_hist2.append(q_and_a)
+
+                logger.info(f"Chat history2: {chat_hist2}")
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
                 reporter_graph = create_reporter_graph()
                 # save graph image:
@@ -58,7 +86,7 @@ def chat_view(request):
                 final_state: GraphState = reporter_graph.invoke(
                     {
                         "database_source": datasource,
-                        "chat_history": chat_hist,
+                        "chat_history": chat_hist2,
                         "question": user_message,
                         "refine_sql_recursive_limit": 3,
                         "refine_empty_result_recursive_limit": 3,

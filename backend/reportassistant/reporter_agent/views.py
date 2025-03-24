@@ -70,8 +70,11 @@ def generate_description(request):
         chart_id = request.POST["chart_id"]
         chart_img_file = request.FILES.get("chart_img_file", None)
         fs = FileSystemStorage(location="files")
-        file = fs.save(str(uuid4()) + ".png", chart_img_file)
-        url = fs.path(file)
+        if chart_img_file:
+            file = fs.save(str(uuid4()) + ".png", chart_img_file)
+            url = fs.path(file)
+        else:
+            url = None
 
         chart = Chart.objects.get(id=chart_id)
         chart.chart_img_url = url

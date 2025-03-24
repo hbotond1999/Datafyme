@@ -1,6 +1,7 @@
 import logging
 
 from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate, PromptTemplate
 from langchain_core.tools import tool
@@ -8,6 +9,7 @@ from langchain_core.tools import tool
 from common.ai.model import get_llm_model
 from common.db.manager.database_manager import DatabaseManager
 from reporter_agent.reporter.response import RefinedSQLCommand, IsSQLNeeded
+from reporter_agent.reporter.utils import png_to_base64
 
 logger = logging.getLogger('reportassistant.custom')
 
@@ -35,18 +37,36 @@ def create_history_summarizer():
     return contextualize_q_prompt | get_llm_model() | StrOutputParser()
 
 
-def task_router():
+def convert_chat_to_llm_format(base_content, chat_data):
+    messages = []
+
+    messages.append({"role": "user", "content": base_content})
+
+    for chat in chat_data:
+        messages.append({"role": "user", "content": chat["HUMAN"]})
+
+        if "AI" in chat and chat["AI"]:
+            ai_content = chat["AI"]
+            messages.append({"role": "assistant", "content": ai_content})
+
+        if "image" in chat and chat["image"]:
+            base64_img = png_to_base64(chat["image"])
+            messages.append({"role": "assistant", "content": f"IMAGE: data:image/png;base64,{base64_img}"})
+
+    return messages
+
+
+def task_router(question, chat_data):
     prompt_str = """You are a task assigning agent whose job is to decide whether the answer to the user's question can 
     be generated from the data from the chat history or whether a new database query is required. If all the necessary 
     data for the answer is not available, a new SQL query is required to generate the data.
-    User question: {question}.
-    Chat history with previously used tables: {chat_history}.
-    
-    """
+    If it's necessary, use the diagrams in the chat history to provide the answer, as the question may be directed to 
+    previously created diagrams.
+    """ + f""" User question: {question}.""" + f"""Chat history: """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["question", "chat_history"])
+    message = convert_chat_to_llm_format(prompt_str, chat_data)
 
-    return prompt | get_llm_model().with_structured_output(IsSQLNeeded)
+    return get_llm_model().with_structured_output(IsSQLNeeded).invoke(message)
 
 
 def refine_sql_agent():
