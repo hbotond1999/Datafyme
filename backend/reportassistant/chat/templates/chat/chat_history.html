@@ -3,9 +3,9 @@
 {% load static %}
 {% block content %}
     <link href="{% static 'chat/css/chat_history.css' %}" rel="stylesheet">
-<div class="container py-5">
+<div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-md-12 col-lg-12">
             <div class="card shadow-sm">
                 <div class="card-header text-center bg-primary text-white">
                     <h2>{% trans 'Chat History' %}</h2>
@@ -61,7 +61,7 @@
 <script src="{% static 'chat/js/chart.js' %}"></script>
 <script>
     document.querySelectorAll('.custom-chart').forEach(function(element) {
-        new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', '', null, element, element.dataset.id, false, false, true, '{% url "reporter_agent:download_chart" 0 %}'.replace('0', element.dataset.id) , '{% trans 'download' %}');
+        new ChartHelper('{% url "reporter_agent:get_chart" 0 %}'.replace('0', element.dataset.id), '', '', null, element, element.dataset.id, false, false, true, '{% url "reporter_agent:download_chart" 0 %}'.replace('0', element.dataset.id) , '{% trans 'download' %}', 600);
     });
 </script>
 {% endblock %}

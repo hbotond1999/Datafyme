@@ -9,7 +9,8 @@ class ChartHelper {
                 scrollToInit = false,
                 init = true,
                 download_url = "",
-                download_text = null
+                download_text = null,
+                chartHeight = 300
               ) {
         this.parent = parentContainer;
         this.url = url;
@@ -22,6 +23,7 @@ class ChartHelper {
         this.generateDescriptionCallback = generateDescriptionCallback
         this.download_url = download_url;
         this.download_text =download_text
+        this.chartHeight = chartHeight
         if (init) {
             this.init()
         }
@@ -42,7 +44,7 @@ class ChartHelper {
     renderCanvasChart(charData) {
         const canvas = document.createElement('canvas');
         if (this.draggable) {
-            canvas.height = 300
+            canvas.height = this.chartHeight
             const contEl = this.createDraggableContainer()
             contEl.append(canvas);
             this.parent.append(contEl);
