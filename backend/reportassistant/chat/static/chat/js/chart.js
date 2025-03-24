@@ -9,7 +9,8 @@ class ChartHelper {
                 scrollToInit = false,
                 init = true,
                 download_url = "",
-                download_text = null
+                download_text = null,
+                chartHeight
               ) {
         this.parent = parentContainer;
         this.url = url;
@@ -22,6 +23,7 @@ class ChartHelper {
         this.generateDescriptionCallback = generateDescriptionCallback
         this.download_url = download_url;
         this.download_text =download_text
+        this.chartHeight = chartHeight
         if (init) {
             this.init()
         }
@@ -41,8 +43,12 @@ class ChartHelper {
 
     renderCanvasChart(charData) {
         const canvas = document.createElement('canvas');
+        // canvas.height = 1200
+        if (this.chartHeight) {
+            canvas.height =  this.chartHeight;
+        }
+
         if (this.draggable) {
-            canvas.height = 300
             const contEl = this.createDraggableContainer()
             contEl.append(canvas);
             this.parent.append(contEl);
@@ -56,15 +62,11 @@ class ChartHelper {
         if (this.scrollToInit) {
             canvas.scrollIntoView({behavior: "smooth", block: "end"})
         }
-        console.log(charData)
-        console.log("url", this.generate_description_url)
         if (this.generate_description_url) {
             setTimeout(() => {this.getDescription(canvas)}, 500)
         } else if (this.generateDescriptionCallback != null){
             this.generateDescriptionCallback(charData.description)
         }
-
-
     }
 
     createChart(canvas, charData) {

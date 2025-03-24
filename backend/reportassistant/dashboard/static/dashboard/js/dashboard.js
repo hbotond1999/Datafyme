@@ -62,7 +62,6 @@ class DashboardHelper {
             if (response.ok) {
                 const data = await response.json();
                 document.getElementById("DashboardModalClose").click();
-                console.log('Dashboard created successfully:', data);
                 await this.getDashboardOptions();
                 return data;
             } else {
