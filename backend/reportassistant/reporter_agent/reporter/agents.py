@@ -1,9 +1,9 @@
 import logging
 
 from langchain.agents import AgentExecutor, create_openai_tools_agent
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
-from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate, PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.tools import tool
 
 from common.ai.model import get_llm_model
@@ -14,44 +14,40 @@ from reporter_agent.reporter.utils import png_to_base64
 logger = logging.getLogger('reportassistant.custom')
 
 
-def create_history_summarizer():
+def create_history_summarizer(question, chat_data):
     contextualize_q_system_prompt = """
         Given a chat history and the latest user question which might reference context in the chat history, 
         formulate a standalone question which can be understood without the chat history. Do NOT answer the question, 
         just reformulate it if needed and otherwise return it as is."""
 
-    contextualize_q_human_prompt = """ 
+    contextualize_q_human_prompt = f""" 
     Question: {question}
     
     (Reminder Do NOT answer the question, just reformulate it if needed and otherwise return it as is.)
     
     """
-    contextualize_q_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", contextualize_q_system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", contextualize_q_human_prompt),
-        ]
-    )
+    base_content = contextualize_q_system_prompt + contextualize_q_human_prompt
+    message = convert_chat_to_llm_format(base_content, chat_data)
+    human_message = HumanMessage(content=message)
 
-    return contextualize_q_prompt | get_llm_model() | StrOutputParser()
+    llm = (get_llm_model() | StrOutputParser())
+    return llm.invoke([human_message])
 
 
 def convert_chat_to_llm_format(base_content, chat_data):
     messages = []
 
-    messages.append({"role": "user", "content": base_content})
+    messages.append({"type": "text", "text": f"{base_content}"})
 
     for chat in chat_data:
-        messages.append({"role": "user", "content": chat["HUMAN"]})
+        messages.append({"type": "text", "text": f"HUMAN message: {chat['HUMAN']}"})
 
         if "AI" in chat and chat["AI"]:
-            ai_content = chat["AI"]
-            messages.append({"role": "assistant", "content": ai_content})
+            messages.append({"type": "text", "text": f"AI answer: {chat['AI']}"})
 
         if "image" in chat and chat["image"]:
             base64_img = png_to_base64(chat["image"])
-            messages.append({"role": "assistant", "content": f"IMAGE: data:image/png;base64,{base64_img}"})
+            messages.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + base64_img}})
 
     return messages
 
@@ -62,11 +58,11 @@ def task_router(question, chat_data):
     data for the answer is not available, a new SQL query is required to generate the data.
     If it's necessary, use the diagrams in the chat history to provide the answer, as the question may be directed to 
     previously created diagrams.
-    """ + f""" User question: {question}.""" + f"""Chat history: """
+    """ + f"""User question: {question}. Chat history: """
 
     message = convert_chat_to_llm_format(prompt_str, chat_data)
-
-    return get_llm_model().with_structured_output(IsSQLNeeded).invoke(message)
+    human_message = HumanMessage(content=message)
+    return get_llm_model().with_structured_output(IsSQLNeeded).invoke([human_message])
 
 
 def refine_sql_agent():

@@ -19,19 +19,17 @@ logger = logging.getLogger('reportassistant.custom')
 
 
 @log(my_logger=logger)
-def summarize_history_node(state: GraphState):
-    new_question = create_history_summarizer().invoke(
-        {"chat_history": state["chat_history"], "question": state["question"]}
-    )
-
-    return {"question": new_question}
+def task_router_node(state: GraphState):
+    result = task_router(question=state["question"], chat_data=state["chat_history"])
+    logger.info(f"SQL is needed? {result.is_sql_needed}")
+    return {"is_sql_needed": result.is_sql_needed}
 
 
 @log(my_logger=logger)
-def task_router_node(state: GraphState):
-    is_sql_needed = task_router(question=state["question"], chat_data=state["chat_history"])
-    logger.info(f"SQL is needed? {is_sql_needed}")
-    return {"is_sql_needed": is_sql_needed}
+def summarize_history_node(state: GraphState):
+    new_question = create_history_summarizer(question=state["question"], chat_data=state["chat_history"])
+
+    return {"question": new_question}
 
 
 @log(my_logger=logger)
