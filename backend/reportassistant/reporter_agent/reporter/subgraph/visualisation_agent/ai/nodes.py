@@ -3,11 +3,13 @@ import json
 from common.custom_logging import log
 from reporter_agent.reporter.agents import logger
 from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData, RepType
-from reporter_agent.reporter.subgraph.visualisation_agent.ai.agents import create_representation_agent, create_chart_selector_agent, \
-    create_chart_def_agent, create_summarize_agent
+from reporter_agent.reporter.subgraph.visualisation_agent.ai.agents import create_representation_agent, \
+    create_chart_selector_agent, \
+    create_chart_def_agent, create_summarize_agent, create_chart_def_fix_agent
 from reporter_agent.reporter.subgraph.visualisation_agent.ai.state import GraphState
 from reporter_agent.reporter.subgraph.visualisation_agent.ai.utils import get_first_ten_records
-from reporter_agent.reporter.subgraph.visualisation_agent.chart import CHART_RESPONSE_MAPPING, ChartTypes
+from reporter_agent.reporter.subgraph.visualisation_agent.chart import CHART_RESPONSE_MAPPING, ChartTypes, Chart, \
+    BarChart
 
 
 @log(my_logger=logger)
@@ -46,10 +48,31 @@ def populate_chart_data(state: GraphState):
     Args:
         state (GraphState): A dictionary containing the state information for generating chart data.
     """
-    agent = create_chart_def_agent(CHART_RESPONSE_MAPPING[state["chart_type"]])
     preview_data = get_first_ten_records(data=state["input_data"])
-    result = agent.invoke({"preview_data": json.dumps(preview_data), "chart_type": state["chart_type"],  'question': state["question"], 'language': state["language"]})
+    if len(state["error_messages"]) > 0 and ["chart_column_data"] is not None:
+        agent = create_chart_def_fix_agent(CHART_RESPONSE_MAPPING[state["chart_type"]])
+        result = agent.invoke({
+            "preview_data": json.dumps(preview_data),
+            "chart_type": state["chart_type"],
+            "selected_chart_structure": json.dumps(["chart_column_data"]),
+            "error_messages": state["error_messages"],
+            'language': state["language"]
+        })
+    else:
+        agent = create_chart_def_agent(CHART_RESPONSE_MAPPING[state["chart_type"]])
+        result: Chart = agent.invoke({
+            "preview_data": json.dumps(preview_data),
+            "chart_type": state["chart_type"],
+            'question': state["question"],
+            'language': state["language"]
+        })
     return {"chart_column_data": result}
+
+@log(my_logger=logger)
+def validate_chart_data(state: GraphState):
+    preview_data = get_first_ten_records(data=state["input_data"])
+    error_messages = state["chart_column_data"].validate_chart_data(list(preview_data.keys()))
+    return {"error_messages": error_messages}
 
 
 @log(my_logger=logger)

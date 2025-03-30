@@ -47,5 +47,17 @@ class MixedChart(BaseModel, Chart):
             }
         }
 
+    @classmethod
     def create_pptx_chart(cls, chart_metadata, data: pd.DataFrame, slide, x, y, cx, cy):
         return None
+
+    def validate_chart_data(self, column_names: List[str]) -> List[str]:
+        error_messages = []
+
+        if self.labels_column_name not in column_names:
+            error_messages.append(f"The {self.labels_column_name} column is not in the dataset.")
+
+        for i, dataset in enumerate(self.datasets):
+            if dataset.data_column_name not in column_names:
+                error_messages.append(f"The {dataset.data_column_name} column is not in the dataset.")
+        return error_messages

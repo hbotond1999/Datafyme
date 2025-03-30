@@ -70,10 +70,30 @@ def create_chart_def_agent(structured_output):
      USER question: {question}
     
      Your task is to assist in creating the visualization. To do this, label each axis of the chart with the column names according to the provided structure. 
-     Please select the column names exactly as they appear in the attached dataset. The title must be in this language {language}
+     
+     Please select the column names exactly as they appear in the attached dataset. 
+     
+     The title must be in this language {language}
     """
-
     prompt = PromptTemplate(template=prompt_str, input_variables=["preview_data", "chart_type", "question", "language"])
+
+    return prompt | get_llm_model().with_structured_output(structured_output)
+
+
+def create_chart_def_fix_agent(structured_output):
+    prompt_str = """"Based on previous interactions, you selected a {chart_type} chart for this dataset: {preview_data}.
+    
+    The chart was initially structured as follows:
+    {selected_chart_structure}
+    
+    However, the following validation errors were encountered:
+    {error_messages}
+    
+    Please provide a corrected version of the chart structure.
+    
+     The title must be in this language {language}
+    """
+    prompt = PromptTemplate(template=prompt_str, input_variables=["chart_type", "preview_data", "error_messages", "selected_chart_structure", "language"])
 
     return prompt | get_llm_model().with_structured_output(structured_output)
 
