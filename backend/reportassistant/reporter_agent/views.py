@@ -69,11 +69,17 @@ def generate_description(request):
     if request.method == 'POST':
         chart_id = request.POST["chart_id"]
         chart_img_file = request.FILES.get("chart_img_file", None)
-        url = None
+        fs = FileSystemStorage(location="files")
         if chart_img_file:
-            fs = FileSystemStorage(location="files")
             file = fs.save(str(uuid4()) + ".png", chart_img_file)
             url = fs.path(file)
+        else:
+            url = None
+
+        chart = Chart.objects.get(id=chart_id)
+        chart.chart_img_url = url
+        chart.save(update_fields=["chart_img_url"])
+
         result = create_description(chart_id, url, get_language())
         return JsonResponse(data={"description": result.description})
     else:

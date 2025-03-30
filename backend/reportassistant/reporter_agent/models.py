@@ -14,6 +14,7 @@ class Chart(models.Model):
     type = models.CharField(max_length=100, choices=TYPES)
     sql_query = models.TextField()
     meta_data = models.JSONField(null=True, blank=True)
+    chart_img_url = models.TextField(null=True)
 
 
 GenAIModelTypes = {"openai": "Openai", "claude": "Claude", "google": "google"}

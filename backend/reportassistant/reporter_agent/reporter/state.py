@@ -19,4 +19,7 @@ class GraphState(TypedDict):
     refine_sql_recursive_limit: int  # input
     refine_empty_result_recursive_limit: int  # input
     language: str
+    is_sql_needed: bool
+    new_chart_needed: bool
+    q_and_a_answer: str
 

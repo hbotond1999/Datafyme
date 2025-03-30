@@ -6,6 +6,7 @@ from langchain_core.messages import HumanMessage
 from common.ai.model import get_llm_model
 from reporter_agent.models import Chart
 from reporter_agent.reporter.subgraph.visualisation_agent.chart_description.response import ChartDescription
+from reporter_agent.reporter.utils import png_to_base64
 from reporter_agent.utils.chart_data import create_chart_meta_data
 
 
@@ -32,19 +33,3 @@ def create_description(chart_id, chart_path, lang):
     chart.save()
 
     return result
-
-
-def png_to_base64(file_path):
-    """
-    Converts a PNG file to a base64 encoded string.
-
-    Parameters:
-        file_path (str): Path to the PNG file
-
-    Returns:
-        str: Base64 encoded string of the PNG file
-    """
-
-    with open(file_path, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
-        return encoded_string
