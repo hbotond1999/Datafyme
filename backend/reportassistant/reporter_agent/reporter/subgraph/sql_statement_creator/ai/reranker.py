@@ -1,6 +1,5 @@
 import logging
 
-from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 
 from common.ai.model import get_llm_model

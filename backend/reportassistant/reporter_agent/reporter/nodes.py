@@ -7,11 +7,12 @@ from common.custom_logging import log
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from reporter_agent.reporter.agents import create_history_summarizer, refine_sql_agent, refine_empty_result_sql_agent, \
-    task_router
-from reporter_agent.reporter.response import RefinedSQLCommand
+    task_router, q_and_a_agent, seconder_task_router, filter_relevant_question, basic_chat
+from reporter_agent.reporter.response import RefinedSQLCommand, IsRelevant, BasicChat
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.graph import create_sql_agent_graph
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
+from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData, RepType
 from reporter_agent.reporter.subgraph.visualisation_agent.ai.graph import create_graph as create_visu_graph
 from reporter_agent.reporter.utils import save_graph_png
 
@@ -19,10 +20,39 @@ logger = logging.getLogger('reportassistant.custom')
 
 
 @log(my_logger=logger)
+def filter_basic_chat(state: GraphState):
+    """
+    Args:
+        state (GraphState): A dictionary-like object containing the current state of the graph.
+
+    Returns:
+        dict: A dictionary containing the 'message' which is the original user input.
+    """
+    logger.info("Running filter_basic_chat node: checking if the message is relevant for a reporting tasks.")
+    result: IsRelevant = filter_relevant_question().invoke({'message': state["question"]})
+
+    if result.is_relevant:
+        logger.info(f"Relevant message for a reporting tasks")
+        return {'question': state["question"]}
+    else:
+        logger.info(f"User message is not relevant for a reporting tasks")
+        answer: BasicChat = basic_chat().invoke({'message': state["question"],
+                                                 'database': state["database_source"].name})
+        raise RefineLimitExceededError(answer.answer)
+
+
+@log(my_logger=logger)
 def task_router_node(state: GraphState):
     result = task_router(question=state["question"], chat_data=state["chat_history"])
     logger.info(f"SQL is needed? {result.is_sql_needed}")
     return {"is_sql_needed": result.is_sql_needed}
+
+
+@log(my_logger=logger)
+def seconder_task_router_node(state: GraphState):
+    result = seconder_task_router(question=state["question"], chat_data=state["chat_history"])
+    logger.info(f"New chart generation is needed? {result.new_chart_needed}")
+    return {"new_chart_needed": result.new_chart_needed}
 
 
 @log(my_logger=logger)
@@ -105,3 +135,11 @@ def create_visualization_node(state: GraphState):
     result = visu_graph.invoke({"question": state["question"], "input_data": state["sql_query_result"], "language": state["language"]})
 
     return {"representation_data": result["final_data"]}
+
+
+@log(my_logger=logger)
+def create_q_and_a_node(state: GraphState):
+
+    result = q_and_a_agent(state["question"], state["chat_history"])
+    final_data = FinalData(type=RepType.TEXT, chart_type=None, data=result, chart_title=None)
+    return {"representation_data": final_data}

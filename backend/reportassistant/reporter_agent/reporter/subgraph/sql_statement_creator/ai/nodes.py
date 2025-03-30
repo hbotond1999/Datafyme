@@ -5,36 +5,13 @@ import logging
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
 from db_configurator.models import TableDocumentation
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent, refine_user_question_agent, \
-    filter_relevant_question, basic_chat
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent, refine_user_question_agent
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_all_ddl
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import IsRelevant, BasicChat
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
 
 logger = logging.getLogger('reportassistant.custom')
-
-
-def filter_basic_chat(state: GraphState):
-    """
-    Args:
-        state (GraphState): A dictionary-like object containing the current state of the graph.
-
-    Returns:
-        dict: A dictionary containing the 'message' which is the original user input.
-    """
-    logger.info("Running filter_basic_chat node: checking if the message is relevant for a reporting tasks.")
-    result: IsRelevant = filter_relevant_question().invoke({'message': state["message"]})
-
-    if result.is_relevant:
-        logger.info(f"Relevant message for a reporting tasks")
-        return {'message': state["message"]}
-    else:
-        logger.info(f"User message is not relevant for a reporting tasks")
-        answer: BasicChat = basic_chat().invoke({'message': state["message"],
-                                                 'database': state["database_source"].name})
-        raise RefineLimitExceededError(answer.answer)
 
 
 def hybrid_search_node(state: GraphState):

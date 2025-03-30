@@ -8,17 +8,44 @@ from langchain_core.tools import tool
 
 from common.ai.model import get_llm_model
 from common.db.manager.database_manager import DatabaseManager
-from reporter_agent.reporter.response import RefinedSQLCommand, IsSQLNeeded
+from reporter_agent.reporter.response import RefinedSQLCommand, IsSQLNeeded, NewChartNeeded, IsRelevant, BasicChat
 from reporter_agent.reporter.utils import png_to_base64
 
 logger = logging.getLogger('reportassistant.custom')
 
 
+def filter_relevant_question():
+    prompt_str = """
+    Your task is to decide whether the message sent by the user is a data analysis question that is intended to query 
+    information from a database or just a general chat message, greeting, etc.
+    User question: {message}. 
+    """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["message"])
+
+    return prompt | get_llm_model().with_structured_output(IsRelevant)
+
+
+def basic_chat():
+    prompt_str = """
+    System: Your are a helpful data analyst, whose task is to answer analytical questions based on the selected 
+    data source.
+    Data source: {database}.
+    User message: {message}.
+    """
+
+    prompt = PromptTemplate(template=prompt_str, input_variables=["message", "database"])
+
+    return prompt | get_llm_model().with_structured_output(BasicChat)
+
+
 def create_history_summarizer(question, chat_data):
     contextualize_q_system_prompt = """
-        Given a chat history and the latest user question which might reference context in the chat history, 
-        formulate a standalone question which can be understood without the chat history. Do NOT answer the question, 
-        just reformulate it if needed and otherwise return it as is."""
+        Given a chat history and a question asked by the user that can refer to the chat history context.
+        Write a standalone message that can be understood without the chat history and contains all the information 
+        about the original question and the necessary chat history parts. 
+        Where possible, reformulate the task into a representation task.
+        Do NOT answer the question, just reformulate it if needed and otherwise return it as is."""
 
     contextualize_q_human_prompt = f""" 
     Question: {question}
@@ -63,6 +90,19 @@ def task_router(question, chat_data):
     message = convert_chat_to_llm_format(prompt_str, chat_data)
     human_message = HumanMessage(content=message)
     return get_llm_model().with_structured_output(IsSQLNeeded).invoke([human_message])
+
+
+def seconder_task_router(question, chat_data):
+    prompt_str = """You are a task dispatcher whose job is to decide whether a question asked by a user regarding the 
+    content of the chat history requires only a textual answer or whether some visualization needs to be created or 
+    modified. 
+    If a visualization is not required, but a text-only answer is sufficient, return false.
+    If the request requires visualization, return true.
+    """ + f"""User question: {question}. Chat history: """
+
+    message = convert_chat_to_llm_format(prompt_str, chat_data)
+    human_message = HumanMessage(content=message)
+    return get_llm_model().with_structured_output(NewChartNeeded).invoke([human_message])
 
 
 def refine_sql_agent():
@@ -167,3 +207,14 @@ def generate_title_agent():
     prompt = PromptTemplate(template=prompt_str, input_variables=["first_message", "language"])
 
     return prompt | get_llm_model() | StrOutputParser()
+
+
+def q_and_a_agent(question, chat_data):
+    prompt_str = """
+    Based on the input chat history, please answer the question asked by the user.
+    """ + f"""User question: {question}. Chat history: """
+
+    message = convert_chat_to_llm_format(prompt_str, chat_data)
+    human_message = HumanMessage(content=message)
+    llm = (get_llm_model() | StrOutputParser())
+    return llm.invoke([human_message])

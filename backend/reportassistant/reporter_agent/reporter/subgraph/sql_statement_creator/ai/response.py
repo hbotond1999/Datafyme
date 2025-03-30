@@ -2,8 +2,6 @@ from typing import List, Dict, Any
 
 from pydantic import BaseModel, Field
 
-from db_configurator.models import TableDocumentation
-
 
 class SQLCommand(BaseModel):
     """
@@ -27,22 +25,6 @@ class NewQuestion(BaseModel):
         message: The text of the original user question
     """
     message: str = Field(description="The refined user question")
-
-
-class IsRelevant(BaseModel):
-    """
-    IsRelevant:
-        A class to store true values if the user message is relevant for a data analysis task
-
-    Attributes:
-        is_relevant: The text of the original user question
-    """
-    is_relevant: bool = Field(description="The user message is relevant for a data analysis task")
-
-
-class BasicChat(BaseModel):
-
-    answer: str = Field(description="The answer for the user message")
 
 
 class DDLGrade(BaseModel):

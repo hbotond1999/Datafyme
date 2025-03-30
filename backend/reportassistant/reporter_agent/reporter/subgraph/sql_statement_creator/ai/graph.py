@@ -2,7 +2,7 @@ from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.nodes import hybrid_search_node, get_ddls, reranker, \
-    relation_graph, get_final_ddls, create_query, refine_user_question, filter_basic_chat
+    relation_graph, get_final_ddls, create_query, refine_user_question
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
 
@@ -15,7 +15,6 @@ def create_sql_agent_graph():
         Compiled state graph for the SQL generation workflow.
     """
     graph = StateGraph(GraphState)
-    graph.add_node("filter_basic_chat_node", filter_basic_chat)
     graph.add_node("hybrid_search_node", hybrid_search_node)
     graph.add_node("get_ddls_node", get_ddls)
     graph.add_node("reranker_node", reranker)
@@ -24,8 +23,7 @@ def create_sql_agent_graph():
     graph.add_node("get_final_ddls_node", get_final_ddls)
     graph.add_node("create_query_node", create_query)
 
-    graph.add_edge(START, "filter_basic_chat_node")
-    graph.add_edge("filter_basic_chat_node", "hybrid_search_node")
+    graph.add_edge(START, "hybrid_search_node")
     graph.add_edge("hybrid_search_node", "get_ddls_node")
     graph.add_edge("get_ddls_node", "reranker_node")
     graph.add_conditional_edges(
