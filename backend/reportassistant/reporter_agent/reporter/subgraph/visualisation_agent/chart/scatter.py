@@ -1,3 +1,5 @@
+from typing import List
+
 from pptx.enum.chart import XL_LEGEND_POSITION
 from pydantic import BaseModel,Field
 from pptx.enum.chart import XL_CHART_TYPE
@@ -116,3 +118,12 @@ class ScatterChart(BaseModel, Chart):
         marker.format.fill.solid()
 
         return pptx_chart
+
+    def validate_chart_data(self, column_names: List[str]):
+        error_messages = []
+        if self.x_axis_column_name not in column_names:
+            error_messages.append(f"The {self.x_axis_column_name} column is not in the dataset.")
+
+        if self.y_axis_column_name not in column_names:
+            error_messages.append(f"The {self.y_axis_column_name} column is not in the dataset.")
+        return error_messages

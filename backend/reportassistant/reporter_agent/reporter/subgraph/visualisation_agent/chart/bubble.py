@@ -1,3 +1,5 @@
+from typing import List
+
 from pptx.chart.data import BubbleChartData
 from pydantic import BaseModel, Field
 from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
@@ -108,3 +110,15 @@ class BubbleChart(BaseModel, Chart):
         pptx_chart.legend.include_in_layout = False
 
         return pptx_chart
+
+    def validate_chart_data(self, column_names: List[str]):
+        error_messages = []
+        if self.X_axis_column_name not in column_names:
+            error_messages.append(f"The {self.X_axis_column_name} column is not in the dataset.")
+
+        if self.Y_axis_column_name not in column_names:
+            error_messages.append(f"The {self.Y_axis_column_name} column is not in the dataset.")
+
+        if self.Y_axis_column_name not in column_names:
+            error_messages.append(f"The {self.Y_axis_column_name} column is not in the dataset.")
+        return error_messages

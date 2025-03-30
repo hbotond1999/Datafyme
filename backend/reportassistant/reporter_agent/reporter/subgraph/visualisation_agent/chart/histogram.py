@@ -1,3 +1,5 @@
+from typing import List
+
 from pptx.chart.data import CategoryChartData
 from pydantic import BaseModel, Field
 
@@ -96,3 +98,9 @@ class HistogramChart(BaseModel, Chart):
         plot.gap_width = 0
 
         return pptx_chart
+
+    def validate_chart_data(self, column_names: List[str]):
+        error_messages = []
+        if self.y_axis_column not in column_names:
+            error_messages.append(f"The {self.y_axis_column} column is not in the dataset.")
+        return error_messages

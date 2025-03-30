@@ -17,6 +17,7 @@ class GraphState(TypedDict):
     """
     representation_type: str # local
     chart_type: str # local
+    error_messages: List[str] # local
     chart_column_data: Chart
     input_data: Dict[str, List[Any]] # input
     question: str # input

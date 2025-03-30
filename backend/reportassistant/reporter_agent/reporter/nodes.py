@@ -85,6 +85,10 @@ def refine_empty_result_sql_query_node(state: GraphState):
 
 @log(my_logger=logger)
 def create_visualization_node(state: GraphState):
-    result = create_visu_graph().invoke({"question": state["question"], "input_data": state["sql_query_result"], "language": state["language"]})
-
+    result = create_visu_graph().invoke({
+        "question": state["question"],
+        "input_data": state["sql_query_result"],
+        "language": state["language"],
+        "error_messages": []}
+    )
     return {"representation_data": result["final_data"]}
