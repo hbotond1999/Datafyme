@@ -147,6 +147,7 @@ def chat_history(request):
     conversations = (
         Conversation.objects
         .annotate(latest_message_time=Subquery(recent_conversations.values('timestamp')[:1]))
+        .filter(latest_message_time__isnull=False)
         .order_by('-latest_message_time')
     )
 

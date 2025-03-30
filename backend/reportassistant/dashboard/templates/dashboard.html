@@ -10,6 +10,7 @@
     <div class="dashboard-container">
 
         <button id="openAddDatabaseModal" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDashboardModal"><i class="fas fa-add"></i></button>
+        <button id="exportToPPTX" class="btn  btn-outline-primary"><i class="fas fa-file-export"></i></button>
         <button id="deleteDashBoardButton" class="btn  btn-outline-danger"><i class="fas fa-trash"></i></button>
         {% include 'dashboard_selector.html' %}
     </div>
@@ -29,7 +30,8 @@
             "{% url 'dashboard:delete_dashboard' 0 %}",
             "{% url 'dashboard:add_dashboard_slot' %}",
             '{% url "reporter_agent:get_chart" 0 %}',
-            '{% url "reporter_agent:edit_chart" %}'
+            '{% url "reporter_agent:edit_chart" %}',
+            '{% url "dashboard:export_dashboard_to_pptx" 0 %}',
         )
 
         document.getElementById('saveDashboard').addEventListener(('click'), () => dashboardHelper.createDashboard()
@@ -46,7 +48,10 @@
         document.getElementById('deleteDashBoardButton').addEventListener("click", () => {
             dashboardHelper.deleteDashboard()
         })
-
+        const exportButton = document.getElementById('exportToPPTX')
+       exportButton.addEventListener("click", () => {
+            dashboardHelper.exportDashboardToPptx(exportButton)
+        })
         dashboardHelper.getDashboardOptions()
 
 </script>

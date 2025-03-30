@@ -1,7 +1,8 @@
 from typing import Optional
 
+from pptx.chart.data import CategoryChartData
 from pydantic import BaseModel, Field
-
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.color import ColorPalette
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.utils import axis_date_str_converter
@@ -21,6 +22,7 @@ class BarChart(BaseModel, Chart):
 
     @classmethod
     def create_chart_data(cls, chart, data):
+
         x_axis = chart.meta_data["metadata"]["x_axis"]
         y_axis = chart.meta_data["metadata"]["y_axis"]
         date_format = chart.meta_data["metadata"].get("date_format")
@@ -53,3 +55,60 @@ class BarChart(BaseModel, Chart):
                 }
             }
         }
+
+    @classmethod
+    def create_pptx_chart(cls, chart_metadata, data, slide, x, y, cx, cy):
+        """
+        Creates a chart object that can be directly added to a PowerPoint slide.
+
+        Args:
+            chart_metadata: The chart object containing metadata
+            data: The DataFrame containing the data to be plotted
+            slide: The PowerPoint slide to add the chart to
+            x: The x-coordinate for the chart position
+            y: The y-coordinate for the chart position
+            cx: The width of the chart
+            cy: The height of the chart
+
+        Returns:
+            Chart: A PowerPoint chart object that has been added to the slide
+        """
+
+
+        x_axis = chart_metadata.meta_data["metadata"]["x_axis"]
+        y_axis = chart_metadata.meta_data["metadata"]["y_axis"]
+        date_format = chart_metadata.meta_data["metadata"].get("date_format")
+
+        chart_data = CategoryChartData()
+
+        if date_format:
+            categories = axis_date_str_converter(dates=data[x_axis], date_format=date_format)
+        else:
+            categories = data[x_axis].tolist()
+
+        chart_data.categories = categories
+
+        values = data[y_axis].tolist()
+        series_name = y_axis
+        chart_data.add_series(series_name, values)
+
+        pptx_chart = slide.shapes.add_chart(
+            XL_CHART_TYPE.COLUMN_CLUSTERED,
+            x, y, cx, cy,
+            chart_data
+        ).chart
+
+        pptx_chart.has_title = True
+        if chart_metadata.title:
+            pptx_chart.chart_title.text_frame.text = chart_metadata.title
+        else:
+            pptx_chart.chart_title.text_frame.text = f"{y_axis} by {x_axis}"
+
+        value_axis = pptx_chart.value_axis
+        value_axis.has_major_gridlines = True
+        value_axis.has_minor_gridlines = False
+
+        category_axis = pptx_chart.category_axis
+        category_axis.has_major_gridlines = False
+
+        return pptx_chart

@@ -90,7 +90,8 @@
                         false,
                         true,
                          '{% url "reporter_agent:download_chart" 0 %}'.replace('0', element.dataset.id) ,
-                        '{% trans 'download' %}'
+                        '{% trans 'download' %}',
+                        300
                     )
 
                 });
@@ -143,7 +144,8 @@
                     true,
                     true,
                      '{% url "reporter_agent:download_chart" 0 %}'.replace('0', data.chart_id) ,
-                    '{% trans 'download' %}'
+                    '{% trans 'download' %}',
+                    300
                 );
             }
         })

@@ -12,4 +12,5 @@ urlpatterns = [
     path('delete_dashboard_slots/<int:slot_id>/', views.delete_dashboard_slot, name='delete_dashboard_slot'),
     path('delete_dashboard/<int:dashboard_id>/', views.delete_dashboard, name='delete_dashboard'),
     path('add_dashboard_slot/', views.add_dashboard_slot, name='add_dashboard_slot'),
+    path('export_pptx/<int:dashboard_id>', views.export_dashboard_to_pptx, name="export_dashboard_to_pptx"),
 ]

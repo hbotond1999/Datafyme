@@ -1,10 +1,12 @@
 import json
-
+import logging
+from io import BytesIO
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseNotAllowed, JsonResponse
-
+from django.http import HttpResponseNotAllowed, JsonResponse, HttpResponseForbidden, HttpResponse, HttpResponseNotFound, \
+    HttpResponseServerError
+from django.utils.text import slugify
 from dashboard.models import Dashboard, DashboardSlot
-
+from dashboard.services.pptx.presentation import create_presentation
 
 
 # Create your views here.
@@ -112,3 +114,46 @@ def add_dashboard_slot(request):
         return JsonResponse({'ok': True}, status=200)
     else:
         return HttpResponseNotAllowed(permitted_methods=["POST"])
+
+
+@login_required
+def export_dashboard_to_pptx(request, dashboard_id: int):
+    """
+    Django view to export a dashboard to a PowerPoint presentation.
+    Each chart will be placed on a separate slide.
+
+    Args:
+        request: The HTTP request
+        dashboard_id: The ID of the dashboard to export
+
+    Returns:
+        HTTP response with the PowerPoint file for download
+    """
+    if request.method == 'GET':
+        try:
+            dashboard = Dashboard.objects.get(id=dashboard_id)
+            if dashboard.user != request.user:
+                return HttpResponseForbidden("You don't have permission to export this dashboard.")
+
+            prs = create_presentation(dashboard)
+
+            pptx_data = BytesIO()
+            prs.save(pptx_data)
+            pptx_data.seek(0)
+
+            response = HttpResponse(
+                pptx_data.getvalue(),
+                content_type='application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            )
+            filename = f"{slugify(dashboard.title)}-export.pptx"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+            return response
+
+        except Dashboard.DoesNotExist:
+            return HttpResponseNotFound("Dashboard not found")
+        except Exception as e:
+            logging.error(f"Error exporting dashboard {dashboard_id}: {str(e)}")
+            return HttpResponseServerError(f"Error exporting dashboard: {str(e)}")
+    else:
+        return HttpResponseNotAllowed(['GET'])
