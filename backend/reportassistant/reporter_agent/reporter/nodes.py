@@ -132,8 +132,12 @@ def create_visualization_node(state: GraphState):
     # save graph image:
     if int(os.getenv('DEBUG')) == 1:
         save_graph_png(visu_graph, name='visu_graph')
-    result = visu_graph.invoke({"question": state["question"], "input_data": state["sql_query_result"], "language": state["language"]})
-
+    result = visu_graph.invoke({
+        "question": state["question"],
+        "input_data": state["sql_query_result"],
+        "language": state["language"],
+        "error_messages": []}
+    )
     return {"representation_data": result["final_data"]}
 
 

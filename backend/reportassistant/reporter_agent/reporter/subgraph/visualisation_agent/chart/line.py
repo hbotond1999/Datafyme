@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pptx.chart.data import CategoryChartData
 from pptx.dml.color import RGBColor
@@ -113,3 +113,13 @@ class LineChart(BaseModel, Chart):
         series.marker.size = 5
 
         return pptx_chart
+
+    def validate_chart_data(self, column_names: List[str]):
+        error_messages = []
+        if self.y_axis_column_name not in column_names:
+            error_messages.append(f"The {self.y_axis_column_name} column is not in the dataset.")
+
+        if self.x_axis_column_name not in column_names:
+            error_messages.append(f"The {self.x_axis_column_name} column is not in the dataset.")
+
+        return error_messages
