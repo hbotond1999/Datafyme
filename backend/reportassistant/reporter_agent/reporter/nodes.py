@@ -69,7 +69,9 @@ def create_sql_query_node(state: GraphState):
     if int(os.getenv('DEBUG')) == 1:
         save_graph_png(sql_agent_graph, name='sql_agent_graph')
     logger.info(f"message: {state["question"]}")
-    result = sql_agent_graph.invoke({"message": state["question"], "database_source": state["database_source"],
+    result = sql_agent_graph.invoke({"message": state["question"],
+                                     "database_source": state["database_source"],
+                                     "language": state["language"],
                                      "refine_recursive_limit": 3})
 
     return {"sql_query": result["sql_query"], "sql_query_description": result["query_description"],

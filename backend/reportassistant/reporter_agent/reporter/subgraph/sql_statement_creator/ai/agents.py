@@ -16,11 +16,14 @@ def sql_agent():
     You must use the following DDL-s containing the useful data columns. DDLs: {ddls}. 
     The generated query can only use the columns included in the ddls. 
     In the generated query you must use schema reference before every table name.
+    When writing SQL, please use user-friendly aliases for the columns in the query result set, which can also be 
+    displayed in visualizations. For example, instead of order_count, use Number of Orders.
+    The aliases must be in this language {language}.
     The source database is {database}. 
     The system time is {systemtime}.
     """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["ddls", "message", "database", "systemtime"])
+    prompt = PromptTemplate(template=prompt_str, input_variables=["ddls", "message", "database", "systemtime", "language"])
 
     return prompt | get_llm_model().with_structured_output(SQLCommand)
 
