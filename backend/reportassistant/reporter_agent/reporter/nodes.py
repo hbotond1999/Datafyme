@@ -33,12 +33,14 @@ def filter_basic_chat(state: GraphState):
 
     if result.is_relevant:
         logger.info(f"Relevant message for a reporting tasks")
-        return {'question': state["question"]}
+        return {'question_is_relevant': result.is_relevant}
     else:
         logger.info(f"User message is not relevant for a reporting tasks")
         answer: BasicChat = basic_chat().invoke({'message': state["question"],
-                                                 'database': state["database_source"].name})
-        raise RefineLimitExceededError(answer.answer)
+                                                 'database': state["database_source"].name,
+                                                 'language': state['language']})
+        final_data = FinalData(type=RepType.TEXT, chart_type=None, data=answer.answer, chart_title=None)
+        return {'question_is_relevant': result.is_relevant, 'representation_data': final_data}
 
 
 @log(my_logger=logger)
@@ -58,7 +60,7 @@ def seconder_task_router_node(state: GraphState):
 @log(my_logger=logger)
 def summarize_history_node(state: GraphState):
     new_question = create_history_summarizer(question=state["question"], chat_data=state["chat_history"])
-
+    logger.info(f"New summarized question: {new_question}")
     return {"question": new_question}
 
 

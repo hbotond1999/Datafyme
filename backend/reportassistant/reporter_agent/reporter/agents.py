@@ -30,11 +30,12 @@ def basic_chat():
     prompt_str = """
     System: Your are a helpful data analyst, whose task is to answer analytical questions based on the selected 
     data source.
+    Give a simple answer to the question using the following language: {language}
     Data source: {database}.
     User message: {message}.
     """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["message", "database"])
+    prompt = PromptTemplate(template=prompt_str, input_variables=["message", "database", "language"])
 
     return prompt | get_llm_model().with_structured_output(BasicChat)
 
