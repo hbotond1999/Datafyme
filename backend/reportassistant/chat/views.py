@@ -43,19 +43,12 @@ def chat_view(request):
                     generate_title.enqueue(conversation_id, user_message, get_language())
 
                 chat_hist = []
-                for msg in messages:
-                    if msg.chart:
-                        chat_hist.append(msg.type + " : \nChart type: " + msg.chart.type + " description: " + str(msg.chart.description) + " sql_query: " + msg.chart.sql_query)
-                    if msg.message:
-                        chat_hist.append(msg.type + " : " + msg.message)
-
-                chat_hist2 = []
                 q_and_a = {}
 
                 for msg in messages:
                     if msg.type == "HUMAN":
                         if q_and_a:
-                            chat_hist2.append(q_and_a)
+                            chat_hist.append(q_and_a)
                             q_and_a = {}
 
                         q_and_a["HUMAN"] = msg.message
@@ -71,13 +64,12 @@ def chat_view(request):
                         else:
                             q_and_a["AI"] = msg.message
 
-                        chat_hist2.append(q_and_a)
+                        chat_hist.append(q_and_a)
                         q_and_a = {}
 
                 if q_and_a:
-                    chat_hist2.append(q_and_a)
+                    chat_hist.append(q_and_a)
 
-                logger.info(f"Chat history2: {chat_hist2}")
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
                 reporter_graph = create_reporter_graph()
                 # save graph image:
@@ -86,7 +78,7 @@ def chat_view(request):
                 final_state: GraphState = reporter_graph.invoke(
                     {
                         "database_source": datasource,
-                        "chat_history": chat_hist2,
+                        "chat_history": chat_hist,
                         "question": user_message,
                         "refine_sql_recursive_limit": 3,
                         "refine_empty_result_recursive_limit": 3,
