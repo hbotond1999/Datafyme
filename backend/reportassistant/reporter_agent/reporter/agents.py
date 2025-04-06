@@ -45,13 +45,19 @@ def create_history_summarizer(question, chat_data):
         Write a standalone message that can be understood without the chat history and contains all the information 
         about the original question and the necessary chat history parts. 
         Where possible, reformulate the task into a representation task.
-        Do NOT answer the question, just reformulate it if needed and otherwise return it as is."""
+        Do NOT answer the question, just reformulate it if needed and otherwise return it as is.
+        """
 
     contextualize_q_human_prompt = f""" 
     Question: {question}
     
-    (Reminder Do NOT answer the question, just reformulate it if needed and otherwise return it as is.)
+    Perform the following steps:
+        - Interpret the input question.
+        - Decide whether it refers back to a previous question or questions.
+        - If it refers back, gather these questions and form a single meaningful question that contains all the necessary information.
+        - Return with the new question.
     
+    (Reminder Do NOT answer the question, just reformulate it if needed and otherwise return it as is.)
     """
     base_content = contextualize_q_system_prompt + contextualize_q_human_prompt
     message = convert_chat_to_llm_format(base_content, chat_data)

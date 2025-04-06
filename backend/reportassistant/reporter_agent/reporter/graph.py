@@ -31,17 +31,17 @@ def create_reporter_graph():
     graph.add_node("create_visualization", create_visualization_node)
     graph.add_node("q_and_a", create_q_and_a_node)
 
-    graph.add_edge(START, "filter_basic_chat_node")
+    graph.add_edge(START, "summarize_history")
+    graph.add_edge("summarize_history", "filter_basic_chat_node")
     graph.add_edge("filter_basic_chat_node", "task_router")
     graph.add_conditional_edges(
         "task_router", lambda x: x["is_sql_needed"],
-        {True: "summarize_history", False: "seconder_task_router"})
+        {True: "create_sql_query", False: "seconder_task_router"})
 
     graph.add_conditional_edges(
         "seconder_task_router", lambda x: x["new_chart_needed"],
-        {True: "summarize_history", False: "q_and_a"})
+        {True: "create_sql_query", False: "q_and_a"})
 
-    graph.add_edge("summarize_history", "create_sql_query")
     graph.add_edge("create_sql_query", "run_sql_query")
     graph.add_edge("refine_sql_query", "run_sql_query")
     graph.add_edge("refine_empty_result_sql_query", "run_sql_query")
