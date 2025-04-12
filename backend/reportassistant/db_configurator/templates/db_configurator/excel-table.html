@@ -1,0 +1,57 @@
+{% load static %}
+{% load i18n %}
+<div class="container mt-12">
+{% if perms.db_configurator.add_databasesource %}
+        <button class="btn btn-primary w-25 mb-2" data-bs-toggle="modal" data-bs-target="#addExcelModal">{% trans 'Add Excel' %}</button>
+{% endif %}
+<script src="{% static 'db_connector/js/db_configurator.js' %}"></script>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                         <th>{% trans 'Display name' %}</th>
+                        <th>{% trans 'Status' %}</th>
+                        <th>{% trans 'Actions' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for database in databases %}
+                    <tr>
+                        <td data-display-name="{{ database.id }}">{{ database.display_name }}</td>
+                        <td>
+                            {% if database.status == 'PAUSED'  %}
+                                <span class="badge bg-warning">{% trans 'Paused' %}</span>
+                            {% elif database.status == 'LOADING' %}
+                                <span class="badge bg-info">{% trans 'LOADING' %}</span>
+                            {% elif database.status == 'READY' %}
+                                <span class="badge bg-success">{% trans 'READY' %}</span>
+                             {% elif database.status == 'ERROR' %}
+                                <span class="badge bg-danger">{% trans 'ERROR' %}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                {% if perms.db_configurator.change_databasesource and database.status != 'LOADING' and database.status != 'ERROR'%}
+{#                                    <button type="button" class="btn btn-primary" onclick="populateDatabaseFormForEdit({{ database.id }})"> <i class="fas fa-edit"></i></button>#}
+                                    <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
+                                        {% if database.status == 'PAUSED' %}
+                                            <i class="fas fa-play"></i>
+                                        {% else %}
+                                            <i class="fas fa-pause"></i>
+                                        {% endif %}
+                                    </a>
+                               {% endif %}
+                                {% if perms.db_configurator.delete_databasesource and database.status != 'LOADING'%}
+                                    <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                {% endif %}
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>

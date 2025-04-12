@@ -1,4 +1,5 @@
 import logging
+from abc import abstractmethod
 from datetime import datetime, date
 from decimal import Decimal
 from typing import List, Dict, AnyStr, Any, Literal
@@ -269,3 +270,12 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             key: [self._convert_to_serializable(record) for record in values]
             for key, values in data.items()
         }
+
+    def check_schema_exists(self, schema_name: str) -> bool:
+        result = self.db_manager.execute_query(f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{schema_name}'")
+        if result and isinstance(result, list):
+            return len(result) > 0
+        return False
+
+    def create_schema(self, schema_name: str):
+        self.db_manager.execute_query(f"CREATE SCHEMA {schema_name}")

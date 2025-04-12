@@ -1,8 +1,10 @@
 import logging
 
+import pandas
+from django.contrib.postgres.fields import JSONField
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.messages import HumanMessage
-from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
+from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser, JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.tools import tool
 
@@ -218,3 +220,35 @@ def q_and_a_agent(question, chat_data):
     human_message = HumanMessage(content=message)
     llm = (get_llm_model() | StrOutputParser())
     return llm.invoke([human_message])
+
+
+def dataframe_date_decider():
+        prompt_str ="""
+## Context
+Analyze the provided dataframe and determine the optimal data type for each column. Proper data typing is essential for efficient storage, accurate calculations, and meaningful visualizations.
+
+## Input Dataframe
+Dataframe: {dataframe}
+
+## Instructions
+Examine EVERY column in the dataframe and classify each into the most appropriate data type:
+1. Analyze the content pattern and values
+2. Analyze the column name
+3. Consider the business context when determining types
+4. Identify any data quality issues that might affect typing
+
+## Required Output Format
+Return a valid JSON with the following structure:
+{{
+  "column_types": [
+    {{
+      "name": "column_name",
+      "recommended_type": "one of: string, int, float, date, datetime, bool",
+      "parsing_format": "For date/datetime: exact pandas format string (e.g., '%Y-%m-%d') needed for pd.to_datetime()",
+    }}
+  ]
+}}
+"""
+        prompt = PromptTemplate(template=prompt_str, input_variables=["dataframe"])
+
+        return prompt | get_llm_model() | JsonOutputParser()

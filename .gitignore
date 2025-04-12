@@ -166,3 +166,5 @@ data/
 .idea
 docker/dev/backend/huggingface/
 *.png
+*.csv
+*.xlsx

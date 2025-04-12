@@ -1,5 +1,7 @@
 import dataclasses
 
+from ir_datasets.datasets.touche_image import dataset
+
 from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from db_configurator.models import DatabaseSource
@@ -18,15 +20,19 @@ class DBLoader:
 
     def vector_loader(self):
         tables_schemas = self.extractor.get_tables_schemas()
+        tables_schemas = self.filter_schemas(tables_schemas)
         VectorLoader(tables_schemas, self.datasource).load()
 
     def create_relation_graph(self):
 
         database_relations = self.extractor.get_relations()
-
-        defined_relations = [dataclasses.asdict(t) for t in database_relations]
+        defined_relations = []
+        for dr in database_relations:
+            if dr.table_schema == self.datasource.schema_name:
+                defined_relations.append(dr)
 
         tables_schemas = self.extractor.get_tables_schemas()
+        tables_schemas = self.filter_schemas(tables_schemas)
         table_ddls = [table.to_dict() for table in tables_schemas]
         found_relations = RelationFinder(table_ddls).find_relation()
         found_relations = [rel.model_dump() for rel in found_relations.relations]
@@ -72,3 +78,10 @@ class DBLoader:
                                                table_pair["foreign_column_name"])
         finally:
             neo4j_instance.close()
+
+    def filter_schemas(self, tables_schemas):
+        filtered_schemas = []
+        for table_schema in tables_schemas:
+            if table_schema.schema == self.datasource.schema_name:
+                filtered_schemas.append(table_schema)
+        return filtered_schemas

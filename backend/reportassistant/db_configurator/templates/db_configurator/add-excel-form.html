@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load static %}
+<div class="modal fade" id="addExcelModal">
+     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+         <div class="modal-content">
+             <div class="modal-header">
+                <h5 class="modal-title">{% trans "Excel" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+             <form method="POST" enctype="multipart/form-data" id="excelUploadForm" action="{% url 'db_configurator:excel_to_database_source' %}">
+             <div class="modal-body">
+                 <div class="container mt-4 form-container">
+                    <div class="col-md-12">
+
+                        {% csrf_token %}
+                            <input type="number" hidden="hidden" id="excel_datasource_id" name="id">
+                            <div class="mb-3">
+                                <label for="id_display_name" class="form-label">{% trans "Display name" %}</label>
+                                <input type="text" class="form-control" id="id_display_name" name="display_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_files" class="form-label">Upload Files Here</label>
+                                <input type="file" class="form-control" id="id_files" name="files" multiple accept=".xlsx,.csv" required>
+                            </div>
+
+                    </div>
+                </div>
+             </div>
+             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+                <button type="submit" class="btn btn-primary" >{% trans 'Save Excel'%}</button>
+             </div>
+         </form>
+        </div>
+    </div>
+</div>

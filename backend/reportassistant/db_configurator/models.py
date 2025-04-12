@@ -1,6 +1,6 @@
 import enum
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.db import models
 
 class DBType(enum.Enum):
@@ -26,9 +26,11 @@ class DatabaseSource(models.Model):
     port = models.IntegerField()
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=STATUS, default=Status.LOADING.value)
+    schema_name=models.CharField(max_length=1000, null=True, default=None) # korlát hogy csak az adott sémát nézzük
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('host', 'port', 'name')
+        unique_together = ('host', 'port', 'name', 'schema_name')
 
 class TableDocumentation(models.Model):
     database_source = models.ForeignKey(DatabaseSource, on_delete=models.CASCADE)

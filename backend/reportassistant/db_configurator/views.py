@@ -1,12 +1,15 @@
-import json
-from random import random
+import os
+import uuid
+from io import BytesIO
+from uuid import uuid4
 
+import pandas
+import pandas as pd
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http import JsonResponse, HttpResponseNotAllowed, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
-from langchain.smith.evaluation.name_generation import random_name
 
 from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
@@ -14,8 +17,9 @@ from common.vectordb.db import COLLECTION_NAME
 from common.vectordb.db.utils import delete_docs_from_collection
 from .models import DatabaseSource, Status
 from .forms import DatabaseSourceForm
-from .tasks import load_db
+from .tasks import load_db, load_excel
 from django.utils.translation import gettext as _
+
 
 
 @permission_required("db_configurator.view_databasesource")
@@ -35,6 +39,7 @@ def connection(request):
             db_source = DatabaseSource.objects.get(pk=request.POST.get('id'))
 
         form = DatabaseSourceForm(request.POST, instance=db_source)
+        form.user = request.user
         if not form.is_valid():
             return JsonResponse({"success": False, "errors": form.errors.as_json()})
 
@@ -45,6 +50,7 @@ def connection(request):
             port=form.cleaned_data["port"],
             username=form.cleaned_data["username"],
             password=form.cleaned_data["password"],
+            user=request.user
         )
         success = DatabaseManager(database_source).check_connection()
         if success:
@@ -72,7 +78,53 @@ def connection(request):
                 form.add_error(field, ValidationError(_("Could not connect to database"), code="ConnectionError"))
             return JsonResponse({'success': False, "errors": form.errors.as_json()})
 
+@login_required()
+def excel_to_database_source(request):
+    if request.method == 'POST':
+        display_name = request.POST.get('display_name')
+        files = request.FILES.getlist('files')
+        request_uuid = str(uuid.uuid4())
+        files_dir = './files'
+        if not os.path.exists(files_dir):
+            os.makedirs(files_dir)
 
+        uuid_dir = os.path.join(files_dir, request_uuid)
+        os.makedirs(uuid_dir)
+        for file in files:
+            filename = file.name.lower()
+            if not filename.endswith('.xlsx') and not filename.endswith('.csv'):
+                return HttpResponseBadRequest(content="Only csv and xlsx are supported")
+            file_path = os.path.join(uuid_dir, file.name)
+
+            with open(file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+
+        group_name = "database_source_group_" + "excel" + "_" + files[0].name.lower()
+        existing_groups = Group.objects.filter(name__startswith=group_name)
+        if existing_groups.exists():
+            latest_group = existing_groups.order_by('-id').first()
+            unique_name = f"{group_name}_{latest_group.id + 1}"
+        else:
+            unique_name = group_name
+        group = Group(name=unique_name)
+        group.save()
+        group.user_set.add(request.user)
+        database_source = DatabaseSource(
+            name=os.getenv("EXCEL_STORE_DB_NAME"),
+            display_name=display_name,
+            type=os.getenv("EXCEL_STORE_DB_TYPE"),
+            host=os.getenv("EXCEL_STORE_DB_HOST"),
+            port=os.getenv("EXCEL_STORE_DB_PORT"),
+            username=os.getenv("EXCEL_STORE_DB_USER"),
+            password=os.getenv("EXCEL_STORE_DB_PASSWORD"),
+            group=group,
+            user=request.user
+        )
+        database_source.save()
+
+        load_excel.enqueue(database_source.id, request.user.id, uuid_dir)
+        return redirect('db_configurator:manage_connections')
 
 @permission_required("db_configurator.delete_databasesource")
 def delete_database(request, pk):
