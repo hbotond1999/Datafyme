@@ -15,34 +15,34 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for database in databases %}
+                    {% for excel in excels %}
                     <tr>
-                        <td data-display-name="{{ database.id }}">{{ database.display_name }}</td>
+                        <td data-display-name="{{ excel.id }}">{{ excel.display_name }}</td>
                         <td>
-                            {% if database.status == 'PAUSED'  %}
+                            {% if excel.status == 'PAUSED'  %}
                                 <span class="badge bg-warning">{% trans 'Paused' %}</span>
-                            {% elif database.status == 'LOADING' %}
+                            {% elif excel.status == 'LOADING' %}
                                 <span class="badge bg-info">{% trans 'LOADING' %}</span>
-                            {% elif database.status == 'READY' %}
+                            {% elif excel.status == 'READY' %}
                                 <span class="badge bg-success">{% trans 'READY' %}</span>
-                             {% elif database.status == 'ERROR' %}
+                             {% elif excel.status == 'ERROR' %}
                                 <span class="badge bg-danger">{% trans 'ERROR' %}</span>
                             {% endif %}
                         </td>
                         <td>
                             <div class="btn-group" role="group">
-                                {% if perms.db_configurator.change_databasesource and database.status != 'LOADING' and database.status != 'ERROR'%}
-{#                                    <button type="button" class="btn btn-primary" onclick="populateDatabaseFormForEdit({{ database.id }})"> <i class="fas fa-edit"></i></button>#}
-                                    <a href="{% url 'db_configurator:pause_connection' database.id %}" class="btn btn-warning">
-                                        {% if database.status == 'PAUSED' %}
+                                {% if perms.db_configurator.change_databasesource and excel.status != 'LOADING' and excel.status != 'ERROR'%}
+{#                                    <button type="button" class="btn btn-primary" onclick="populateDatabaseFormForEdit({{ excel.id }})"> <i class="fas fa-edit"></i></button>#}
+                                    <a href="{% url 'db_configurator:pause_connection' excel.id %}" class="btn btn-warning">
+                                        {% if excel.status == 'PAUSED' %}
                                             <i class="fas fa-play"></i>
                                         {% else %}
                                             <i class="fas fa-pause"></i>
                                         {% endif %}
                                     </a>
                                {% endif %}
-                                {% if perms.db_configurator.delete_databasesource and database.status != 'LOADING'%}
-                                    <a href="{% url 'db_configurator:delete_database' database.id %}" class="btn btn-danger">
+                                {% if perms.db_configurator.delete_databasesource and excel.status != 'LOADING'%}
+                                    <a href="{% url 'db_configurator:delete_database' excel.id %}" class="btn btn-danger">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 {% endif %}

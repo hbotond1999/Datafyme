@@ -1,13 +1,10 @@
 import logging
-from abc import abstractmethod
 from datetime import datetime, date
 from decimal import Decimal
-from typing import List, Dict, AnyStr, Any, Literal
+from typing import List, Dict, Any, Literal
 
 import pandas as pd
-from numpy.f2py.auxfuncs import throw_error
 
-from common.custom_logging import log
 from common.db.manager.handlers.utils.postgres_helper import PostgresHelper
 from db_configurator.models import DatabaseSource
 from common.db.manager.abc import DatabaseManagerAbc
@@ -279,3 +276,6 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
 
     def create_schema(self, schema_name: str):
         self.db_manager.execute_query(f"CREATE SCHEMA {schema_name}")
+
+    def drop_schema(self, schema_name: str):
+        self.execute_sql(f"DROP SCHEMA {schema_name}")

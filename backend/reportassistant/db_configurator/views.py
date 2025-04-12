@@ -15,7 +15,7 @@ from common.db.manager.database_manager import DatabaseManager
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db import COLLECTION_NAME
 from common.vectordb.db.utils import delete_docs_from_collection
-from .models import DatabaseSource, Status
+from .models import DatabaseSource, Status, SourceType
 from .forms import DatabaseSourceForm
 from .tasks import load_db, load_excel
 from django.utils.translation import gettext as _
@@ -24,10 +24,12 @@ from django.utils.translation import gettext as _
 
 @permission_required("db_configurator.view_databasesource")
 def manage_connections(request):
-    databases = DatabaseSource.objects.all()
+    databases = DatabaseSource.objects.filter(source_type=SourceType.DB.value)
+    excels = DatabaseSource.objects.filter(source_type=SourceType.EXCEL.value)
     form = DatabaseSourceForm()
     return render(request, 'db_configurator/manage_connections.html', {
         'form': form,
+        'excels': excels,
         'databases': databases,
     })
 
@@ -119,7 +121,8 @@ def excel_to_database_source(request):
             username=os.getenv("EXCEL_STORE_DB_USER"),
             password=os.getenv("EXCEL_STORE_DB_PASSWORD"),
             group=group,
-            user=request.user
+            user=request.user,
+            source_type=SourceType.EXCEL
         )
         database_source.save()
 
@@ -132,6 +135,9 @@ def delete_database(request, pk):
     delete_docs_from_collection(collection_name=COLLECTION_NAME, column_name="database_id", value=database.id)
     neo4j_instance = Neo4JInstance()
     neo4j_instance.clear_graph_database(database.id)
+    if database.schema_name:
+        DatabaseManager(database).drop_schema(database.schema_name)
+
     database.group.delete()
     database.delete()
     return redirect('db_configurator:manage_connections')

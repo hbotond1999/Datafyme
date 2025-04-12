@@ -48,3 +48,7 @@ class DatabaseManagerAbc(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def check_schema_exists(self, schema_name: str) -> bool:
         pass
+
+    @abc.abstractmethod
+    def drop_schema(self, schema_name: str):
+        pass

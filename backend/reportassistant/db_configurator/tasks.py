@@ -37,29 +37,36 @@ def load_db(datasource_id: int, user_id: int):
 
 @task()
 def load_excel(datasource_id: int, user_id: int, files_dir: str):
+    user = User.objects.get(id=user_id)
     datasource = DatabaseSource.objects.get(id=datasource_id)
+    try:
+        connection_string = f"{datasource.type}://{datasource.username}:{datasource.password}@{datasource.host}:{datasource.port}/{datasource.name}"
+        engine = create_engine(connection_string)
+        database_manager = DatabaseManager(db_source=datasource)
 
-    connection_string = f"{datasource.type}://{datasource.username}:{datasource.password}@{datasource.host}:{datasource.port}/{datasource.name}"
-    engine = create_engine(connection_string)
-    database_manager = DatabaseManager(db_source=datasource)
+        schema = "schema_" + str(datasource.id)
+        if not database_manager.check_schema_exists(schema):
+            database_manager.create_schema(schema)
+        datasource.schema_name = schema
 
-    schema = "schema_" + str(datasource.id)
-    if not database_manager.check_schema_exists(schema):
-        database_manager.create_schema(schema)
-    datasource.schema_name = schema
+        for filename in os.listdir(files_dir):
+            file_path = os.path.join(files_dir, filename)
+            if filename.lower().endswith('.xlsx'):
+                df = pd.read_excel(file_path, engine='openpyxl')
+            else:
+                df = pd.read_csv(file_path)
 
-    for filename in os.listdir(files_dir):
-        file_path = os.path.join(files_dir, filename)
-        if filename.lower().endswith('.xlsx'):
-            df = pd.read_excel(file_path, engine='openpyxl')
-        else:
-            df = pd.read_csv(file_path)
+            df = convert_pandas_columns(df)
 
-        df = convert_pandas_columns(df)
+            datasource.save()
+            table_name = os.path.splitext(filename)[0].lower().replace(".csv", "").replace(".xlsx", "")
+            table_name = ''.join(c if c.isalnum() else '_' for c in table_name)
+            df.to_sql(name=table_name, con=engine, index=False, if_exists='replace', schema=schema)
 
+        load_db.enqueue(datasource_id, user_id)
+    except Exception as e:
+        datasource.status = Status.ERROR.value
+        note = Notification(text=LoadingMessage.ERROR_TO_LOAD_DATABASE.value, level=Level.ERROR.value, user=user)
+        note.save()
         datasource.save()
-        table_name = os.path.splitext(filename)[0].lower().replace(".csv", "").replace(".xlsx", "")
-        table_name = ''.join(c if c.isalnum() else '_' for c in table_name)
-        df.to_sql(name=table_name, con=engine, index=False, if_exists='replace', schema=schema)
-
-    load_db.enqueue(datasource_id, user_id)
+        raise e

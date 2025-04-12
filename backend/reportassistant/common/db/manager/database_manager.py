@@ -71,3 +71,6 @@ class DatabaseManager(DatabaseManagerAbc):
 
     def check_schema_exists(self, schema_name: str) -> bool:
         return self.handler.check_schema_exists(schema_name)
+
+    def drop_schema(self, schema_name: str):
+        self.handler.drop_schema(schema_name)
