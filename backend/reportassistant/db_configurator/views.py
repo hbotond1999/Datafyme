@@ -122,7 +122,7 @@ def excel_to_database_source(request):
             password=os.getenv("EXCEL_STORE_DB_PASSWORD"),
             group=group,
             user=request.user,
-            source_type=SourceType.EXCEL
+            source_type=SourceType.EXCEL.value
         )
         database_source.save()
 

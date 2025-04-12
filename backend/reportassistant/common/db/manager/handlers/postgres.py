@@ -278,4 +278,4 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
         self.db_manager.execute_query(f"CREATE SCHEMA {schema_name}")
 
     def drop_schema(self, schema_name: str):
-        self.execute_sql(f"DROP SCHEMA {schema_name}")
+        self.execute_sql(f"DROP SCHEMA {schema_name} CASCADE")
