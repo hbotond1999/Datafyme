@@ -1,3 +1,4 @@
+import json
 import os
 import pickle
 from io import BytesIO
@@ -17,33 +18,32 @@ def cleaning_pandas_df(df):
 
 def run_pandas_code_on_server(dataframe: pd.DataFrame, code: str):
     """
-    Send a pandas DataFrame and Python code to the server for execution.
+    Send a pandas DataFrame and Python code to the server for execution using JSON.
 
     Args:
         dataframe (pd.DataFrame): The DataFrame to process
         code (str): Python code to execute on the DataFrame
-        url (str): The URL of the server endpoint
 
     Returns:
         pd.DataFrame: The resulting DataFrame after code execution
     """
-    pickle_buffer = BytesIO()
-    pickle.dump(dataframe, pickle_buffer)
-    pickle_buffer.seek(0)
+    # Convert DataFrame to JSON
+    json_data = dataframe.to_json(orient='records', date_format='iso')
 
-    files = {
-        'data_file': ('dataframe.pkl', pickle_buffer.getvalue(), 'application/octet-stream')
-    }
-    form_data = {
+    # Prepare the request
+    data = {
+        'data_json': json_data,
         'code': code
     }
 
     # Send the request to the server
     url = os.getenv("CODE_RUNNER_SERVER")
-    response = requests.post(url + "/run_pandas_code", files=files, data=form_data)
+    response = requests.post(url + "/run_pandas_code", json=data)
 
     if response.status_code == 200:
-        result_df = pickle.loads(response.content)
+        # Convert JSON response back to DataFrame
+        result_json = response.json()
+        result_df = pd.read_json(json.dumps(result_json), orient='records', convert_dates=True)
         return result_df
     else:
         raise Exception(f"Server error: {response.text}")
