@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 
 from common.db.manager.database_manager import DatabaseManager
 from db_configurator.models import DatabaseSource, Status
-from db_configurator.utils import convert_pandas_columns
+from db_configurator.ai import cleaning_pandas_df
 from dbloader.services import DBLoader
 from home.models import Notification, Level
 
@@ -48,7 +48,7 @@ def load_excel(datasource_id: int, user_id: int, files_dir: str):
         if not database_manager.check_schema_exists(schema):
             database_manager.create_schema(schema)
         datasource.schema_name = schema
-
+        datasource.save()
         for filename in os.listdir(files_dir):
             file_path = os.path.join(files_dir, filename)
             if filename.lower().endswith('.xlsx'):
@@ -56,9 +56,8 @@ def load_excel(datasource_id: int, user_id: int, files_dir: str):
             else:
                 df = pd.read_csv(file_path)
 
-            df = convert_pandas_columns(df)
+            df = cleaning_pandas_df(df)
 
-            datasource.save()
             table_name = os.path.splitext(filename)[0].lower().replace(".csv", "").replace(".xlsx", "")
             table_name = ''.join(c if c.isalnum() else '_' for c in table_name)
             df.to_sql(name=table_name, con=engine, index=False, if_exists='replace', schema=schema)
