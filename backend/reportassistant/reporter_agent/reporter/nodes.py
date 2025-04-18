@@ -29,7 +29,7 @@ def filter_basic_chat(state: GraphState):
         dict: A dictionary containing the 'message' which is the original user input.
     """
     logger.info("Running filter_basic_chat node: checking if the message is relevant for a reporting tasks.")
-    result: IsRelevant = filter_relevant_question().invoke({'message': state["question"]})
+    result: IsRelevant = filter_relevant_question(question=state["question"], chat_data=state["chat_history"])
 
     if result.is_relevant:
         logger.info(f"Relevant message for a reporting tasks")

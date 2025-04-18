@@ -14,16 +14,15 @@ from reporter_agent.reporter.utils import png_to_base64
 logger = logging.getLogger('reportassistant.custom')
 
 
-def filter_relevant_question():
-    prompt_str = """
-    Your task is to decide whether the message sent by the user is a data analysis question that is intended to query 
-    information from a database or just a general chat message, greeting, etc.
-    User question: {message}. 
-    """
+def filter_relevant_question(question, chat_data):
+    prompt_str = """Given a chat history and a message sent by a user that may refer to the chat history.
+    The received message may be just a general chat and not refer to a previous message. Examples of such general chats are greetings, thanks, etc.
+    Decide whether the received message is a general chat that does not require a task solution. In this case, return False, otherwise True.
+    """ + f"""User question: {question}. Chat history: """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["message"])
-
-    return prompt | get_llm_model().with_structured_output(IsRelevant)
+    message = convert_chat_to_llm_format(prompt_str, chat_data)
+    human_message = HumanMessage(content=message)
+    return get_llm_model().with_structured_output(IsRelevant).invoke([human_message])
 
 
 def basic_chat():

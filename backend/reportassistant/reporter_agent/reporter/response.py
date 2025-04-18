@@ -4,12 +4,12 @@ from pydantic import BaseModel, Field
 class IsRelevant(BaseModel):
     """
     IsRelevant:
-        A class to store true values if the user message is relevant for a data analysis task
+        A class to store true values if the user message is a data analysis task or not
 
     Attributes:
-        is_relevant: The text of the original user question
+        is_relevant: The user message is a data analysis task
     """
-    is_relevant: bool = Field(description="The user message is relevant for a data analysis task")
+    is_relevant: bool = Field(description="The user message is a data analysis task")
 
 
 class BasicChat(BaseModel):
