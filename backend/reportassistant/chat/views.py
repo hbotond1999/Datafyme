@@ -37,7 +37,7 @@ def chat_view(request):
                 user_message = form.cleaned_data['user_message']
                 datasource = form.cleaned_data['database_source']
                 request.session["database_source_id"] = datasource.id
-                messages = Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user)
+                messages = list(Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user))
 
                 if len(messages) == 0:
                     generate_title.enqueue(conversation_id, user_message, get_language())
@@ -45,7 +45,7 @@ def chat_view(request):
                 chat_hist = []
                 q_and_a = {}
 
-                for msg in messages:
+                for msg in messages[-int(os.getenv('HISTORY_LIMIT'))*2:]:
                     if msg.type == "HUMAN":
                         if q_and_a:
                             chat_hist.append(q_and_a)
