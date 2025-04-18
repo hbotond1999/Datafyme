@@ -42,20 +42,21 @@ def basic_chat():
 
 def create_history_summarizer(question, chat_data):
     contextualize_q_system_prompt = """
-        Given a chat history and a question asked by the user that can refer to the chat history context.
-        Write a standalone message that can be understood without the chat history and contains all the information 
-        about the original question and the necessary chat history parts. 
-        Where possible, reformulate the task into a representation task.
-        Do NOT answer the question, just reformulate it if needed and otherwise return it as is.
+        Given a chat history and a message sent by a user that may reference the context of the chat history.
+        It may be just a general chat and does not reference an earlier message. In that case, return the message received without transformation.
+
+        However, if the message refers back to an earlier point in the chat and asks for an analysis task, write a standalone message that can be understood without the chat history and contains all the information about the message sent and the necessary parts of the chat history.
+        Where possible, reformulate the task into a representational task.
+        DO NOT answer the question, just reformulate if necessary, otherwise return it as is.
         """
 
     contextualize_q_human_prompt = f""" 
-    Question: {question}
+    Message: {question}
     
     Perform the following steps:
-        - Interpret the input question.
-        - Decide whether it refers back to a previous question or questions.
-        - If it refers back, gather these questions and form a single meaningful question that contains all the necessary information.
+        - Interpret the input message.
+        - Decide whether it refers back to a previous message or messages and filter out messages that refer to general chat
+        - If it refers back to an analysis task and it is not basic conversation, gather these messages and form a single meaningful message that contains all the necessary information.
         - Return with the new question.
     
     (Reminder Do NOT answer the question, just reformulate it if needed and otherwise return it as is.)
