@@ -29,16 +29,18 @@ def filter_basic_chat(state: GraphState):
         dict: A dictionary containing the 'message' which is the original user input.
     """
     logger.info("Running filter_basic_chat node: checking if the message is relevant for a reporting tasks.")
-    result: IsRelevant = filter_relevant_question().invoke({'message': state["question"]})
+    result: IsRelevant = filter_relevant_question(question=state["question"], chat_data=state["chat_history"])
 
     if result.is_relevant:
         logger.info(f"Relevant message for a reporting tasks")
-        return {'question': state["question"]}
+        return {'question_is_relevant': result.is_relevant}
     else:
         logger.info(f"User message is not relevant for a reporting tasks")
         answer: BasicChat = basic_chat().invoke({'message': state["question"],
-                                                 'database': state["database_source"].name})
-        raise RefineLimitExceededError(answer.answer)
+                                                 'database': state["database_source"].name,
+                                                 'language': state['language']})
+        final_data = FinalData(type=RepType.TEXT, chart_type=None, data=answer.answer, chart_title=None)
+        return {'question_is_relevant': result.is_relevant, 'representation_data': final_data}
 
 
 @log(my_logger=logger)
@@ -58,7 +60,7 @@ def seconder_task_router_node(state: GraphState):
 @log(my_logger=logger)
 def summarize_history_node(state: GraphState):
     new_question = create_history_summarizer(question=state["question"], chat_data=state["chat_history"])
-
+    logger.info(f"New summarized question: {new_question}")
     return {"question": new_question}
 
 
@@ -69,7 +71,9 @@ def create_sql_query_node(state: GraphState):
     if int(os.getenv('DEBUG')) == 1:
         save_graph_png(sql_agent_graph, name='sql_agent_graph')
     logger.info(f"message: {state["question"]}")
-    result = sql_agent_graph.invoke({"message": state["question"], "database_source": state["database_source"],
+    result = sql_agent_graph.invoke({"message": state["question"],
+                                     "database_source": state["database_source"],
+                                     "language": state["language"],
                                      "refine_recursive_limit": 3})
 
     return {"sql_query": result["sql_query"], "sql_query_description": result["query_description"],

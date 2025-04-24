@@ -21,9 +21,9 @@ def refine_routes(state: GraphState):
 def create_reporter_graph():
     graph = StateGraph(GraphState)
     graph.add_node("filter_basic_chat_node", filter_basic_chat)
+    graph.add_node("summarize_history", summarize_history_node)
     graph.add_node("task_router", task_router_node)
     graph.add_node("seconder_task_router", seconder_task_router_node)
-    graph.add_node("summarize_history", summarize_history_node)
     graph.add_node("create_sql_query", create_sql_query_node)
     graph.add_node("run_sql_query", run_sql_query_node)
     graph.add_node("refine_sql_query", refine_sql_query_node)
@@ -32,19 +32,25 @@ def create_reporter_graph():
     graph.add_node("q_and_a", create_q_and_a_node)
 
     graph.add_edge(START, "filter_basic_chat_node")
-    graph.add_edge("filter_basic_chat_node", "task_router")
+
+    graph.add_conditional_edges(
+        "filter_basic_chat_node", lambda x: x["question_is_relevant"],
+        {True: "summarize_history", False: END})
+
+    graph.add_edge("summarize_history", "task_router")
+
     graph.add_conditional_edges(
         "task_router", lambda x: x["is_sql_needed"],
-        {True: "summarize_history", False: "seconder_task_router"})
+        {True: "create_sql_query", False: "seconder_task_router"})
 
     graph.add_conditional_edges(
         "seconder_task_router", lambda x: x["new_chart_needed"],
-        {True: "summarize_history", False: "q_and_a"})
+        {True: "create_sql_query", False: "q_and_a"})
 
-    graph.add_edge("summarize_history", "create_sql_query")
     graph.add_edge("create_sql_query", "run_sql_query")
     graph.add_edge("refine_sql_query", "run_sql_query")
     graph.add_edge("refine_empty_result_sql_query", "run_sql_query")
+
     graph.add_conditional_edges(
         "run_sql_query",
         refine_routes,

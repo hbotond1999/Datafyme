@@ -16,6 +16,7 @@ class GraphState(TypedDict):
     sql_query_description: str  # local
     sql_query_result: Dict[str, List[Any]]  # local
     representation_data: FinalData  # output
+    question_is_relevant: bool
     refine_sql_recursive_limit: int  # input
     refine_empty_result_recursive_limit: int  # input
     language: str

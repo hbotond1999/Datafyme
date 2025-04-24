@@ -19,5 +19,6 @@ class GraphState(TypedDict):
     tables_all: List[Dict[str, str]]
     table_final_ddls: List[Dict[str, Any]]
     sql_query: str
+    language: str
     query_description: str
     refine_recursive_limit: int

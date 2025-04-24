@@ -14,44 +14,51 @@ from reporter_agent.reporter.utils import png_to_base64
 logger = logging.getLogger('reportassistant.custom')
 
 
-def filter_relevant_question():
-    prompt_str = """
-    Your task is to decide whether the message sent by the user is a data analysis question that is intended to query 
-    information from a database or just a general chat message, greeting, etc.
-    User question: {message}. 
-    """
+def filter_relevant_question(question, chat_data):
+    prompt_str = """Given a chat history and a message sent by a user that may refer to the chat history.
+    The received message may be just a general chat and not refer to a previous message. Examples of such general chats are greetings, thanks, etc.
+    Decide whether the received message is a general chat that does not require a task solution. In this case, return False, otherwise True.
+    """ + f"""User question: {question}. Chat history: """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["message"])
-
-    return prompt | get_llm_model().with_structured_output(IsRelevant)
+    message = convert_chat_to_llm_format(prompt_str, chat_data)
+    human_message = HumanMessage(content=message)
+    return get_llm_model().with_structured_output(IsRelevant).invoke([human_message])
 
 
 def basic_chat():
     prompt_str = """
     System: Your are a helpful data analyst, whose task is to answer analytical questions based on the selected 
     data source.
+    Give a simple answer to the question using the following language: {language}
     Data source: {database}.
     User message: {message}.
     """
 
-    prompt = PromptTemplate(template=prompt_str, input_variables=["message", "database"])
+    prompt = PromptTemplate(template=prompt_str, input_variables=["message", "database", "language"])
 
     return prompt | get_llm_model().with_structured_output(BasicChat)
 
 
 def create_history_summarizer(question, chat_data):
     contextualize_q_system_prompt = """
-        Given a chat history and a question asked by the user that can refer to the chat history context.
-        Write a standalone message that can be understood without the chat history and contains all the information 
-        about the original question and the necessary chat history parts. 
-        Where possible, reformulate the task into a representation task.
-        Do NOT answer the question, just reformulate it if needed and otherwise return it as is."""
+        Given a chat history and a message sent by a user that may reference the context of the chat history.
+        It may be just a general chat and does not reference an earlier message. In that case, return the message received without transformation.
+
+        However, if the message refers back to an earlier point in the chat and asks for an analysis task, write a standalone message that can be understood without the chat history and contains all the information about the message sent and the necessary parts of the chat history.
+        Where possible, reformulate the task into a representational task.
+        DO NOT answer the question, just reformulate if necessary, otherwise return it as is.
+        """
 
     contextualize_q_human_prompt = f""" 
-    Question: {question}
+    Message: {question}
+    
+    Perform the following steps:
+        - Interpret the input message.
+        - Decide whether it refers back to a previous message or messages and filter out messages that refer to general chat
+        - If it refers back to an analysis task and it is not basic conversation, gather these messages and form a single meaningful message that contains all the necessary information.
+        - Return with the new question.
     
     (Reminder Do NOT answer the question, just reformulate it if needed and otherwise return it as is.)
-    
     """
     base_content = contextualize_q_system_prompt + contextualize_q_human_prompt
     message = convert_chat_to_llm_format(base_content, chat_data)
