@@ -168,11 +168,32 @@ services:
     networks:
       - "docker_network"
 
+  python-code-runner-proxy:
+    build:
+      context: .
+      dockerfile: python-code-runner-nginx.dockerfile
+    ports:
+      - "8050:8050"
+    networks:
+      - "docker_network"
+      - internal_network
+
+  python-code-runner:
+    build:
+      context:  ../../python_code_runner
+      dockerfile: Dockerfile
+    ports:
+      - "8050:8050"
+    expose:
+      - "8050"
+    networks:
+      - internal_network
+
 networks:
   docker_network:
     driver: bridge
-
-
-
+  internal_network:
+    driver: bridge
+    internal: true
 volumes:
   static_files:

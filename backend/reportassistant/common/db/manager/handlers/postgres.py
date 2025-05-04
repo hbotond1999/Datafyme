@@ -1,12 +1,10 @@
 import logging
 from datetime import datetime, date
 from decimal import Decimal
-from typing import List, Dict, AnyStr, Any, Literal
+from typing import List, Dict, Any, Literal
 
 import pandas as pd
-from numpy.f2py.auxfuncs import throw_error
 
-from common.custom_logging import log
 from common.db.manager.handlers.utils.postgres_helper import PostgresHelper
 from db_configurator.models import DatabaseSource
 from common.db.manager.abc import DatabaseManagerAbc
@@ -269,3 +267,15 @@ class PostgresDatabaseManager(DatabaseManagerAbc):
             key: [self._convert_to_serializable(record) for record in values]
             for key, values in data.items()
         }
+
+    def check_schema_exists(self, schema_name: str) -> bool:
+        result = self.db_manager.execute_query(f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{schema_name}'")
+        if result and isinstance(result, list):
+            return len(result) > 0
+        return False
+
+    def create_schema(self, schema_name: str):
+        self.db_manager.execute_query(f"CREATE SCHEMA {schema_name}")
+
+    def drop_schema(self, schema_name: str):
+        self.execute_sql(f"DROP SCHEMA {schema_name} CASCADE")

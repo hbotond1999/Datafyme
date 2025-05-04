@@ -1,8 +1,5 @@
 import logging
-from datetime import datetime
-from typing import List, Dict, Any, Literal
-
-import pandas as pd
+from typing import List, Literal
 
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
 from db_configurator.models import DatabaseSource
@@ -14,6 +11,7 @@ logger = logging.getLogger("reportassistant.default")
 
 
 class DatabaseManager(DatabaseManagerAbc):
+
 
     def __init__(self, db_source: DatabaseSource):
         super().__init__(db_source)
@@ -67,3 +65,12 @@ class DatabaseManager(DatabaseManagerAbc):
 
     def get_table_ddl(self, table_name: str) -> str:
         return self.handler.get_table_ddl(table_name)
+
+    def create_schema(self, schema_name: str):
+        self.handler.create_schema(schema_name)
+
+    def check_schema_exists(self, schema_name: str) -> bool:
+        return self.handler.check_schema_exists(schema_name)
+
+    def drop_schema(self, schema_name: str):
+        self.handler.drop_schema(schema_name)

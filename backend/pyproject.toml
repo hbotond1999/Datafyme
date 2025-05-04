@@ -29,6 +29,7 @@ langchain-anthropic = "0.3.10"
 langchain-google-genai = "2.1.0"
 xlsxwriter = "^3.2.2"
 python-pptx = "^1.0.2"
+openpyxl = "^3.1.5"
 
 [tool.poetry.dev-dependencies]
 

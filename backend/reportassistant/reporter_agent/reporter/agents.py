@@ -1,8 +1,10 @@
 import logging
 
+import pandas
+from django.contrib.postgres.fields import JSONField
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.messages import HumanMessage
-from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser
+from langchain_core.output_parsers import StrOutputParser, PydanticOutputParser, JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.tools import tool
 
@@ -225,3 +227,4 @@ def q_and_a_agent(question, chat_data):
     human_message = HumanMessage(content=message)
     llm = (get_llm_model() | StrOutputParser())
     return llm.invoke([human_message])
+

@@ -9,4 +9,5 @@ urlpatterns = [
     path('manage/delete/<int:pk>/', views.delete_database, name='delete_database'),
     path('manage/pause/<int:pk>/', views.pause_connection, name='pause_connection'),
     path('manage/user_databases/', views.get_user_databases, name='user_databases'),
+    path("excel_to_database_source", views.excel_to_database_source, name="excel_to_database_source"),
 ]
