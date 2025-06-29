@@ -132,7 +132,7 @@ def refine_sql_query_node(state: GraphState):
 @log(my_logger=logger)
 def refine_empty_result_sql_query_node(state: GraphState):
     if state.get("node_started_callback"):
-        state["node_started_callback"]("refine_empty_result_sql_query_node", gettext_noop("Refine SQL query"))
+        state["node_started_callback"]("refine_empty_result_sql_query_node", gettext_noop("Refine SQL query for empty results"))
     refine_empty_result_recursive_limit = state["refine_empty_result_recursive_limit"] - 1
     logger.info(f"Current EMPTY RESULT REFINE RECURSIVE LIMIT value: {refine_empty_result_recursive_limit}")
 

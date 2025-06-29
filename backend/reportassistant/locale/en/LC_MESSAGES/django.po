@@ -428,8 +428,8 @@ msgid "Refine SQL query"
 msgstr "Refine SQL query"
 
 #: .\reporter_agent\reporter\nodes.py:134
-msgid "Refine SQL query"
-msgstr "Refine SQL query"
+msgid "Refine SQL query for empty results"
+msgstr "Refine SQL query for empty results"
 
 #: .\reporter_agent\reporter\nodes.py:155
 msgid "Create visualization"

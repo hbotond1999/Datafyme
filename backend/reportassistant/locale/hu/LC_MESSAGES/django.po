@@ -423,8 +423,8 @@ msgid "Refine SQL query"
 msgstr "SQL lekérdezés finomítása"
 
 #: .\reporter_agent\reporter\nodes.py:134
-msgid "Refine SQL query"
-msgstr "SQL lekérdezés finomítása"
+msgid "Refine SQL query for empty results"
+msgstr "SQL lekérdezés finomítása üres eredmény esetén"
 
 #: .\reporter_agent\reporter\nodes.py:155
 msgid "Create visualization"
