@@ -1,6 +1,8 @@
 import json
+import logging
+from datetime import datetime
 
-from django.conf.global_settings import gettext_noop
+from django.utils.translation import gettext_noop
 
 from common.custom_logging import log
 from reporter_agent.reporter.agents import logger

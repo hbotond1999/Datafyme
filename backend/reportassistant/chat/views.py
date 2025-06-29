@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponseNotAllowed
-from django.utils.translation import get_language, gettext_noop
+from django.utils.translation import get_language, gettext, gettext_noop
 
 from chat.forms import MessageForm
 from chat.models import Conversation, Message, MessageType
@@ -132,7 +132,7 @@ def get_conversation_status(request):
     if request.method == 'GET':
         conversation_id = request.session['conversation_id']
         conversation = Conversation.objects.get(id=conversation_id, user=request.user)
-        return JsonResponse({"status": conversation.status, "text": conversation.status_desc})
+        return JsonResponse({"status": conversation.status, "text": gettext(conversation.status_desc)})
     else:
         return HttpResponseNotAllowed(['GET'])
 

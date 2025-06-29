@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime
 
-from django.conf.global_settings import gettext_noop
+from django.utils.translation import gettext, gettext_noop
 
 from common.custom_logging import log
 from common.db.manager.database_manager import DatabaseManager
