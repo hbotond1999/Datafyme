@@ -13,7 +13,8 @@ class MessageType(enum.Enum):
 class Conversation(models.Model):
     title = models.CharField(max_length=300)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    status = models.CharField(max_length=300, null=True)
+    status_desc = models.CharField(max_length=2000, null=True)
 
 class Message(models.Model):
     TYPES = [(t.value, t.value) for t in MessageType]

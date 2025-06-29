@@ -1,4 +1,4 @@
-from typing import TypedDict, Dict, List, Any
+from typing import TypedDict, Dict, List, Any, Optional, Callable
 
 from db_configurator.models import DatabaseSource
 
@@ -22,3 +22,4 @@ class GraphState(TypedDict):
     language: str
     query_description: str
     refine_recursive_limit: int
+    node_started_callback: Optional[Callable[[str, str], None]]

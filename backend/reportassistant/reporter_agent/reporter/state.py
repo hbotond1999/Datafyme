@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 
 from typing_extensions import TypedDict
 
@@ -23,4 +23,5 @@ class GraphState(TypedDict):
     is_sql_needed: bool
     new_chart_needed: bool
     q_and_a_answer: str
+    node_started_callback: Optional[Callable[[str, str], None]]  # input
 

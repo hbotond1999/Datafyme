@@ -65,10 +65,138 @@
     </form>
 </div>
 
+<!-- Progress Indicator -->
+<div id="progressIndicator" class="progress-indicator" style="display: none;">
+    <div class="progress-content">
+        <h6 class="mb-3">{% trans 'AI Workflow Progress' %}</h6>
+        <div id="progressList" class="progress-list">
+            <!-- Status items will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+<style>
+.progress-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    text-align: left;
+    min-width: 300px;
+    max-width: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.progress-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border-left: 3px solid #007bff;
+}
+
+.status-item.completed {
+    border-left-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.status-item.current {
+    border-left-color: #ffc107;
+    background-color: #fffbf0;
+}
+
+.status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.status-text {
+    font-size: 14px;
+    color: #333;
+    flex-grow: 1;
+    word-wrap: break-word;
+}
+
+.spinner-border-sm {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.ai-status-message {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: #f6f8fa;
+    border-radius: 12px;
+    box-shadow: none;
+    padding: 10px 16px;
+    margin: 14px auto 14px auto;
+    max-width: 70%;
+    min-width: 160px;
+    border: 1px solid #e3e6ee;
+    font-size: 15px;
+    font-weight: 400;
+    color: #555;
+    gap: 10px;
+}
+.ai-status-message .status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-size: 1em;
+    margin-right: 8px;
+}
+.ai-status-message .spinner-border-sm {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+.ai-status-message .status-text {
+    flex: 1;
+    text-align: left;
+    font-size: 1em;
+    color: #555;
+    letter-spacing: 0.01em;
+}
+</style>
 
 <script src="{% static 'chat/js/chart.js' %}"></script>
+<script src="{% static 'js/utils.js' %}"></script>
 <script>
     let chatLoaded = false;
+    let progressPollingInterval = null;
+    let statusItems = new Map(); // Track status items by text
 
     document.getElementById("toggleChat").addEventListener("click", toggleChat)
     document.getElementById("closeChat").addEventListener("click", toggleChat)
@@ -99,6 +227,62 @@
             }
         }
 
+    function startProgressPolling() {
+        const messagesContainer = document.getElementById('messagesContainer');
+        let statusMessageDiv = document.getElementById('aiStatusMessage');
+        if (!statusMessageDiv) {
+            statusMessageDiv = document.createElement('div');
+            statusMessageDiv.id = 'aiStatusMessage';
+            statusMessageDiv.className = 'ai-status-message';
+            messagesContainer.appendChild(statusMessageDiv);
+            // Scroll to bottom when status bar is created
+            statusMessageDiv.scrollIntoView({behavior: "smooth", block: "end"});
+        }
+        statusMessageDiv.innerHTML = '';
+        let lastStatusText = '';
+        progressPollingInterval = setInterval(() => {
+            fetch("{% url 'chat:get_conversation_status' %}", {
+                method: "GET",
+                headers: {
+                    'X-CSRFToken': Cookies.get('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.text && data.status !== 'Ready' && data.text !== lastStatusText) {
+                    lastStatusText = data.text;
+                    statusMessageDiv.innerHTML = `
+                        <span class=\"status-icon\"><span class=\"spinner-border spinner-border-sm\" role=\"status\"></span></span>
+                        <span class=\"status-text\">${data.text}</span>
+                    `;
+                    // Scroll to bottom when status bar updates
+                    statusMessageDiv.scrollIntoView({behavior: "smooth", block: "end"});
+                }
+                // If status is Ready, remove the status message immediately
+                if (data.status === 'Ready') {
+                    if (statusMessageDiv) {
+                        statusMessageDiv.remove();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error polling progress:', error);
+            });
+        }, 100);
+    }
+
+    function clearProgressPolling() {
+        if (progressPollingInterval) {
+            clearInterval(progressPollingInterval);
+            progressPollingInterval = null;
+        }
+        const statusMessageDiv = document.getElementById('aiStatusMessage');
+        if (statusMessageDiv) {
+            statusMessageDiv.remove();
+        }
+        statusItems.clear && statusItems.clear();
+    }
+
       function sendMessage(event) {
         event.preventDefault();
         const form = document.getElementById("chatForm");
@@ -109,9 +293,12 @@
         messagesContainer.append(userMessage);
         userMessage.scrollIntoView({behavior: "smooth", block: "end"})
         sendButton.disabled = true;
-        sendButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
         const userMessageField = document.getElementById('chatUserMessage');
         userMessageField.value = ''
+        
+        // Start progress polling
+        startProgressPolling();
+        
         fetch("{% url 'chat:chat' %}", {
             method: "POST",
             body: formData,
@@ -121,19 +308,36 @@
         })
         .then(response => response.json())
         .then(data => {
+            // Clear progress polling
+            clearProgressPolling();
+            
             if (data.message) {
                 const message = createElementFromString('<div class="message reply-message"><strong>{% trans 'System' %}:</strong> ' + data.message + '</div>')
                 message.scrollIntoView({behavior: "smooth", block: "end"})
-                sendButton.disabled = true;
                 messagesContainer.append(message);
                 resetLoading(sendButton);
             }
             if (data.chart_id) {
+                // Show description status bar
+                let descStatusDiv = document.getElementById('descStatusMessage');
+                if (!descStatusDiv) {
+                    descStatusDiv = document.createElement('div');
+                    descStatusDiv.id = 'descStatusMessage';
+                    descStatusDiv.className = 'ai-status-message';
+                    descStatusDiv.innerHTML = `
+                        <span class="status-icon"><span class="spinner-border spinner-border-sm" role="status"></span></span>
+                        <span class="status-text">{% trans 'Generating description...' %}</span>
+                    `;
+                    messagesContainer.appendChild(descStatusDiv);
+                }
                 new ChartHelper(
                     '{% url "reporter_agent:get_chart" 0 %}'.replace('0', data.chart_id),
                     '',
                     '{% url "reporter_agent:generate_description" %}',
                     (description) => {
+                        // Remove description status bar
+                        const descStatusDiv = document.getElementById('descStatusMessage');
+                        if (descStatusDiv) descStatusDiv.remove();
                         const message = createElementFromString('<div class="message reply-message"><strong>{% trans 'System' %}:</strong> ' +description+ '</div>');
                         messagesContainer.append(message);
                         resetLoading(sendButton)
@@ -148,9 +352,14 @@
                     300
                 );
             }
+            // If no message and no chart, still re-enable the button
+            if (!data.message && !data.chart_id) {
+                resetLoading(sendButton);
+            }
         })
         .catch(error => {
             console.error('Hiba történt:', error);
+            clearProgressPolling();
             resetLoading(sendButton)
         })
 
@@ -159,7 +368,6 @@
 
     function resetLoading(sendButton) {
         sendButton.disabled = false;
-        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
 
 

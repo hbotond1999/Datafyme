@@ -3,6 +3,8 @@ import logging
 import os
 from datetime import datetime
 
+from django.utils.translation import gettext, gettext_noop
+
 from common.custom_logging import log
 from common.db.manager.database_manager import DatabaseManager
 from common.db.manager.handlers.utils.exception import ExecuteQueryError
@@ -28,6 +30,9 @@ def filter_basic_chat(state: GraphState):
     Returns:
         dict: A dictionary containing the 'message' which is the original user input.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("filter_basic_chat", gettext_noop("Checking if the message is relevant for a reporting tasks."))
+
     logger.info("Running filter_basic_chat node: checking if the message is relevant for a reporting tasks.")
     result: IsRelevant = filter_relevant_question(question=state["question"], chat_data=state["chat_history"])
 
@@ -45,6 +50,8 @@ def filter_basic_chat(state: GraphState):
 
 @log(my_logger=logger)
 def task_router_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("task_router_node", gettext_noop("Is SQL needed?"))
     result = task_router(question=state["question"], chat_data=state["chat_history"])
     logger.info(f"SQL is needed? {result.is_sql_needed}")
     return {"is_sql_needed": result.is_sql_needed}
@@ -52,6 +59,8 @@ def task_router_node(state: GraphState):
 
 @log(my_logger=logger)
 def seconder_task_router_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("seconder_task_router_node", gettext_noop("New chart generation is needed?"))
     result = seconder_task_router(question=state["question"], chat_data=state["chat_history"])
     logger.info(f"New chart generation is needed? {result.new_chart_needed}")
     return {"new_chart_needed": result.new_chart_needed}
@@ -59,6 +68,8 @@ def seconder_task_router_node(state: GraphState):
 
 @log(my_logger=logger)
 def summarize_history_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("summarize_history_node", gettext_noop("Summarize history"))
     new_question = create_history_summarizer(question=state["question"], chat_data=state["chat_history"])
     logger.info(f"New summarized question: {new_question}")
     return {"question": new_question}
@@ -66,6 +77,8 @@ def summarize_history_node(state: GraphState):
 
 @log(my_logger=logger)
 def create_sql_query_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("create_sql_query_node", gettext_noop("Generating SQL query"))
     sql_agent_graph = create_sql_agent_graph()
     # save graph image:
     if int(os.getenv('DEBUG')) == 1:
@@ -82,6 +95,8 @@ def create_sql_query_node(state: GraphState):
 
 @log(my_logger=logger)
 def run_sql_query_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("run_sql_query_node", gettext_noop("Execute the generated SQL query"))
     db_manager = DatabaseManager(state["database_source"])
     try:
         data = db_manager.execute_sql(state["sql_query"], response_format="list", row_num=100)
@@ -92,6 +107,9 @@ def run_sql_query_node(state: GraphState):
 
 @log(my_logger=logger)
 def refine_sql_query_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("refine_sql_query_node", gettext_noop("Refine SQL query"))
+
     refine_sql_recursive_limit = state["refine_sql_recursive_limit"] - 1
     logger.info(f"Actual REFINE SQL RECURSIVE LIMIT value: {state["refine_sql_recursive_limit"]}")
 
@@ -113,6 +131,8 @@ def refine_sql_query_node(state: GraphState):
 
 @log(my_logger=logger)
 def refine_empty_result_sql_query_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("refine_empty_result_sql_query_node", gettext_noop("Refine SQL query for empty results"))
     refine_empty_result_recursive_limit = state["refine_empty_result_recursive_limit"] - 1
     logger.info(f"Current EMPTY RESULT REFINE RECURSIVE LIMIT value: {refine_empty_result_recursive_limit}")
 
@@ -132,6 +152,8 @@ def refine_empty_result_sql_query_node(state: GraphState):
 
 @log(my_logger=logger)
 def create_visualization_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("create_visualization", gettext_noop("Create visualization"))
     visu_graph = create_visu_graph()
     # save graph image:
     if int(os.getenv('DEBUG')) == 1:
@@ -147,6 +169,8 @@ def create_visualization_node(state: GraphState):
 
 @log(my_logger=logger)
 def create_q_and_a_node(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("create_q_and_a_node", gettext_noop("Generating the answer"))
 
     result = q_and_a_agent(state["question"], state["chat_history"])
     final_data = FinalData(type=RepType.TEXT, chart_type=None, data=result, chart_title=None)

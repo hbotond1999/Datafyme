@@ -1,4 +1,4 @@
-from typing import TypedDict, Any, Dict, List
+from typing import TypedDict, Any, Dict, List, Optional, Callable
 
 from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData
 from reporter_agent.reporter.subgraph.visualisation_agent.chart.abc import Chart
@@ -23,3 +23,4 @@ class GraphState(TypedDict):
     question: str # input
     language: str
     final_data: FinalData # output
+    node_started_callback: Optional[Callable[[str, str], None]]
