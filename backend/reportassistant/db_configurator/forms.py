@@ -11,7 +11,7 @@ def get_db_types():
 class DatabaseSourceForm(forms.ModelForm):
     class Meta:
         model = DatabaseSource
-        fields = ['type', 'name', 'username', 'password', 'host', 'port', 'display_name', 'user']
+        fields = ['type', 'name', 'username', 'password', 'host', 'port', 'display_name']
         widgets = {
             'password': forms.PasswordInput(render_value=True),
         }
