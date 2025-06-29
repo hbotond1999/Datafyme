@@ -41,10 +41,10 @@ def connection(request):
             db_source = DatabaseSource.objects.get(pk=request.POST.get('id'))
 
         form = DatabaseSourceForm(request.POST, instance=db_source)
-        form.user = request.user
         if not form.is_valid():
             return JsonResponse({"success": False, "errors": form.errors.as_json()})
 
+        # Create a temporary instance for connection testing
         database_source = DatabaseSource(
             name=form.cleaned_data['name'],
             type=form.cleaned_data["type"],
@@ -57,9 +57,15 @@ def connection(request):
         success = DatabaseManager(database_source).check_connection()
         if success:
             if request.POST.get('id'):
-                form.save()
+                # Update existing database source
+                db_source = DatabaseSource.objects.get(pk=request.POST.get('id'))
+                for field in ['name', 'type', 'host', 'port', 'username', 'password', 'display_name']:
+                    if field in form.cleaned_data:
+                        setattr(db_source, field, form.cleaned_data[field])
+                db_source.save()
                 return JsonResponse({"success": True})
 
+            # Create new database source
             group_name = "database_source_group_" + form.cleaned_data["name"] + "_" + form.cleaned_data["type"]
             existing_groups = Group.objects.filter(name__startswith=group_name)
 
@@ -70,8 +76,12 @@ def connection(request):
                 unique_name = group_name
             new_group = Group.objects.create(name=unique_name)
 
-            form.instance.group = new_group
-            saved_data = form.save()
+            # Save the form with the group and user
+            saved_data = form.save(commit=False)
+            saved_data.group = new_group
+            saved_data.user = request.user
+            saved_data.save()
+            
             load_db.enqueue(saved_data.id, request.user.id)
 
             return JsonResponse({'success': True})
