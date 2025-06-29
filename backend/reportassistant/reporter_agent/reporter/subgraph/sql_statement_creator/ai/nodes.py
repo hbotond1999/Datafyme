@@ -2,6 +2,8 @@ import json
 from datetime import datetime
 import logging
 
+from django.conf.global_settings import gettext_noop
+
 from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
 from db_configurator.models import TableDocumentation
@@ -22,6 +24,9 @@ def hybrid_search_node(state: GraphState):
     Returns:
         dict: A dictionary containing the matching_tables derived from the result of the hybrid search.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("hybrid_search_node", gettext_noop("Search for tables"))
+
     logger.info("Running hybrid_search_node: selecting matching table descriptions for the user message with hybrid search.")
     collection_name = "TablesDocs"
     similar_docs = hybrid_search(state["message"], collection_name, database_id=state["database_source"].id, limit=15)
@@ -43,6 +48,8 @@ def get_ddls(state: GraphState):
     Returns:
         dict: A dictionary containing the matching_table_ddls filtered from the django database.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("get_ddls", gettext_noop("Getting table definitions"))
     logger.info("Running get_ddls node: selecting matching table ddls from django database.")
     matching_tables = [(temp["schema"], temp["table_name"]) for temp in state["matching_tables"]]
     json_data = [TableDocumentation.objects.get(database_source=state["database_source"], schema_name=schema,
@@ -59,6 +66,8 @@ def reranker(state: GraphState):
     Returns:
         dict: A dictionary containing the filtered_table_ddls derived from the result of the ddl grader agent.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("reranker", gettext_noop("Ranking relevant tables"))
     logger.info("Running reranker node: we examine the relevance of the tables using an agent.")
     results = grade_all_ddl().invoke({'message': state["message"], 'ddls': state["matching_table_ddls"]})
     filtered_ddls = [ddl for relevance, ddl in zip(results, state["matching_table_ddls"]) if relevance]
@@ -76,6 +85,8 @@ def refine_user_question(state: GraphState):
         dict: A dictionary containing the refined user message derived from the result of the refine user question
          agent.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("refine_user_question", gettext_noop("Refining user question"))
     logger.info("Running refine_user_question node: refining the incoming user message.")
     refine_recursive_limit = state["refine_recursive_limit"] - 1
     logger.info(f"Actual REFINE RECURSIVE LIMIT value: {refine_recursive_limit}")
@@ -99,6 +110,8 @@ def relation_graph(state: GraphState):
     Returns:
         dict: A dictionary containing all the relevant tables derived from the relations of the neo4j graph database.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("relation_graph", gettext_noop("Finding related tables"))
     logger.info("Running relation_graph node: selecting all the related tables from neo4j graph database.")
     filtered_tables = [(table["schema_name"], table["table_name"]) for table in state['filtered_table_ddls']]
     neo4j_instance = Neo4JInstance()
@@ -128,6 +141,8 @@ def get_final_ddls(state: GraphState):
     Returns:
         dict: A dictionary containing the 'table_final_ddls' derived from the django database.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("get_final_ddls", gettext_noop("Getting final table definitions"))
     logger.info("Running get_final_ddls node: selecting table ddls from django database for the final table set.")
     matching_tables = [(temp["schema"], temp["table_name"]) for temp in state["tables_all"]]
     json_data = [TableDocumentation.objects.get(database_source=state["database_source"], schema_name=schema,
@@ -146,6 +161,8 @@ def create_query(state: GraphState):
         dict: A dictionary containing the 'result_query' derived from the result of invoking
               the sql agent.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("create_query", gettext_noop("Creating SQL query"))
     logger.info("Running create_query node: creating sql query for the user question.")
     result = sql_agent().invoke({'ddls': json.dumps(state["table_final_ddls"]),
                                  'message': state["message"],

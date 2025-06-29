@@ -1,5 +1,7 @@
 import json
 
+from django.conf.global_settings import gettext_noop
+
 from common.custom_logging import log
 from reporter_agent.reporter.agents import logger
 from reporter_agent.reporter.subgraph.visualisation_agent.ai import FinalData, RepType
@@ -23,6 +25,8 @@ def decide_representation(state: GraphState):
         dict: A dictionary containing the 'representation_type' derived from the result of invoking
               the representation agent.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("decide_representation", gettext_noop("Deciding representation type"))
     preview_data = get_first_ten_records(data=state["input_data"])
     result = create_representation_agent().invoke({'preview_data': json.dumps(preview_data), 'question': state["question"]})
     return {"representation_type": result.content}
@@ -37,6 +41,8 @@ def decide_chart_type(state: GraphState):
     Returns:
         A dictionary with the key 'chart_type' and the value being the type of chart determined by the agent.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("decide_chart_type", gettext_noop("Deciding chart type"))
     preview_data = get_first_ten_records(data=state["input_data"])
     result = create_chart_selector_agent().invoke({'preview_data': json.dumps(preview_data), 'question': state["question"]})
     return {"chart_type": result.content}
@@ -48,6 +54,8 @@ def populate_chart_data(state: GraphState):
     Args:
         state (GraphState): A dictionary containing the state information for generating chart data.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("populate_chart_data", gettext_noop("Populating chart data"))
     preview_data = get_first_ten_records(data=state["input_data"])
     if len(state["error_messages"]) > 0 and ["chart_column_data"] is not None:
         agent = create_chart_def_fix_agent(CHART_RESPONSE_MAPPING[state["chart_type"]])
@@ -70,6 +78,8 @@ def populate_chart_data(state: GraphState):
 
 @log(my_logger=logger)
 def validate_chart_data(state: GraphState):
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("validate_chart_data", gettext_noop("Validating chart data"))
     preview_data = get_first_ten_records(data=state["input_data"])
     error_messages = state["chart_column_data"].validate_chart_data(list(preview_data.keys()))
     return {"error_messages": error_messages}
@@ -88,6 +98,8 @@ def create_final_data(state: GraphState):
         A dictionary with the key "final_data" mapping to a FinalData object which
         contains type, chart type (if applicable), and the relevant data.
     """
+    if state.get("node_started_callback"):
+        state["node_started_callback"]("create_final_data", gettext_noop("Creating final data"))
     rep_type = RepType[state["representation_type"]]
     if rep_type == RepType.TEXT:
         response = create_summarize_agent().invoke({"data": state["input_data"], "question": state["question"], "language": state["language"]}).content

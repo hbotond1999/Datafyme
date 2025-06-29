@@ -5,8 +5,8 @@ from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.utils.translation import get_language
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.utils.translation import get_language, gettext_noop
 
 from chat.forms import MessageForm
 from chat.models import Conversation, Message, MessageType
@@ -29,7 +29,14 @@ def chat_view(request):
         request.session['conversation_id'] = conversation.id
 
     conversation_id = request.session['conversation_id']
+    conversation = Conversation.objects.get(id=conversation_id)
 
+    def update_conversation(status, text):
+        conversation.status = status
+        conversation.status_desc = text
+        conversation.save()
+
+    update_conversation("progress", gettext_noop("progress"))
     if request.method == 'POST':
         form = MessageForm(request.POST, user=request.user)
         if form.is_valid():
@@ -71,6 +78,7 @@ def chat_view(request):
                     chat_hist.append(q_and_a)
 
                 Message(conversation_id=conversation_id, type=MessageType.HUMAN.value, message=user_message, chart=None).save()
+
                 reporter_graph = create_reporter_graph()
                 # save graph image:
                 if int(os.getenv('DEBUG')) == 1:
@@ -82,9 +90,11 @@ def chat_view(request):
                         "question": user_message,
                         "refine_sql_recursive_limit": 3,
                         "refine_empty_result_recursive_limit": 3,
-                        "language": get_language()
+                        "language": get_language(),
+                        "node_started_callback": update_conversation,
                      }
                 )
+                update_conversation("Ready", gettext_noop("Ready"))
                 message = save_message_from_reporter(final_state, datasource, conversation_id)
                 return JsonResponse({
                     "type": message.type,
@@ -116,6 +126,15 @@ def chat_view(request):
     continue_conversation_ = request.session.get('continue_conversation')
     request.session['continue_conversation'] = 0
     return render(request, 'chat/chat.html', {'form': form, 'messages': messages, 'conversation_id': conversation_id, 'continue_conversation': continue_conversation_})
+
+@login_required
+def get_conversation_status(request):
+    if request.method == 'GET':
+        conversation_id = request.session['conversation_id']
+        conversation = Conversation.objects.get(id=conversation_id, user=request.user)
+        return JsonResponse({"status": conversation.status, "text": conversation.status_desc})
+    else:
+        return HttpResponseNotAllowed(['GET'])
 
 @login_required
 def clear_chat(request):
@@ -181,3 +200,5 @@ def continue_conversation(request, conversation_id):
     request.session['conversation_id'] = conversation_id
     request.session['continue_conversation'] = 1
     return redirect('chat:chat')
+
+
