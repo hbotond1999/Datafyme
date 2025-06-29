@@ -394,6 +394,102 @@ msgstr "API kulcs érvényes és működőképes."
 msgid "API kulcs teszt sikertelen"
 msgstr "API kulcs teszt sikertelen"
 
+#: .\reporter_agent\reporter\nodes.py:33
+msgid "Checking if the message is relevant for a reporting tasks."
+msgstr "Ellenőrzés, hogy az üzenet releváns-e jelentéskészítési feladatokhoz."
+
+#: .\reporter_agent\reporter\nodes.py:53
+msgid "Is SQL needed?"
+msgstr "SQL szükséges?"
+
+#: .\reporter_agent\reporter\nodes.py:62
+msgid "New chart generation is needed?"
+msgstr "Új diagram generálás szükséges?"
+
+#: .\reporter_agent\reporter\nodes.py:71
+msgid "Summarize history"
+msgstr "Történet összefoglalása"
+
+#: .\reporter_agent\reporter\nodes.py:80
+msgid "Generating SQL query"
+msgstr "SQL lekérdezés generálása"
+
+#: .\reporter_agent\reporter\nodes.py:98
+msgid "Execute the generated SQL query"
+msgstr "A generált SQL lekérdezés végrehajtása"
+
+#: .\reporter_agent\reporter\nodes.py:110
+msgid "Refine SQL query"
+msgstr "SQL lekérdezés finomítása"
+
+#: .\reporter_agent\reporter\nodes.py:134
+msgid "Refine SQL query"
+msgstr "SQL lekérdezés finomítása"
+
+#: .\reporter_agent\reporter\nodes.py:155
+msgid "Create visualization"
+msgstr "Vizualizáció létrehozása"
+
+#: .\reporter_agent\reporter\nodes.py:172
+msgid "Generating the answer"
+msgstr "Válasz generálása"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:27
+msgid "Search for tables"
+msgstr "Táblák keresése"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:51
+msgid "Getting table definitions"
+msgstr "Tábla definíciók lekérése"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:69
+msgid "Ranking relevant tables"
+msgstr "Releváns táblák rangsorolása"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:88
+msgid "Refining user question"
+msgstr "Felhasználói kérdés finomítása"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:113
+msgid "Finding related tables"
+msgstr "Kapcsolódó táblák keresése"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:144
+msgid "Getting final table definitions"
+msgstr "Végső tábla definíciók lekérése"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:164
+msgid "Creating SQL query"
+msgstr "SQL lekérdezés létrehozása"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:28
+msgid "Deciding representation type"
+msgstr "Megjelenítési típus döntése"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:44
+msgid "Deciding chart type"
+msgstr "Diagram típus döntése"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:57
+msgid "Populating chart data"
+msgstr "Diagram adatok feltöltése"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:81
+msgid "Validating chart data"
+msgstr "Diagram adatok validálása"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:101
+msgid "Creating final data"
+msgstr "Végső adatok létrehozása"
+
+#: .\chat\views.py:38
+msgid "progress"
+msgstr "folyamatban"
+
+#: .\chat\views.py:96
+msgid "Ready"
+msgstr "Kész"
+
 #~ msgid "Establish a New Connection"
 #~ msgstr "Új kapcsolat felvétele"
 

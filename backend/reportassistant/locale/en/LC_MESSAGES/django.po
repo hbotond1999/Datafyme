@@ -399,6 +399,102 @@ msgstr "API key is valid!"
 msgid "API kulcs teszt sikertelen"
 msgstr "API key is not valid!"
 
+#: .\reporter_agent\reporter\nodes.py:33
+msgid "Checking if the message is relevant for a reporting tasks."
+msgstr "Checking if the message is relevant for a reporting tasks."
+
+#: .\reporter_agent\reporter\nodes.py:53
+msgid "Is SQL needed?"
+msgstr "Is SQL needed?"
+
+#: .\reporter_agent\reporter\nodes.py:62
+msgid "New chart generation is needed?"
+msgstr "New chart generation is needed?"
+
+#: .\reporter_agent\reporter\nodes.py:71
+msgid "Summarize history"
+msgstr "Summarize history"
+
+#: .\reporter_agent\reporter\nodes.py:80
+msgid "Generating SQL query"
+msgstr "Generating SQL query"
+
+#: .\reporter_agent\reporter\nodes.py:98
+msgid "Execute the generated SQL query"
+msgstr "Execute the generated SQL query"
+
+#: .\reporter_agent\reporter\nodes.py:110
+msgid "Refine SQL query"
+msgstr "Refine SQL query"
+
+#: .\reporter_agent\reporter\nodes.py:134
+msgid "Refine SQL query"
+msgstr "Refine SQL query"
+
+#: .\reporter_agent\reporter\nodes.py:155
+msgid "Create visualization"
+msgstr "Create visualization"
+
+#: .\reporter_agent\reporter\nodes.py:172
+msgid "Generating the answer"
+msgstr "Generating the answer"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:27
+msgid "Search for tables"
+msgstr "Search for tables"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:51
+msgid "Getting table definitions"
+msgstr "Getting table definitions"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:69
+msgid "Ranking relevant tables"
+msgstr "Ranking relevant tables"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:88
+msgid "Refining user question"
+msgstr "Refining user question"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:113
+msgid "Finding related tables"
+msgstr "Finding related tables"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:144
+msgid "Getting final table definitions"
+msgstr "Getting final table definitions"
+
+#: .\reporter_agent\reporter\subgraph\sql_statement_creator\ai\nodes.py:164
+msgid "Creating SQL query"
+msgstr "Creating SQL query"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:28
+msgid "Deciding representation type"
+msgstr "Deciding representation type"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:44
+msgid "Deciding chart type"
+msgstr "Deciding chart type"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:57
+msgid "Populating chart data"
+msgstr "Populating chart data"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:81
+msgid "Validating chart data"
+msgstr "Validating chart data"
+
+#: .\reporter_agent\reporter\subgraph\visualisation_agent\ai\nodes.py:101
+msgid "Creating final data"
+msgstr "Creating final data"
+
+#: .\chat\views.py:38
+msgid "progress"
+msgstr "progress"
+
+#: .\chat\views.py:96
+msgid "Ready"
+msgstr "Ready"
+
 #~ msgid "Establish a New Connection"
 #~ msgstr "Establish a new connection"
 
