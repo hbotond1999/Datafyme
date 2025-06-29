@@ -27,6 +27,10 @@ msgstr "Kezdjen el írni"
 msgid "Choose a source"
 msgstr "Válasszon adatforrást"
 
+#: .\chat\templates\chat\chat.html:328
+msgid "Generating description..."
+msgstr "Leírás generálása..."
+
 #: .\chat\models.py:10
 msgid "AI"
 msgstr "AI"

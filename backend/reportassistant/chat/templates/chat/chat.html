@@ -293,7 +293,6 @@
         messagesContainer.append(userMessage);
         userMessage.scrollIntoView({behavior: "smooth", block: "end"})
         sendButton.disabled = true;
-        sendButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
         const userMessageField = document.getElementById('chatUserMessage');
         userMessageField.value = ''
         
@@ -315,7 +314,6 @@
             if (data.message) {
                 const message = createElementFromString('<div class="message reply-message"><strong>{% trans 'System' %}:</strong> ' + data.message + '</div>')
                 message.scrollIntoView({behavior: "smooth", block: "end"})
-                sendButton.disabled = true;
                 messagesContainer.append(message);
                 resetLoading(sendButton);
             }
@@ -328,7 +326,7 @@
                     descStatusDiv.className = 'ai-status-message';
                     descStatusDiv.innerHTML = `
                         <span class="status-icon"><span class="spinner-border spinner-border-sm" role="status"></span></span>
-                        <span class="status-text">Leírás generálása...</span>
+                        <span class="status-text">{% trans 'Generating description...' %}</span>
                     `;
                     messagesContainer.appendChild(descStatusDiv);
                 }
@@ -354,6 +352,10 @@
                     300
                 );
             }
+            // If no message and no chart, still re-enable the button
+            if (!data.message && !data.chart_id) {
+                resetLoading(sendButton);
+            }
         })
         .catch(error => {
             console.error('Hiba történt:', error);
@@ -366,7 +368,6 @@
 
     function resetLoading(sendButton) {
         sendButton.disabled = false;
-        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
     }
 
 

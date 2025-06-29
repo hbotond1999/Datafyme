@@ -27,6 +27,10 @@ msgstr "Type your message..."
 msgid "Choose a source"
 msgstr "Choose a source"
 
+#: .\chat\templates\chat\chat.html:328
+msgid "Generating description..."
+msgstr "Generating description..."
+
 #: .\chat\models.py:10
 msgid "AI"
 msgstr "AI"
