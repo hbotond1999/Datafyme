@@ -11,11 +11,11 @@ from django.utils.translation import get_language, gettext, gettext_noop
 from chat.forms import MessageForm
 from chat.models import Conversation, Message, MessageType
 from chat.utils.message import save_message_from_reporter
+from reporter_agent.reporter.agents import generate_title_agent
 from reporter_agent.reporter.graph import create_reporter_graph
 from reporter_agent.reporter.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
 from reporter_agent.reporter.utils import save_graph_png
-from reporter_agent.task import generate_title
 
 
 logger = logging.getLogger('reportassistant.custom')
@@ -47,7 +47,9 @@ def chat_view(request):
                 messages = list(Message.objects.filter(conversation_id=conversation_id, conversation__user=request.user))
 
                 if len(messages) == 0:
-                    generate_title.enqueue(conversation_id, user_message, get_language())
+                    title = generate_title_agent().invoke({"first_message": user_message, "language": get_language()})
+                    conversation.title = title
+                    conversation.save()
 
                 chat_hist = []
                 q_and_a = {}
