@@ -80,6 +80,9 @@ class DBLoader:
             neo4j_instance.close()
 
     def filter_schemas(self, tables_schemas):
+        if not self.datasource.schema_name:
+            return tables_schemas
+
         filtered_schemas = []
         for table_schema in tables_schemas:
             if table_schema.schema == self.datasource.schema_name:
