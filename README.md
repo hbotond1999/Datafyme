@@ -1,93 +1,320 @@
-# Report assistant
+# Datafyme
+
+## Overview
+
+Datafyme is a  agentic reporting system built with Django and modern LLM-based agents. It supports database documentation, relation extraction, and advanced analytical reporting via agentic workflows. The system is fully containerized and integrates with PostgreSQL, Neo4j, and Milvus for advanced data and knowledge management.
+
+**Data Source Support**: Currently supports PostgreSQL as the primary data source. Support for additional database types (MySQL, SQL Server, Oracle, etc.) is planned for future releases.
 
 
+## Authors
 
-## Getting started
+- [Botond Hegedus](https://www.linkedin.com/in/botond-heged%C3%BCs-690982262/)
+- [Oliver Suhajda](https://www.linkedin.com/in/suhajda-oliv%C3%A9r-477535295/)
+---
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Tech Stack
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- **Python 3.12**
+- **Django 5.1.1**
+- **FastAPI (via Uvicorn)**
+- **LangChain, LangGraph** (LLM agent orchestration)
+- **PostgreSQL** (main DB)
+- **Neo4j** (graph DB for relations)
+- **Milvus** (vector DB for semantic search)
+- **Docker Compose** (multi-service orchestration)
 
-## Add your files
+---
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## Dockerized Architecture
 
+The system is fully containerized. Main services:
+
+- `backend`: Django
+- `worker`: Background task runner (dbloader, async jobs)
+- `django-db`: Main PostgreSQL database
+- `mock-db`: Mock/test PostgreSQL database
+- `neo4j`: Graph database for entity/relation storage
+- `standalone` (Milvus): Vector database for semantic search
+- `minio`, `etcd`: Milvus dependencies
+- `nginx`: Serves static files and acts as reverse proxy
+- `python-code-runner`: Isolated code execution service
+
+---
+
+## High-Level Architecture
+
+```mermaid
+flowchart TD
+  subgraph Backend
+    direction TB
+    DBLoader["DBLoader (dbloader)"]
+    VectorLoader["VectorLoader (vector_loader)"]
+    RelationFinder["RelationFinder (graph_loader)"]
+    Neo4JInstance["Neo4JInstance (graph_db)"]
+    TableDocumentationModel["TableDocumentationModel (db_configurator)"]
+    TableDocument["TableDocument (vectordb)"]
+    DatabaseManager["DatabaseManager (common.db.manager)"]
+    DatabaseSource["DatabaseSource (db_configurator)"]
+    DBLoader -->|uses| VectorLoader
+    DBLoader -->|uses| RelationFinder
+    VectorLoader -->|stores| TableDocumentationModel
+    VectorLoader -->|stores| TableDocument
+    RelationFinder -->|creates| Neo4JInstance
+    DBLoader -->|uses| DatabaseManager
+    DBLoader -->|uses| DatabaseSource
+  end
+  subgraph ReporterAgent
+    direction TB
+    ReporterGraph["Reporter Graph (StateGraph)"]
+    SQLAgentGraph["SQL Agent Graph (StateGraph)"]
+    VisAgentGraph["Visualization Agent Graph (StateGraph)"]
+    Nodes["Nodes: filter, summarize, router, create_sql, run_sql, refine, visualize, Q&A"]
+    ReporterGraph -->|invokes| SQLAgentGraph
+    ReporterGraph -->|invokes| VisAgentGraph
+    ReporterGraph -->|executes| Nodes
+  end
+  Backend -->|provides data| ReporterAgent
+  classDef box fill:#fff,stroke:#333,stroke-width:2px;
+  class Backend,ReporterAgent box;
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/hbotond1999/report-assistant.git
-git branch -M main
-git push -uf origin main
+
+---
+
+## dbloader: Purpose & Agentic Workflow
+
+### Purpose
+
+- **dbloader** is responsible for:
+  - Extracting table schemas and relations from a database
+  - Generating rich documentation for each table using LLM agents
+  - Storing documentation in both the main DB and a vector DB (Milvus)
+  - Discovering and storing table relations in Neo4j (graph DB)
+
+### Agentic Workflow
+
+```mermaid
+flowchart TD
+  subgraph dbloader Agentic Workflow
+    direction TB
+    Start["Start: DBLoader.load()"]
+    ExtractSchemas["Extract Table Schemas"]
+    VectorLoader["VectorLoader: Generate Table Docs (LLM agent)"]
+    SaveDocs["Save Docs to DB & VectorDB"]
+    ExtractRelations["Extract Table Relations"]
+    RelationFinder["RelationFinder: Find Relations (LLM agent)"]
+    SaveRelations["Save Relations to Neo4j"]
+    End["End"]
+    Start --> ExtractSchemas --> VectorLoader --> SaveDocs --> ExtractRelations --> RelationFinder --> SaveRelations --> End
+  end
 ```
 
-## Integrate with your tools
+- **VectorLoader**: Uses an LLM agent to generate technical and business documentation for each table.
+- **RelationFinder**: Uses an LLM agent to infer foreign key/public key relations from DDLs.
+- **All results** are stored in the appropriate DBs for later semantic search and graph analysis.
 
-- [ ] [Set up project integrations](https://gitlab.com/hbotond1999/report-assistant/-/settings/integrations)
+---
 
-## Collaborate with your team
+## reporter_agent: Purpose & Agentic Workflow
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Purpose
 
-## Test and Deploy
+- **reporter_agent** orchestrates the analytical reporting workflow:
+  - Receives user questions (in natural language)
+  - Determines if a SQL query or simple Q&A is needed
+  - Generates, refines, and executes SQL queries using LLM agents
+  - Visualizes results (charts, tables, text) using agentic subgraphs
 
-Use the built-in continuous integration in GitLab.
+### Agentic Workflow
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+#### Main Reporter Agent Workflow
 
-***
+```mermaid
+flowchart TD
+    Start([Start: User Question]) --> FilterChat[Check Message Relevance]
+    
+    FilterChat -->|Relevant| SummarizeHistory[Summarize Chat History]
+    FilterChat -->|Not Relevant| BasicChat[Generate Basic Response]
+    BasicChat --> End([End: Return Response])
+    
+    SummarizeHistory --> TaskRouter{Is SQL Query Needed?}
+    
+    TaskRouter -->|Yes| CreateSQL[Generate SQL Query]
+    TaskRouter -->|No| SecondRouter{New Chart Needed?}
+    
+    SecondRouter -->|Yes| CreateSQL
+    SecondRouter -->|No| QandA[Generate Q&A Response]
+    QandA --> End
+    
+    CreateSQL --> RunSQL[Execute SQL Query]
+    
+    RunSQL --> CheckResult{Check SQL Result}
+    CheckResult -->|Success + Data| CreateViz[Create Visualization]
+    CheckResult -->|Error| RefineSQL[Refine SQL Query]
+    CheckResult -->|Empty Result| RefineEmpty[Refine for Empty Result]
+    
+    RefineSQL --> RunSQL
+    RefineEmpty --> RunSQL
+    
+    CreateViz --> End
+    
+    style Start fill:#e1f5fe
+    style End fill:#f3e5f5
+    style FilterChat fill:#fff3e0
+    style TaskRouter fill:#fff8e1
+    style SecondRouter fill:#fff8e1
+    style CheckResult fill:#fff8e1
+    style CreateSQL fill:#e8f5e8
+    style CreateViz fill:#e8f5e8
+    style QandA fill:#e8f5e8
+```
 
-# Editing this README
+#### SQL Agent Subgraph
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```mermaid
+flowchart TD
+    SQLStart([SQL Agent Start]) --> HybridSearch[Hybrid Search: Find Relevant Tables]
+    
+    HybridSearch --> GetDDLs[Extract Table DDLs]
+    GetDDLs --> Reranker[Rerank Tables by Relevance]
+    
+    Reranker --> CheckTables{Tables Found?}
+    CheckTables -->|No| RefineQuestion[Refine User Question]
+    CheckTables -->|Yes| RelationGraph[Build Relation Graph]
+    
+    RefineQuestion --> HybridSearch
+    
+    RelationGraph --> GetFinalDDLs[Get Final DDL Structures]
+    GetFinalDDLs --> CreateQuery[Generate SQL Query]
+    
+    CreateQuery --> SQLEnd([Return SQL + Description])
+    
+    style SQLStart fill:#e1f5fe
+    style SQLEnd fill:#f3e5f5
+    style HybridSearch fill:#fff3e0
+    style Reranker fill:#fff3e0
+    style CheckTables fill:#fff8e1
+    style RelationGraph fill:#e8f5e8
+    style CreateQuery fill:#e8f5e8
+```
 
-## Suggestions for a good README
+#### Visualization Agent Subgraph
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```mermaid
+flowchart TD
+    VizStart([Visualization Agent Start]) --> DecideRep{Decide Representation Type}
+    
+    DecideRep -->|TEXT| CreateFinalText[Create Text Response]
+    DecideRep -->|TABLE| CreateFinalTable[Create Table Response]
+    DecideRep -->|CHART| DecideChart[Decide Chart Type]
+    
+    DecideChart --> PopulateChart[Populate Chart Data]
+    PopulateChart --> ValidateChart{Validate Chart Data}
+    
+    ValidateChart -->|Invalid| PopulateChart
+    ValidateChart -->|Valid| CreateFinalChart[Create Final Chart]
+    
+    CreateFinalText --> VizEnd([Return Visualization])
+    CreateFinalTable --> VizEnd
+    CreateFinalChart --> VizEnd
+    
+    style VizStart fill:#e1f5fe
+    style VizEnd fill:#f3e5f5
+    style DecideRep fill:#fff8e1
+    style ValidateChart fill:#fff8e1
+    style DecideChart fill:#fff3e0
+    style PopulateChart fill:#e8f5e8
+    style CreateFinalText fill:#e8f5e8
+    style CreateFinalTable fill:#e8f5e8
+    style CreateFinalChart fill:#e8f5e8
+```
 
-## Name
-Choose a self-explaining name for your project.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+- **StateGraph**: The workflow is implemented as a state machine (LangGraph), with nodes for filtering, summarizing, routing, SQL generation, execution, refinement, and visualization.
+- **SQL Agent Graph**: Specialized subgraph for robust SQL generation and refinement.
+- **Visualization Agent Graph**: Specialized subgraph for deciding representation and generating charts/tables.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## Deploy Guide
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Prerequisites
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+- Docker and Docker Compose installed
+- Access to the project repository
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Environment Setup
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+**CRITICAL**: Before starting any services, you must create `.env` files for each service based on the provided `.env.example` templates.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+#### 1. Create Environment Files
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+Navigate to each service directory and create `.env` files:
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+```bash
+# Backend service
+cp docker/dev/backend/.env.example docker/dev/backend/.env
 
-## License
-For open source projects, say how it is licensed.
+# Database service  
+cp docker/dev/database/.env.example docker/dev/database/.env
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+# Neo4j service
+cp docker/dev/neo4j/.env.example docker/dev/neo4j/.env
+
+# Vector database service
+cp docker/dev/vectordb/.env.example docker/dev/vectordb/.env
+
+# Any other services with .env.example files
+# Check each subdirectory in docker/dev/ for additional .env.example files
+```
+
+### Deployment Steps
+
+#### Local Development
+
+```bash
+# Navigate to development environment
+cd docker/dev
+
+# Start all services
+docker compose up --build
+
+# Or start in detached mode
+docker compose up --build -d
+```
+
+### Post-Deployment Setup
+
+#### 1. Create superuser
+```bash
+docker compose exec backend python manage.py createsuperuser
+```
+
+#### 2. Verify Services
+
+Check that all services are running correctly:
+
+```bash
+# Check service status
+docker compose ps
+
+# Check logs for any errors
+docker compose logs backend
+docker compose logs django-db
+docker compose logs neo4j
+docker compose logs standalone  # Milvus
+```
+
+#### 3. Access Points
+
+- **Main Application**: `http://localhost:8000` (or your configured port)
+- **Django Admin**: `http://localhost:8000/admin`
+- **Neo4j Browser**: `http://localhost:7474`
+
+#### 4. First Startup Note
+
+⚠️ **Important**: The first startup will be significantly slower as the system needs to download the BAAI/bge-m3 embedding model (~2GB). This is a one-time download that will be cached for subsequent startups.
+
+
+
