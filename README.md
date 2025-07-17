@@ -173,14 +173,14 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    SQLStart([SQL Agent Start]) --> HybridSearch[Hybrid Search: Find Relevant Tables]
+    SQLStart([SQL Agent Start]) --> HybridSearch[Hybrid Search: Find Relevant Tables from vector store]
     
     HybridSearch --> GetDDLs[Extract Table DDLs]
     GetDDLs --> Reranker[Rerank Tables by Relevance]
     
     Reranker --> CheckTables{Tables Found?}
     CheckTables -->|No| RefineQuestion[Refine User Question]
-    CheckTables -->|Yes| RelationGraph[Build Relation Graph]
+    CheckTables -->|Yes| RelationGraph[Get neighbor tables from graph db]
     
     RefineQuestion --> HybridSearch
     
