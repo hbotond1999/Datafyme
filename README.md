@@ -4,6 +4,8 @@
 
 Datafyme is a  agentic reporting system built with Django and modern LLM-based agents. It supports database documentation, relation extraction, and advanced analytical reporting via agentic workflows. The system is fully containerized and integrates with PostgreSQL, Neo4j, and Milvus for advanced data and knowledge management.
 
+[![Main screen](/images/main_screen.png)](https://drive.google.com/file/d/15dOJHVeKP_wKUV9zrb_SawSX-Eg7ws9e/view?usp=sharing)
+
 **Data Source Support**: Currently supports PostgreSQL as the primary data source. Support for additional database types (MySQL, SQL Server, Oracle, etc.) is planned for future releases.
 
 
