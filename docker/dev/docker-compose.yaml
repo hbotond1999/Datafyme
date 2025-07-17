@@ -132,8 +132,6 @@ services:
     volumes:
       - static_files:/app/reportassistant/staticfiles
       - ./backend/huggingface:/root/.cache/huggingface/
-    deploy:
-      replicas: 2
     networks:
       - "docker_network"
 
