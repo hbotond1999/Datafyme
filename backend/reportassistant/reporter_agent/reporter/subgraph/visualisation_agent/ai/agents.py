@@ -17,13 +17,18 @@ def create_representation_agent():
     rep_types = ", ".join([rep.value for rep in RepType])
     prompt_str = f"""You are a professional data scientist. Your task is to decide how to represent the data. This options are available: {rep_types}
     
-    """ + """
-    USER question: {question}
-    
-    DATA: {preview_data}
-    
-    Your answer only contains one of the options.
-    """
+    """ + """  
+Guidelines:
+- Prefer a chart when it helps to visualize the data more clearly.
+- Choose the representation type that best supports answering the user's question.
+- Your answer must contain only **one** of the available representation types — no explanations or extra text.
+
+USER QUESTION:
+{question}
+
+DATA PREVIEW:
+{preview_data}
+"""
 
     prompt = PromptTemplate(template=prompt_str, input_variables=["preview_data", "question"])
 

@@ -9,7 +9,8 @@ from common.graph_db.graph_db import Neo4JInstance
 from common.vectordb.db.utils import hybrid_search
 from db_configurator.models import TableDocumentation
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.agents import sql_agent, refine_user_question_agent
-from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_all_ddl
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.reranker import grade_all_ddl, table_filter_agent
+from reporter_agent.reporter.subgraph.sql_statement_creator.ai.response import RequiredTableList
 
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.state import GraphState
 from reporter_agent.reporter.subgraph.sql_statement_creator.ai.utils import RefineLimitExceededError
@@ -30,7 +31,9 @@ def hybrid_search_node(state: GraphState):
 
     logger.info("Running hybrid_search_node: selecting matching table descriptions for the user message with hybrid search.")
     collection_name = "TablesDocs"
-    similar_docs = hybrid_search(state["message"], collection_name, database_id=state["database_source"].id, limit=15)
+    # average document 16 per table so we query X table max
+    max_table_num = int(os.getenv("MAX_TABLE_NUM_FOR_SQL_QUERY", 10))
+    similar_docs = hybrid_search(state["message"], collection_name, database_id=state["database_source"].id, limit=max_table_num * 16)
     tables = []
     seen = set()
     for table_doc in similar_docs:
@@ -70,8 +73,15 @@ def reranker(state: GraphState):
     if state.get("node_started_callback"):
         state["node_started_callback"]("reranker", gettext_noop("Ranking relevant tables"))
     logger.info("Running reranker node: we examine the relevance of the tables using an agent.")
-    results = grade_all_ddl().invoke({'message': state["message"], 'ddls': state["matching_table_ddls"]})
-    filtered_ddls = [ddl for relevance, ddl in zip(results, state["matching_table_ddls"]) if relevance]
+    # results = grade_all_ddl().invoke({'message': state["message"], 'ddls': state["matching_table_ddls"]})
+    # filtered_ddls = [ddl for relevance, ddl in zip(results, state["matching_table_ddls"]) if relevance]
+    result: RequiredTableList = table_filter_agent().invoke({'message': state["message"], 'ddls': state["matching_table_ddls"]})
+    filtered_ddls = []
+    if result:
+        for table in result.tables:
+            for ddl in state["matching_table_ddls"]:
+              if ddl["schema_name"].lower() == table.schema.lower() and ddl["table_name"].lower() == table.table_name.lower():
+                  filtered_ddls.append(ddl)
 
     logger.info(f"Filtered tables: {[(ddl['schema_name'], ddl['table_name']) for ddl in filtered_ddls]}")
     return {"filtered_table_ddls": filtered_ddls}
