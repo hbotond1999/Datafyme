@@ -35,3 +35,11 @@ class DDLGrade(BaseModel):
 class GradedDDLs(BaseModel):
     grades: List[bool] = Field(description="The grades of the retrieved table documentations")
     # grades: List[DDLGrade] = Field(description="The grades of the retrieved table documentations")
+
+
+class RequiredTable(BaseModel):
+    table_name: str = Field(description="The name of the required table")
+    schema: str = Field(description="The schema of the required table")
+
+class RequiredTableList(BaseModel):
+    tables: List[RequiredTable] = Field(description="The required tables list")
