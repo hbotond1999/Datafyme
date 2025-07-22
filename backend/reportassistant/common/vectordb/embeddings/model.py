@@ -5,6 +5,8 @@ from common.vectordb.embeddings.schema import EmbeddingsResult
 
 from typing import List
 
+embedding_function =  BGEM3EmbeddingFunction(model_name="BAAI/bge-m3", device="cuda")
+
 class BgeM3EmbeddingsModel:
     """
     A class to interact with the BGE M3 embedding model, providing methods to generate
@@ -19,7 +21,7 @@ class BgeM3EmbeddingsModel:
         Returns:
             BGEM3EmbeddingFunction: The embedding model initialized with the "BAAI/bge-m3" configuration.
         """
-        return BGEM3EmbeddingFunction(model_name="BAAI/bge-m3")
+        return embedding_function
 
     @classmethod
     def create_sparse_dense_vectors(cls, contents: List[str]) -> EmbeddingsResult:
