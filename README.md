@@ -249,6 +249,67 @@ flowchart TD
 - Docker and Docker Compose installed
 - Access to the project repository
 
+#### GPU Support (Optional)
+
+The system supports both CPU and GPU acceleration for better performance. To determine which configuration you need:
+
+**Check CUDA Support:**
+
+**Windows:**
+```cmd
+nvidia-smi
+```
+
+**Linux:**
+```bash
+nvidia-smi
+lspci | grep -i nvidia
+```
+
+If you have NVIDIA GPU with CUDA support, you can enable GPU acceleration by modifying the backend configuration.
+
+**CUDA Version Check:**
+```bash
+nvcc --version
+```
+
+**Configure GPU Support:**
+
+1. Navigate to `backend/pyproject.toml`
+2. Comment out the CPU-specific torch version:
+   ```toml
+   # CPU-specific torch verzió
+   #torch = {version = "2.7.1+cpu", source = "pytorch"}
+   ```
+3. Uncomment and use the GPU version with appropriate CUDA version:
+   ```toml
+   torch = {version = "^2.6.0+cu124", source = "pytorch_gpu"}
+   ```
+
+4. Enable GPU support in Docker Compose (`docker/dev/docker-compose.yaml`):
+   - Find the `backend` and `worker` services
+   - Uncomment the GPU configuration sections:
+   ```yaml
+   deploy:
+     resources:
+       reservations:
+         devices:
+           - driver: nvidia
+             count: all
+             capabilities: [gpu]
+   ```
+
+**Note:** Make sure the CUDA version in the configuration (cu124 = CUDA 12.4) matches your system's CUDA version. Common versions:
+- `cu124` for CUDA 12.4
+- `cu121` for CUDA 12.1
+- `cu118` for CUDA 11.8
+
+**Performance Impact:**
+GPU acceleration significantly improves performance for:
+- **Embeddings generation** (BAAI/bge-m3 model) - faster document processing
+
+If you don't have NVIDIA GPU or CUDA support, keep the CPU configuration (default).
+
 ### Environment Setup
 
 **CRITICAL**: Before starting any services, you must create `.env` files for each service based on the provided `.env.example` templates.

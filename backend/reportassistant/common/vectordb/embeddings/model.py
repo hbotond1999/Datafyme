@@ -1,9 +1,15 @@
+import torch
 from milvus_model.hybrid.bge_m3 import BGEM3EmbeddingFunction
 
 from common.vectordb.embeddings.schema import EmbeddingsResult
 
 
 from typing import List
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print("Embedding model run in", device)
+model = BGEM3EmbeddingFunction(model_name="BAAI/bge-m3", device=device)
+
 
 class BgeM3EmbeddingsModel:
     """
@@ -19,7 +25,7 @@ class BgeM3EmbeddingsModel:
         Returns:
             BGEM3EmbeddingFunction: The embedding model initialized with the "BAAI/bge-m3" configuration.
         """
-        return BGEM3EmbeddingFunction(model_name="BAAI/bge-m3")
+        return model
 
     @classmethod
     def create_sparse_dense_vectors(cls, contents: List[str]) -> EmbeddingsResult:
