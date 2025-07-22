@@ -134,6 +134,14 @@ services:
       - ./backend/huggingface:/root/.cache/huggingface/
     networks:
       - "docker_network"
+    # GPU support - uncomment the following lines if you have NVIDIA GPU with CUDA
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
 
   worker:
     image: report_assistant/backend
@@ -153,6 +161,14 @@ services:
       - ./backend/huggingface:/root/.cache/huggingface/
     networks:
       - "docker_network"
+    # GPU support - uncomment the following lines if you have NVIDIA GPU with CUDA
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
 
   nginx:
     build:

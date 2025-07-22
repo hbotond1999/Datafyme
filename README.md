@@ -286,6 +286,19 @@ nvcc --version
    torch = {version = "^2.6.0+cu124", source = "pytorch_gpu"}
    ```
 
+4. Enable GPU support in Docker Compose (`docker/dev/docker-compose.yaml`):
+   - Find the `backend` and `worker` services
+   - Uncomment the GPU configuration sections:
+   ```yaml
+   deploy:
+     resources:
+       reservations:
+         devices:
+           - driver: nvidia
+             count: all
+             capabilities: [gpu]
+   ```
+
 **Note:** Make sure the CUDA version in the configuration (cu124 = CUDA 12.4) matches your system's CUDA version. Common versions:
 - `cu124` for CUDA 12.4
 - `cu121` for CUDA 12.1
